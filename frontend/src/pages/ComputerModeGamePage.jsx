@@ -232,35 +232,46 @@ export default function ComputerModeGamePage() {
     }
   }, [userId]);
 
+  const multiplayerInitDone = useRef(false);
+
   // Multiplayer init: if we got gameData from navigation state, start immediately
   useEffect(() => {
     if (roomId === 'SOLO') return; // Solo handled separately
+    if (multiplayerInitDone.current) return;
     const gd = rd.gameData;
-    if (gd?.challenge && loading) {
-      console.log('[Game] Initializing from gameData in navigation state');
-      setChallenge(gd.challenge);
-      setCurrentRound(gd.currentRound || 1);
-      setPlayers(gd.players || []);
-      setTestResults((gd.challenge?.testCases || []).map(() => false));
-      if (gd.bots && gd.bots.length > 0) {
-        setBots(gd.bots.map(b => {
-          const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
-          return {
-            name: b.name, cfg,
-            completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
-            progress: b.progress || 0,
-            finished: b.finished || false
-          };
-        }));
-      }
-      if (gd.timer) {
-        msCurRef.current = gd.timer * 1000;
-        setPlayerMs(gd.timer * 1000);
-      }
-      setLoading(false);
-      // Start timer slightly delayed to sync with backend's 4s delay
-      setTimeout(() => startTimer(), 500);
+    if (!gd?.challenge) return; // No gameData, will wait for game-init socket event
+
+    multiplayerInitDone.current = true;
+    console.log('[Game] Initializing from gameData in navigation state (fast path)');
+
+    // State is already initialized from useState initializers, just need to ensure consistency
+    setChallenge(gd.challenge);
+    setCurrentRound(gd.currentRound || 1);
+    setPlayers(gd.players || []);
+    setTestResults((gd.challenge?.testCases || []).map(() => false));
+
+    if (gd.bots && gd.bots.length > 0) {
+      setBots(gd.bots.map(b => {
+        const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
+        return {
+          name: b.name, cfg,
+          completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+          progress: b.progress || 0,
+          finished: b.finished || false
+        };
+      }));
     }
+
+    if (gd.timer) {
+      msCurRef.current = gd.timer * 1000;
+      setPlayerMs(gd.timer * 1000);
+    }
+
+    setLoading(false);
+
+    // Start timer in sync with backend's 4s delay from game-starting event
+    // Navigation takes ~3.5s, so we add a 500ms buffer before starting
+    setTimeout(() => startTimer(), 500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount
 
