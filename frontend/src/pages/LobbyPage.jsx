@@ -68,6 +68,8 @@ const LobbyPage = () => {
   const userIdRef = useRef(null); // Stable ref so callbacks always get latest userId
   const [roomState, setRoomState] = useState(null);
   const [connecting, setConnecting] = useState(true);
+  const [connectingAttempt, setConnectingAttempt] = useState(0);
+  const [retryCount, setRetryCount] = useState(0); // Increment to re-trigger join attempt
   const [error, setError] = useState(null);
   const [countdown, setCountdown] = useState(null);
   const [expirySeconds, setExpirySeconds] = useState(ROOM_EXPIRY_SECONDS);
@@ -136,8 +138,27 @@ const LobbyPage = () => {
         initializeSocket();
 
         if (roomData.isJoining) {
-          const result = await joinRoom(roomId, roomPassword, userData._id, userData.username || 'Player');
-          if (active) { setRoomState(result.room); setConnecting(false); }
+          // Retry joining with up to 5 attempts (handles server wake-up delay, host not created yet)
+          let lastError;
+          for (let attempt = 1; attempt <= 5; attempt++) {
+            try {
+              const result = await joinRoom(roomId, roomPassword, userData._id, userData.username || 'Player');
+              if (active) { setRoomState(result.room); setConnecting(false); }
+              return; // Success — exit the init function
+            } catch (err) {
+              lastError = err;
+              // Don't retry on definitive errors like wrong password or full room
+              if (err.message?.includes('password') || err.message?.includes('full')) break;
+              if (attempt < 5 && active) {
+                // Show retrying status
+                setConnectingAttempt(attempt);
+                console.log(`[JoinRoom] Attempt ${attempt} failed: ${err.message}. Retrying in 2s...`);
+                await new Promise(r => setTimeout(r, 2000));
+                if (!active) return;
+              }
+            }
+          }
+          if (active) { setError(lastError?.message || 'Failed to join room'); setConnecting(false); }
         } else {
           const fullRoomData = { ...roomData, roomId, password: roomPassword, playerMode: totalPlayers };
           const result = await createRoom(roomId, fullRoomData, userData._id, userData.username || 'Host');
@@ -211,6 +232,35 @@ const LobbyPage = () => {
     };
   }, []); // ⚠️ Empty deps: run once on mount. Use refs for mutable values.
 
+  // Manual retry effect — triggered when user clicks "Try Again"
+  useEffect(() => {
+    if (!retryCount || !roomData.isJoining) return;
+    let active = true;
+    const retry = async () => {
+      const uid = userIdRef.current;
+      if (!uid) return;
+      let lastError;
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        try {
+          const result = await joinRoom(roomId, roomPassword, uid, username || 'Player');
+          if (active) { setRoomState(result.room); setConnecting(false); setError(null); }
+          return;
+        } catch (err) {
+          lastError = err;
+          if (err.message?.includes('password') || err.message?.includes('full')) break;
+          if (attempt < 5 && active) {
+            setConnectingAttempt(attempt);
+            await new Promise(r => setTimeout(r, 2000));
+            if (!active) return;
+          }
+        }
+      }
+      if (active) { setError(lastError?.message || 'Failed to join room'); setConnecting(false); }
+    };
+    retry();
+    return () => { active = false; };
+  }, [retryCount]);
+
   const handleReadyChange = (checked) => {
     setAccepted(checked);
     if (userId) setPlayerReady(roomId, userId, checked);
@@ -267,6 +317,11 @@ const LobbyPage = () => {
         <p style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 20, fontWeight: 800, color: ac, letterSpacing: 2 }}>
           {roomData.isJoining ? 'JOINING BATTLE ROOM...' : 'CREATING BATTLE ROOM...'}
         </p>
+        {connectingAttempt > 0 && (
+          <p style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+            Retrying... attempt {connectingAttempt + 1} of 5
+          </p>
+        )}
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>
@@ -278,11 +333,23 @@ const LobbyPage = () => {
         <AlertCircle size={48} style={{ color: '#ef4444', marginBottom: 16 }} />
         <h2 style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 22, color: '#ef4444', marginBottom: 12 }}>CONNECTION FAILED</h2>
         <p style={{ fontFamily: 'monospace', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>{error}</p>
-        <button onClick={() => navigate('/computer-mode')} style={{
-          width: '100%', padding: '12px 0', borderRadius: 10, border: 'none',
-          background: ac, color: 'white', fontFamily: 'Rajdhani, sans-serif',
-          fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer',
-        }}>Back to Computer Mode</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {roomData.isJoining && (
+            <button onClick={() => { setError(null); setConnecting(true); setConnectingAttempt(0); setRetryCount(c => c + 1); }}
+              style={{
+                width: '100%', padding: '12px 0', borderRadius: 10, border: `1px solid ${ac}`,
+                background: 'transparent', color: ac, fontFamily: 'Rajdhani, sans-serif',
+                fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer', fontSize: 14,
+              }}>
+              🔄 Try Again
+            </button>
+          )}
+          <button onClick={() => navigate('/computer-mode')} style={{
+            width: '100%', padding: '12px 0', borderRadius: 10, border: 'none',
+            background: ac, color: 'white', fontFamily: 'Rajdhani, sans-serif',
+            fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer',
+          }}>Back to Computer Mode</button>
+        </div>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>

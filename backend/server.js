@@ -678,33 +678,56 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`❌ Client disconnected: ${socket.id}`);
 
-    // Find and remove player from all rooms
-    rooms.forEach((room, roomId) => {
-      const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
-      if (playerIndex !== -1) {
-        const player = room.players[playerIndex];
-        room.players.splice(playerIndex, 1);
+    // Give a 15-second grace period before removing player from rooms.
+    // This prevents rooms being deleted during:
+    //   - Page navigation (LobbyPage → ComputerModeGamePage)
+    //   - Brief network hiccups
+    //   - Socket reconnections (new socket ID replaces old)
+    setTimeout(() => {
+      rooms.forEach((room, roomId) => {
+        const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
+        if (playerIndex !== -1) {
+          const player = room.players[playerIndex];
 
-        // If room is empty, delete it
-        if (room.players.length === 0) {
-          rooms.delete(roomId);
-          console.log(`🗑️ Room ${roomId} deleted (empty after disconnect)`);
-        } else {
-          // If host disconnected, assign new host
-          if (room.host === socket.id && room.players.length > 0) {
-            room.host = room.players[0].socketId;
-            room.players[0].isHost = true;
+          // Only remove if the player hasn't reconnected with a new socket
+          // (reconnection updates socketId via create-room/join-room handlers)
+          if (player.socketId !== socket.id) {
+            // Player reconnected — skip removal
+            return;
           }
 
-          // Notify remaining players
-          io.to(roomId).emit('player-left', {
-            userId: player.userId,
-            room: room,
-            totalPlayers: room.players.length
-          });
+          // Only remove if room is NOT in 'playing' state (game in progress)
+          if (room.status === 'playing') {
+            // During a game, just mark as disconnected but keep in room
+            player.disconnected = true;
+            console.log(`⚡ ${player.username} disconnected during game in room ${roomId} — keeping in session`);
+            return;
+          }
+
+          room.players.splice(playerIndex, 1);
+          console.log(`👋 ${player.username} removed from room ${roomId} after grace period`);
+
+          // If room is empty, delete it
+          if (room.players.length === 0) {
+            rooms.delete(roomId);
+            console.log(`🗑️ Room ${roomId} deleted (empty after disconnect)`);
+          } else {
+            // If host disconnected, assign new host
+            if (room.host === socket.id && room.players.length > 0) {
+              room.host = room.players[0].socketId;
+              room.players[0].isHost = true;
+            }
+
+            // Notify remaining players
+            io.to(roomId).emit('player-left', {
+              userId: player.userId,
+              room: room,
+              totalPlayers: room.players.length
+            });
+          }
         }
-      }
-    });
+      });
+    }, 15000); // 15-second grace period
   });
 });
 
