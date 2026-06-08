@@ -80,37 +80,59 @@ export default function ComputerModeGamePage() {
 
   const [roomId]       = useState(() => rd.roomId || 'SOLO');
   const [userId, setUserId]     = useState(() => rd.userId || null);
-  const [players, setPlayers]   = useState([]);
-  const [currentRound, setCurrentRound] = useState(1);
+  const [players, setPlayers]   = useState(() => rd.gameData?.players || []);
+  const [currentRound, setCurrentRound] = useState(() => rd.gameData?.currentRound || 1);
   const [scores, setScores]     = useState({ player: 0, ai: 0 });
-  const [challenge, setChallenge] = useState(null);
-  const [loading, setLoading]   = useState(true);
+  const [challenge, setChallenge] = useState(() => rd.gameData?.challenge || null);
+  // For multiplayer: initialize from gameData sent in game-starting event (no join-game needed)
+  // For solo: loading stays true until we fetch from API
+  const [loading, setLoading]   = useState(() => {
+    if (roomId === 'SOLO' || rd.roomId === 'SOLO') return true;
+    return !(rd.gameData?.challenge); // false if we already have challenge data
+  });
 
   // Editor
   const [userCode, setUserCode] = useState('');
   const [logs, setLogs]         = useState([]);
   const [compiledOutput, setCompiledOutput] = useState('');
-  const [testResults, setTestResults]       = useState([]);
+  const [testResults, setTestResults]       = useState(() =>
+    (rd.gameData?.challenge?.testCases || []).map(() => false)
+  );
   const [allPassed, setAllPassed]           = useState(false);
   const [compiling, setCompiling]           = useState(false);
   const [progress, setProgress]             = useState(0);
 
   // Timer (ms precision)
   const totalMs    = roomTime * 60 * 1000;
-  const [playerMs, setPlayerMs] = useState(totalMs);
-  const msCurRef   = useRef(totalMs);
+  // For multiplayer, sync timer to server's current timer value
+  const initMs     = rd.gameData?.timer ? rd.gameData.timer * 1000 : totalMs;
+  const [playerMs, setPlayerMs] = useState(initMs);
+  const msCurRef   = useRef(initMs);
   const startRef   = useRef(null);
   const timerIdRef = useRef(null);
 
-  // Bots
-  const [bots, setBots] = useState(() =>
-    Array.from({ length: playerMode }, (_, i) => {
+  // Bots — initialize from gameData (multiplayer) or room settings (solo)
+  const [bots, setBots] = useState(() => {
+    // Multiplayer: use bots from server session
+    if (rd.gameData?.bots && rd.gameData.bots.length > 0) {
+      return rd.gameData.bots.map(b => {
+        const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
+        return {
+          name: b.name, cfg,
+          completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+          progress: b.progress || 0,
+          finished: b.finished || false
+        };
+      });
+    }
+    // Solo or fallback: compute from room settings
+    return Array.from({ length: playerMode }, (_, i) => {
       const raw  = playerBotsRaw[i];
       const name = typeof raw === 'string' ? raw : (raw?.name || ALL_BOTS[i % ALL_BOTS.length]);
       const cfg  = BOT_CONFIGS[name] || BOT_CONFIGS['Logic Bot'];
       return { name, cfg, completesAtSecond: roomTime * 60 - cfg.offsetSeconds, progress: 0, finished: false };
-    })
-  );
+    });
+  });
 
   const botsRef = useRef(bots);
   useEffect(() => {
@@ -210,6 +232,38 @@ export default function ComputerModeGamePage() {
     }
   }, [userId]);
 
+  // Multiplayer init: if we got gameData from navigation state, start immediately
+  useEffect(() => {
+    if (roomId === 'SOLO') return; // Solo handled separately
+    const gd = rd.gameData;
+    if (gd?.challenge && loading) {
+      console.log('[Game] Initializing from gameData in navigation state');
+      setChallenge(gd.challenge);
+      setCurrentRound(gd.currentRound || 1);
+      setPlayers(gd.players || []);
+      setTestResults((gd.challenge?.testCases || []).map(() => false));
+      if (gd.bots && gd.bots.length > 0) {
+        setBots(gd.bots.map(b => {
+          const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
+          return {
+            name: b.name, cfg,
+            completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+            progress: b.progress || 0,
+            finished: b.finished || false
+          };
+        }));
+      }
+      if (gd.timer) {
+        msCurRef.current = gd.timer * 1000;
+        setPlayerMs(gd.timer * 1000);
+      }
+      setLoading(false);
+      // Start timer slightly delayed to sync with backend's 4s delay
+      setTimeout(() => startTimer(), 500);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
+
 
   // WebSocket — Register listeners ONCE on mount (stable, never re-registered)
   useEffect(() => {
@@ -297,7 +351,8 @@ export default function ComputerModeGamePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]); // Register once when socket is available
 
-  // Emit join-game once we have both roomId (non-SOLO) and userId
+  // Emit join-game for session tracking (backend still needs to know player is in session)
+  // Also serves as fallback if gameData was missing from navigation state
   useEffect(() => {
     if (!socket || roomId === 'SOLO') return;
     const uid = userId || rd.userId;

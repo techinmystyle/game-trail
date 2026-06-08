@@ -192,6 +192,8 @@ const LobbyPage = () => {
               roomState: data.room,
               playerBots,
               userId: currentUserId,
+              // ✨ Pass the full challenge/game data so no join-game roundtrip is needed
+              gameData: data.gameData || null,
             },
           });
         }

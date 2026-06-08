@@ -498,18 +498,32 @@ io.on('connection', (socket) => {
 
       gameSessions.set(roomId, session);
 
+      // 📡 Send full game data WITH game-starting so ALL players get challenge immediately
+      // No need for a separate join-game roundtrip — eliminates timing issues entirely
+      const gameInitPayload = {
+        challenge: session.challenge,
+        currentRound: session.currentRound,
+        totalRounds: session.totalRounds,
+        timer: session.timer,
+        players: session.players,
+        bots: session.bots,
+        language: session.language,
+        difficulty: session.difficulty,
+        aiScore: session.aiScore || 0
+      };
+
       io.to(roomId).emit('game-starting', {
         room: room,
-        countdown: 3
+        countdown: 3,
+        gameData: gameInitPayload  // ✨ Full challenge data embedded
       });
 
-      console.log(`🎮 Game starting in room ${roomId} — timer starts in 4s (after countdown)`);
+      console.log(`🎮 Game starting in room ${roomId} — challenge sent to all ${room.players.length} players`);
 
       // ⏱️ Delay the game timer by 4 seconds to match the 3-second frontend countdown
-      // + navigation time so all players can join before the timer/bots start.
       setTimeout(() => {
         const startSess = gameSessions.get(roomId);
-        if (!startSess) return; // Room was cleaned up during countdown
+        if (!startSess) return;
 
         startSess.intervalId = setInterval(async () => {
           const currentTickSess = gameSessions.get(roomId);
@@ -544,11 +558,6 @@ io.on('connection', (socket) => {
           });
 
           const allHumansFinished = currentTickSess.players.every(p => p.finished);
-          const anyBotFinished = currentTickSess.bots.some(b => b.finished);
-          const anyHumanFinished = currentTickSess.players.some(p => p.finished);
-          // Only end the round if timer runs out OR all humans finished.
-          // If a bot finishes before any human, only end when timer is also up,
-          // giving humans the full time to complete.
           if (currentTickSess.timer <= 0 || allHumansFinished) {
             clearInterval(currentTickSess.intervalId);
             currentTickSess.intervalId = null;
@@ -557,7 +566,7 @@ io.on('connection', (socket) => {
         }, 1000);
 
         console.log(`▶️  Game timer started for room ${roomId}`);
-      }, 4000); // 4s delay matches 3s countdown + 1s buffer
+      }, 4000);
 
     } catch (error) {
       console.error("Failed to start game room:", error);
