@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: game-trail-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false   # Set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false
+      - key: GMAIL_USER
+        sync: false
+      - key: GMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: FRONTEND_URL
+        sync: false   # Set to your Vercel URL after deploying frontend
+      - key: GROQ_API_KEYS
+        sync: false   # Paste all comma-separated keys here

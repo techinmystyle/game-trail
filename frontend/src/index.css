@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background: #000005;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+body.custom-cursor-active {
+  cursor: none;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #a855f7;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  transition: width 0.2s, height 0.2s, border-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #a855f7;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active .feature-card,
+body.custom-cursor-active .course-card,
+body.custom-cursor-active .scroll-top,
+body.custom-cursor-active .nav-link,
+body.custom-cursor-active .switch,
+body.custom-cursor-active .team-card,
+body.custom-cursor-active .social-item,
+body.custom-cursor-active .info-card {
+  cursor: none;
+}
+
+@media (max-width: 768px) {
+  .custom-cursor {
+    display: none;
+  }
+  body {
+    cursor: auto;
+  }
+  a, button, .feature-card, .course-card, .scroll-top, .nav-link, .switch, .team-card, .social-item, .info-card {
+    cursor: pointer;
+  }
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.45);
+  color: #ffffff;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-rise {
+  animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.font-display {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.font-techno {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.5);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.8);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── Performance: WebGL Canvas GPU compositing ─────────────────────────────
+   Promote WebGL canvases to their own compositor layer so the browser
+   doesn't repaint surrounding DOM when the canvas updates every frame.      */
+[data-testid$="-webgl-canvas"] canvas,
+[data-testid="space-hero-webgl-canvas"] canvas {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* ─── Performance: content-visibility note ───────────────────────────────────
+   content-visibility: auto is NOT applied to sections because it creates a
+   new stacking context that traps the fixed GlobalParticleScene canvas
+   inside individual sections, preventing particles from traveling freely
+   across all section boundaries.                                             */
+
+/* ─── Performance: paint containment removed from sections ──────────────────
+   Note: we do NOT use 'contain: layout style' on sections because it would
+   create a new stacking context that traps the fixed-position
+   GlobalParticleScene canvas inside it, breaking cross-section travel.     */

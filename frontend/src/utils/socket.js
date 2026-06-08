@@ -1,0 +1,168 @@
+import { io } from 'socket.io-client';
+
+// WebSocket connection
+const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+
+let socket = null;
+
+export const initializeSocket = () => {
+  if (!socket) {
+    socket = io(SOCKET_URL, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
+
+    socket.on('connect', () => {
+      console.log('✅ WebSocket connected:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('❌ WebSocket disconnected');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('WebSocket connection error:', error);
+    });
+  }
+  return socket;
+};
+
+export const getSocket = () => {
+  if (!socket) {
+    return initializeSocket();
+  }
+  return socket;
+};
+
+export const disconnectSocket = () => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+};
+
+// Room Management
+export const createRoom = (roomId, roomData, userId, username) => {
+  const sock = getSocket();
+  return new Promise((resolve, reject) => {
+    sock.emit('create-room', { roomId, roomData, userId, username });
+    
+    sock.once('room-created', (data) => {
+      resolve(data);
+    });
+
+    setTimeout(() => reject(new Error('Room creation timeout')), 5000);
+  });
+};
+
+export const joinRoom = (roomId, password, userId, username) => {
+  const sock = getSocket();
+  return new Promise((resolve, reject) => {
+    sock.emit('join-room', { roomId, password, userId, username });
+    
+    sock.once('room-joined', (data) => {
+      resolve(data);
+    });
+
+    sock.once('join-error', (error) => {
+      reject(new Error(error.message));
+    });
+
+    setTimeout(() => reject(new Error('Join room timeout')), 5000);
+  });
+};
+
+export const setPlayerReady = (roomId, userId, ready) => {
+  const sock = getSocket();
+  sock.emit('player-ready', { roomId, userId, ready });
+};
+
+export const startGame = (roomId) => {
+  const sock = getSocket();
+  return new Promise((resolve, reject) => {
+    sock.emit('start-game', { roomId });
+    
+    sock.once('game-starting', (data) => {
+      resolve(data);
+    });
+
+    sock.once('start-error', (error) => {
+      reject(new Error(error.message));
+    });
+
+    setTimeout(() => reject(new Error('Start game timeout')), 5000);
+  });
+};
+
+export const sendPlayerProgress = (roomId, userId, progress, testsPassed) => {
+  const sock = getSocket();
+  sock.emit('player-progress', { roomId, userId, progress, testsPassed });
+};
+
+export const sendPlayerFinished = (roomId, userId, time, score) => {
+  const sock = getSocket();
+  sock.emit('player-finished', { roomId, userId, time, score });
+};
+
+export const leaveRoom = (roomId, userId) => {
+  const sock = getSocket();
+  sock.emit('leave-room', { roomId, userId });
+};
+
+// Event Listeners
+export const onPlayerJoined = (callback) => {
+  const sock = getSocket();
+  sock.on('player-joined', callback);
+  return () => sock.off('player-joined', callback);
+};
+
+export const onPlayerLeft = (callback) => {
+  const sock = getSocket();
+  sock.on('player-left', callback);
+  return () => sock.off('player-left', callback);
+};
+
+export const onPlayerStatusChanged = (callback) => {
+  const sock = getSocket();
+  sock.on('player-status-changed', callback);
+  return () => sock.off('player-status-changed', callback);
+};
+
+export const onGameStarting = (callback) => {
+  const sock = getSocket();
+  sock.on('game-starting', callback);
+  return () => sock.off('game-starting', callback);
+};
+
+export const onProgressUpdate = (callback) => {
+  const sock = getSocket();
+  sock.on('progress-update', callback);
+  return () => sock.off('progress-update', callback);
+};
+
+export const onPlayerCompleted = (callback) => {
+  const sock = getSocket();
+  sock.on('player-completed', callback);
+  return () => sock.off('player-completed', callback);
+};
+
+export default {
+  initializeSocket,
+  getSocket,
+  disconnectSocket,
+  createRoom,
+  joinRoom,
+  setPlayerReady,
+  startGame,
+  sendPlayerProgress,
+  sendPlayerFinished,
+  leaveRoom,
+  onPlayerJoined,
+  onPlayerLeft,
+  onPlayerStatusChanged,
+  onGameStarting,
+  onProgressUpdate,
+  onPlayerCompleted
+};

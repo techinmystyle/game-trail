@@ -1,0 +1,22 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Environment / Secrets (NEVER commit these) ────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Test files (local only) ───────────────────────────────────────────────────
+test-challenge-api.js
+test-challenge-uniqueness.js
+test_api_computer.js
