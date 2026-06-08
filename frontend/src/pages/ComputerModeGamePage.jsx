@@ -278,7 +278,8 @@ export default function ComputerModeGamePage() {
 
   // WebSocket — Register listeners ONCE on mount (stable, never re-registered)
   useEffect(() => {
-    if (!socket) return;
+    const sock = getSocket();
+    if (!sock) return;
 
     const onGameInit = (d) => {
       console.log('[Socket] Received game-init event:', d);
@@ -350,31 +351,43 @@ export default function ComputerModeGamePage() {
       });
     };
 
-    socket.on('game-init', onGameInit);
-    socket.on('round-ended', onRoundEnded);
-    socket.on('next-round', onNextRound);
-    socket.on('game-state-tick', onGameStateTick);
-    socket.on('game-over', onGameOver);
+    sock.on('game-init', onGameInit);
+    sock.on('round-ended', onRoundEnded);
+    sock.on('next-round', onNextRound);
+    sock.on('game-state-tick', onGameStateTick);
+    sock.on('game-over', onGameOver);
 
     return () => {
-      socket.off('game-init', onGameInit);
-      socket.off('round-ended', onRoundEnded);
-      socket.off('next-round', onNextRound);
-      socket.off('game-state-tick', onGameStateTick);
-      socket.off('game-over', onGameOver);
+      sock.off('game-init', onGameInit);
+      sock.off('round-ended', onRoundEnded);
+      sock.off('next-round', onNextRound);
+      sock.off('game-state-tick', onGameStateTick);
+      sock.off('game-over', onGameOver);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]); // Register once when socket is available
+  }, []); // Register once when socket is available
 
   // Emit join-game for session tracking (backend still needs to know player is in session)
-  // Also serves as fallback if gameData was missing from navigation state
+  // Also serves as robust fallback if gameData was missing from navigation state
   useEffect(() => {
-    if (!socket || roomId === 'SOLO') return;
+    const sock = getSocket();
+    if (!sock || roomId === 'SOLO') return;
     const uid = userId || rd.userId;
     if (!uid) return;
+
+    // Emit immediately
     console.log(`[Socket] Emitting join-game: Room = ${roomId}, User = ${uid}`);
-    socket.emit('join-game', { roomId, userId: uid });
-  }, [socket, roomId, userId]); // Re-emit if userId resolves late
+    sock.emit('join-game', { roomId, userId: uid });
+
+    // If still loading, poll every 2 seconds just in case we missed the game-init or game-starting events
+    if (loading) {
+      const interval = setInterval(() => {
+        console.log(`[Socket] Still loading, re-emitting join-game...`);
+        sock.emit('join-game', { roomId, userId: uid });
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [roomId, userId, loading]); // Re-emit if userId resolves late or while loading
 
   // Solo challenge load
   useEffect(() => {
