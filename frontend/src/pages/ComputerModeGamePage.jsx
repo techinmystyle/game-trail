@@ -284,19 +284,10 @@ export default function ComputerModeGamePage() {
       });
     });
 
-    // Then emit join-game (safeguard connection status)
+    // Then emit join-game
     if (roomId !== 'SOLO' && userId) {
-      console.log(`[Socket] Attempting to join game: Room = ${roomId}, User = ${userId}`);
-      const emitJoin = () => {
-        console.log('[Socket] Socket connected. Emitting join-game event.');
-        socket.emit('join-game', { roomId, userId });
-      };
-      if (socket.connected) {
-        emitJoin();
-      } else {
-        socket.once('connect', emitJoin);
-        socket.connect();
-      }
+      console.log(`[Socket] Emitting join-game: Room = ${roomId}, User = ${userId}`);
+      socket.emit('join-game', { roomId, userId });
     }
     return () => { 
       socket.off('game-init'); 
