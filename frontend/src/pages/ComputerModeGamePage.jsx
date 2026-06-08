@@ -79,7 +79,7 @@ export default function ComputerModeGamePage() {
   const { accent: ac, ui, bg: pageBg } = THEMES[themeKey];
 
   const [roomId]       = useState(() => rd.roomId || 'SOLO');
-  const [userId, setUserId]     = useState(null);
+  const [userId, setUserId]     = useState(() => rd.userId || null);
   const [players, setPlayers]   = useState([]);
   const [currentRound, setCurrentRound] = useState(1);
   const [scores, setScores]     = useState({ player: 0, ai: 0 });
@@ -111,6 +111,11 @@ export default function ComputerModeGamePage() {
       return { name, cfg, completesAtSecond: roomTime * 60 - cfg.offsetSeconds, progress: 0, finished: false };
     })
   );
+
+  const botsRef = useRef(bots);
+  useEffect(() => {
+    botsRef.current = bots;
+  }, [bots]);
 
   // Modals
   const [exitModal,  setExitModal]  = useState(false);
@@ -161,23 +166,50 @@ export default function ComputerModeGamePage() {
   }, []);
 
   // Bot progress simulation
+  // Bot progress simulation (Solo mode only)
   useEffect(() => {
     if (loading) return;
+    if (roomId !== 'SOLO') return;
     const iv = setInterval(() => {
       const elSec = (totalMs - playerMs) / 1000;
+      let botFinished = false;
       setBots(prev => prev.map(b => {
-        if (b.finished) return b;
+        if (b.finished) {
+          botFinished = true;
+          return b;
+        }
         const pct = Math.min(100, (elSec / b.completesAtSecond) * 100);
-        return { ...b, progress: Math.max(0, pct), finished: elSec >= b.completesAtSecond };
+        const finished = elSec >= b.completesAtSecond;
+        if (finished) botFinished = true;
+        return { ...b, progress: Math.max(0, pct), finished };
       }));
+
+      // If in Solo Mode, and a bot has finished, and we haven't submitted yet
+      if (botFinished && !allPassed) {
+        clearInterval(iv);
+        stopTimer();
+        // Go to results screen with AI victory
+        navigate('/computer-mode/results', {
+          state: {
+            roomId: 'SOLO', winner: 'ai',
+            players: [{ userId: 'me', username, score: 0, finished: false }],
+            aiScore: 1, scores: { player: 0, ai: 1 },
+            botsUsed: botsRef.current.map(b => ({ name: b.name, progress: 100, finished: true, won: true })),
+            timeUsed: totalMs - msCurRef.current, totalRounds: 1, language, difficulty, playerMode,
+          },
+        });
+      }
     }, 300);
     return () => clearInterval(iv);
-  }, [loading, playerMs, totalMs]);
+  }, [loading, playerMs, totalMs, roomId, allPassed, username, language, difficulty, playerMode]);
 
   // Profile
   useEffect(() => {
-    profileAPI.getProfile().then(r => setUserId(r.data.user._id)).catch(() => {});
-  }, []);
+    if (!userId) {
+      profileAPI.getProfile().then(r => setUserId(r.data.user._id)).catch(() => {});
+    }
+  }, [userId]);
+
 
   // WebSocket
   useEffect(() => {
@@ -204,24 +236,59 @@ export default function ComputerModeGamePage() {
       msCurRef.current = totalMs; setPlayerMs(totalMs); startRef.current = Date.now(); startTimer();
       setBots(prev => prev.map(b => ({ ...b, progress: 0, finished: false })));
     });
+    socket.on('game-state-tick', d => {
+      if (d.timer !== undefined) {
+        msCurRef.current = d.timer * 1000;
+        setPlayerMs(d.timer * 1000);
+      }
+      if (d.players) {
+        setPlayers(d.players);
+      }
+      if (d.bots) {
+        setBots(prev => d.bots.map(b => {
+          const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
+          return {
+            name: b.name,
+            cfg,
+            completesAtSecond: b.delaySeconds + b.completionTime,
+            progress: b.progress,
+            finished: b.finished
+          };
+        }));
+      }
+    });
     socket.on('game-over', d => {
       stopTimer();
-      let fw='ai', maxH=0;
-      d.players?.forEach(p => { if (p.score>maxH) maxH=p.score; });
-      if (maxH > (d.aiScore||0)) {
-        const w = d.players?.filter(p=>p.score===maxH)||[];
-        fw = w.length===1 ? (w[0].userId===userId?'player':'competitor') : 'draw';
+      const totalHumanScore = d.players?.reduce((sum, p) => sum + (p.score || 0), 0) || 0;
+      const aiScore = d.aiScore || 0;
+      let fw = 'ai';
+      if (totalHumanScore > aiScore) {
+        let maxH = 0;
+        d.players?.forEach(p => { if (p.score > maxH) maxH = p.score; });
+        const w = d.players?.filter(p => p.score === maxH) || [];
+        const isMeTop = w.some(p => p.userId === userId);
+        fw = isMeTop ? 'player' : 'competitor';
+      } else if (totalHumanScore === aiScore) {
+        fw = 'draw';
+      } else {
+        fw = 'ai';
       }
       navigate('/computer-mode/results', {
         state: {
           roomId, winner: fw, players: d.players,
-          scores: { player: d.players?.find(p=>p.userId===userId)?.score||0, ai: d.aiScore||0 },
-          botsUsed: bots.map(b=>({name:b.name,progress:b.progress,finished:b.finished})),
-          timeUsed: totalMs - playerMs, totalRounds, language, difficulty, playerMode,
+          scores: { player: d.players?.find(p=>p.userId === userId)?.score||0, ai: d.aiScore||0 },
+          botsUsed: botsRef.current.map(b=>({name:b.name,progress:b.progress,finished:b.finished})),
+          timeUsed: totalMs - msCurRef.current, totalRounds, language, difficulty, playerMode,
         },
       });
     });
-    return () => { socket.off('game-init'); socket.off('round-ended'); socket.off('next-round'); socket.off('game-over'); };
+    return () => { 
+      socket.off('game-init'); 
+      socket.off('round-ended'); 
+      socket.off('next-round'); 
+      socket.off('game-state-tick');
+      socket.off('game-over'); 
+    };
   }, [roomId, userId, socket]);
 
   // Solo challenge load
@@ -881,11 +948,21 @@ export default function ComputerModeGamePage() {
                      }}>
                        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
                          <span style={{fontFamily:'monospace',fontSize:7.5,color:`${cfg.color}aa`,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>
-                           {cfg.emoji} AI PROCESSING
+                           {bot.finished ? '✅ DONE' : `${cfg.emoji} AI PROCESSING`}
                          </span>
                          <div style={{flex:1,height:1,background:`${cfg.color}10`}}/>
                        </div>
-                       <BinaryMatrix color={cfg.color} progress={bot.progress}/>
+                       {bot.finished ? (
+                         <div style={{
+                           fontFamily: 'monospace', fontSize: 10, color: cfg.color,
+                           textAlign: 'center', padding: '10px 0', fontWeight: 'bold',
+                           textShadow: `0 0 8px ${cfg.color}`,
+                         }}>
+                           CODE COMPILED & SUBMITTED SUCCESSFULLY
+                         </div>
+                       ) : (
+                         <BinaryMatrix color={cfg.color} progress={bot.progress}/>
+                       )}
                      </div>
                    </div>
                  );

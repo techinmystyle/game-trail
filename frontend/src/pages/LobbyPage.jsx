@@ -11,7 +11,7 @@ import { profileAPI } from '../utils/api';
 import {
   initializeSocket, createRoom, joinRoom, setPlayerReady,
   startGame, leaveRoom, onPlayerJoined, onPlayerLeft,
-  onPlayerStatusChanged, onGameStarting
+  onPlayerStatusChanged, onGameStarting, sendChatMessage, onChatMessage
 } from '../utils/socket';
 
 const THEMES = {
@@ -181,17 +181,23 @@ const LobbyPage = () => {
               players: data.room.players.length,
               roomState: data.room,
               playerBots,
+              userId,
             },
           });
         }
       }, 3200);
     });
+    const unsubChat = onChatMessage((msg) => {
+      if (active) {
+        setChatMessages(m => [...m, msg]);
+      }
+    });
 
     return () => {
       active = false;
-      unsubJoined(); unsubLeft(); unsubStatus(); unsubStarting();
+      unsubJoined(); unsubLeft(); unsubStatus(); unsubStarting(); unsubChat();
     };
-  }, []);
+  }, [userId]);
 
   const handleReadyChange = (checked) => {
     setAccepted(checked);
@@ -230,6 +236,7 @@ const LobbyPage = () => {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
     setChatMessages(m => [...m, msg]);
+    sendChatMessage(roomId, { ...msg, isMine: false });
     setChatInput('');
   };
 

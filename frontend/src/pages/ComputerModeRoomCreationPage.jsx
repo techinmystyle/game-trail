@@ -416,7 +416,7 @@ const ComputerModeRoomCreationPage = () => {
 
               {config.botMode === 'random' && (
                 <button onClick={randomizeAllBots} style={{
-                  marginTop: 10, width: '100%', padding: '10px', borderRadius: 8, border: 'none',
+                  marginTop: 10, width: '100%', padding: '10px', borderRadius: 8,
                   background: `${ac}15`, color: ac, cursor: 'pointer',
                   fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 12,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,

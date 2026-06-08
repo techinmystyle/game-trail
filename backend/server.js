@@ -244,6 +244,11 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ─── LOBBY CHAT ───
+  socket.on('send-chat', ({ roomId, message }) => {
+    socket.to(roomId).emit('chat-message', message);
+  });
+
   // ─── BOT CONFIGS AND ROSTER GENERATOR FOR SERVER-SIDE SIMULATION ───
   const BOT_CONFIGS = {
     'Beginner Bot': { delaySeconds: 22, completionRatio: 0.92 },
@@ -377,13 +382,15 @@ io.on('connection', (socket) => {
               totalRounds: currentTickSess.totalRounds
             });
 
-            const allHumansFinished = currentTickSess.players.every(p => p.finished);
-            if (currentTickSess.timer <= 0 || allHumansFinished) {
-              clearInterval(currentTickSess.intervalId);
-              currentTickSess.intervalId = null;
-              await endRound(roomId);
-            }
-          }, 1000);
+             const allHumansFinished = currentTickSess.players.every(p => p.finished);
+             const anyBotFinished = currentTickSess.bots.some(b => b.finished);
+             const anyHumanFinished = currentTickSess.players.some(p => p.finished);
+             if (currentTickSess.timer <= 0 || allHumansFinished || (anyBotFinished && !anyHumanFinished)) {
+               clearInterval(currentTickSess.intervalId);
+               currentTickSess.intervalId = null;
+               await endRound(roomId);
+             }
+           }, 1000);
 
           io.to(roomId).emit('next-round', {
             round: currentSess.currentRound,
@@ -394,35 +401,37 @@ io.on('connection', (socket) => {
         }
       }, 5000);
 
-    } else {
-      let maxHumanScore = 0;
-      sess.players.forEach(p => {
-        if (p.score > maxHumanScore) maxHumanScore = p.score;
-      });
+     } else {
+       const totalHumanScore = sess.players.reduce((sum, p) => sum + (p.score || 0), 0);
+       const aiScore = sess.aiScore || 0;
+       let finalWinner = 'ai';
 
-      const aiScore = sess.aiScore || 0;
-      let finalWinner = 'ai';
+       if (totalHumanScore > aiScore) {
+         let maxHumanScore = 0;
+         sess.players.forEach(p => {
+           if (p.score > maxHumanScore) maxHumanScore = p.score;
+         });
+         const winnersList = sess.players.filter(p => p.score === maxHumanScore);
+         if (winnersList.length === 1) {
+           finalWinner = winnersList[0].userId;
+         } else {
+           finalWinner = 'draw';
+         }
+       } else if (totalHumanScore === aiScore) {
+         finalWinner = 'draw';
+       } else {
+         finalWinner = 'ai';
+       }
 
-      if (maxHumanScore > aiScore) {
-        const winnersList = sess.players.filter(p => p.score === maxHumanScore);
-        if (winnersList.length === 1) {
-          finalWinner = winnersList[0].userId;
-        } else {
-          finalWinner = 'draw';
-        }
-      } else {
-        finalWinner = 'ai';
-      }
+       io.to(roomId).emit('game-over', {
+         winner: finalWinner,
+         players: sess.players,
+         aiScore: aiScore,
+         bots: sess.bots
+       });
 
-      io.to(roomId).emit('game-over', {
-        winner: finalWinner,
-        players: sess.players,
-        aiScore: aiScore,
-        bots: sess.bots
-      });
-
-      gameSessions.delete(roomId);
-    }
+       gameSessions.delete(roomId);
+     }
   }
 
   // ─── START GAME ───
@@ -527,13 +536,15 @@ io.on('connection', (socket) => {
           totalRounds: currentTickSess.totalRounds
         });
 
-        const allHumansFinished = currentTickSess.players.every(p => p.finished);
-        if (currentTickSess.timer <= 0 || allHumansFinished) {
-          clearInterval(currentTickSess.intervalId);
-          currentTickSess.intervalId = null;
-          await endRound(roomId);
-        }
-      }, 1000);
+         const allHumansFinished = currentTickSess.players.every(p => p.finished);
+         const anyBotFinished = currentTickSess.bots.some(b => b.finished);
+         const anyHumanFinished = currentTickSess.players.some(p => p.finished);
+         if (currentTickSess.timer <= 0 || allHumansFinished || (anyBotFinished && !anyHumanFinished)) {
+           clearInterval(currentTickSess.intervalId);
+           currentTickSess.intervalId = null;
+           await endRound(roomId);
+         }
+       }, 1000);
 
     } catch (error) {
       console.error("Failed to start game room:", error);

@@ -148,6 +148,17 @@ export const onPlayerCompleted = (callback) => {
   return () => sock.off('player-completed', callback);
 };
 
+export const sendChatMessage = (roomId, message) => {
+  const sock = getSocket();
+  sock.emit('send-chat', { roomId, message });
+};
+
+export const onChatMessage = (callback) => {
+  const sock = getSocket();
+  sock.on('chat-message', callback);
+  return () => sock.off('chat-message', callback);
+};
+
 export default {
   initializeSocket,
   getSocket,
@@ -164,5 +175,7 @@ export default {
   onPlayerStatusChanged,
   onGameStarting,
   onProgressUpdate,
-  onPlayerCompleted
+  onPlayerCompleted,
+  sendChatMessage,
+  onChatMessage
 };
