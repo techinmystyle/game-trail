@@ -246,7 +246,9 @@ io.on('connection', (socket) => {
 
   // ─── LOBBY CHAT ───
   socket.on('send-chat', ({ roomId, message }) => {
-    socket.to(roomId).emit('chat-message', message);
+    // Broadcast to ALL others in the room (sender already adds their own msg locally)
+    socket.to(roomId).emit('chat-message', { ...message, isMine: false });
+    console.log(`💬 Chat in room ${roomId} from ${message.from}: ${message.text}`);
   });
 
   // ─── BOT CONFIGS AND ROSTER GENERATOR FOR SERVER-SIDE SIMULATION ───
@@ -382,15 +384,14 @@ io.on('connection', (socket) => {
               totalRounds: currentTickSess.totalRounds
             });
 
-             const allHumansFinished = currentTickSess.players.every(p => p.finished);
-             const anyBotFinished = currentTickSess.bots.some(b => b.finished);
-             const anyHumanFinished = currentTickSess.players.some(p => p.finished);
-             if (currentTickSess.timer <= 0 || allHumansFinished || (anyBotFinished && !anyHumanFinished)) {
-               clearInterval(currentTickSess.intervalId);
-               currentTickSess.intervalId = null;
-               await endRound(roomId);
-             }
-           }, 1000);
+            const allHumansFinished = currentTickSess.players.every(p => p.finished);
+            // Only end when timer is up or all humans finished
+            if (currentTickSess.timer <= 0 || allHumansFinished) {
+              clearInterval(currentTickSess.intervalId);
+              currentTickSess.intervalId = null;
+              await endRound(roomId);
+            }
+          }, 1000);
 
           io.to(roomId).emit('next-round', {
             round: currentSess.currentRound,
@@ -502,49 +503,61 @@ io.on('connection', (socket) => {
         countdown: 3
       });
 
-      console.log(`🎮 Game starting in room ${roomId}`);
+      console.log(`🎮 Game starting in room ${roomId} — timer starts in 4s (after countdown)`);
 
-      session.intervalId = setInterval(async () => {
-        const currentTickSess = gameSessions.get(roomId);
-        if (!currentTickSess) return;
+      // ⏱️ Delay the game timer by 4 seconds to match the 3-second frontend countdown
+      // + navigation time so all players can join before the timer/bots start.
+      setTimeout(() => {
+        const startSess = gameSessions.get(roomId);
+        if (!startSess) return; // Room was cleaned up during countdown
 
-        currentTickSess.timer -= 1;
-        const elapsedSecs = currentTickSess.roomTime * 60 - currentTickSess.timer;
+        startSess.intervalId = setInterval(async () => {
+          const currentTickSess = gameSessions.get(roomId);
+          if (!currentTickSess) return;
 
-        currentTickSess.bots.forEach(bot => {
-          if (bot.finished) return;
-          if (!bot.started && elapsedSecs >= bot.delaySeconds) {
-            bot.started = true;
-            bot.timeLeft = bot.completionTime;
-          }
-          if (bot.started) {
-            bot.timeLeft -= 1;
-            bot.progress = Math.min(100, ((bot.completionTime - bot.timeLeft) / bot.completionTime) * 100);
-            if (bot.timeLeft <= 0) {
-              bot.finished = true;
-              bot.timeLeft = 0;
-              bot.progress = 100;
+          currentTickSess.timer -= 1;
+          const elapsedSecs = currentTickSess.roomTime * 60 - currentTickSess.timer;
+
+          currentTickSess.bots.forEach(bot => {
+            if (bot.finished) return;
+            if (!bot.started && elapsedSecs >= bot.delaySeconds) {
+              bot.started = true;
+              bot.timeLeft = bot.completionTime;
             }
+            if (bot.started) {
+              bot.timeLeft -= 1;
+              bot.progress = Math.min(100, ((bot.completionTime - bot.timeLeft) / bot.completionTime) * 100);
+              if (bot.timeLeft <= 0) {
+                bot.finished = true;
+                bot.timeLeft = 0;
+                bot.progress = 100;
+              }
+            }
+          });
+
+          io.to(roomId).emit('game-state-tick', {
+            timer: currentTickSess.timer,
+            players: currentTickSess.players,
+            bots: currentTickSess.bots,
+            round: currentTickSess.currentRound,
+            totalRounds: currentTickSess.totalRounds
+          });
+
+          const allHumansFinished = currentTickSess.players.every(p => p.finished);
+          const anyBotFinished = currentTickSess.bots.some(b => b.finished);
+          const anyHumanFinished = currentTickSess.players.some(p => p.finished);
+          // Only end the round if timer runs out OR all humans finished.
+          // If a bot finishes before any human, only end when timer is also up,
+          // giving humans the full time to complete.
+          if (currentTickSess.timer <= 0 || allHumansFinished) {
+            clearInterval(currentTickSess.intervalId);
+            currentTickSess.intervalId = null;
+            await endRound(roomId);
           }
-        });
+        }, 1000);
 
-        io.to(roomId).emit('game-state-tick', {
-          timer: currentTickSess.timer,
-          players: currentTickSess.players,
-          bots: currentTickSess.bots,
-          round: currentTickSess.currentRound,
-          totalRounds: currentTickSess.totalRounds
-        });
-
-         const allHumansFinished = currentTickSess.players.every(p => p.finished);
-         const anyBotFinished = currentTickSess.bots.some(b => b.finished);
-         const anyHumanFinished = currentTickSess.players.some(p => p.finished);
-         if (currentTickSess.timer <= 0 || allHumansFinished || (anyBotFinished && !anyHumanFinished)) {
-           clearInterval(currentTickSess.intervalId);
-           currentTickSess.intervalId = null;
-           await endRound(roomId);
-         }
-       }, 1000);
+        console.log(`▶️  Game timer started for room ${roomId}`);
+      }, 4000); // 4s delay matches 3s countdown + 1s buffer
 
     } catch (error) {
       console.error("Failed to start game room:", error);

@@ -82,17 +82,26 @@ export const setPlayerReady = (roomId, userId, ready) => {
 export const startGame = (roomId) => {
   const sock = getSocket();
   return new Promise((resolve, reject) => {
-    sock.emit('start-game', { roomId });
-    
-    sock.once('game-starting', (data) => {
-      resolve(data);
-    });
-
-    sock.once('start-error', (error) => {
+    // Listen for start-error (only once)
+    const onStartError = (error) => {
       reject(new Error(error.message));
-    });
+    };
+    sock.once('start-error', onStartError);
 
-    setTimeout(() => reject(new Error('Start game timeout')), 5000);
+    // Emit start-game — navigation is handled by the persistent onGameStarting listener in LobbyPage
+    sock.emit('start-game', { roomId });
+
+    // Resolve immediately — the actual game-starting event is handled by onGameStarting
+    setTimeout(() => {
+      sock.off('start-error', onStartError);
+      resolve({ roomId });
+    }, 500);
+
+    // Fail if we get an explicit error
+    const timeout = setTimeout(() => {
+      sock.off('start-error', onStartError);
+      // Don't reject on timeout — the game may still start
+    }, 8000);
   });
 };
 

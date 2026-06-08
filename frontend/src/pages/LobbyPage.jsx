@@ -65,6 +65,7 @@ const LobbyPage = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState('You');
   const [userId, setUserId] = useState(null);
+  const userIdRef = useRef(null); // Stable ref so callbacks always get latest userId
   const [roomState, setRoomState] = useState(null);
   const [connecting, setConnecting] = useState(true);
   const [error, setError] = useState(null);
@@ -119,7 +120,7 @@ const LobbyPage = () => {
     return () => clearInterval(iv);
   }, [roomExpired]);
 
-  // Initialize
+  // Initialize — run once on mount only, use ref for userId access in callbacks
   useEffect(() => {
     let active = true;
     const init = async () => {
@@ -127,6 +128,7 @@ const LobbyPage = () => {
         const response = await profileAPI.getProfile();
         if (!active) return;
         const userData = response.data.user;
+        userIdRef.current = userData._id;
         setUserId(userData._id);
         if (userData.username) setUsername(userData.username);
         if (userData.profileSetupComplete && userData.profileImage) setProfileImage(userData.profileImage);
@@ -165,15 +167,23 @@ const LobbyPage = () => {
       if (active) setRoomState(data.room);
     });
     const unsubStarting = onGameStarting((data) => {
+      if (!active) return;
       let count = 3;
-      if (active) setCountdown(count);
+      setCountdown(count);
       const cdInterval = setInterval(() => {
         count -= 1;
-        if (count <= 0) clearInterval(cdInterval);
-        else if (active) setCountdown(count);
+        if (count <= 0) {
+          clearInterval(cdInterval);
+          setCountdown(null);
+        } else if (active) {
+          setCountdown(count);
+        }
       }, 1000);
+      // Navigate after 3.5s — matches 3s countdown + 0.5s buffer
+      // Use ref to always get latest userId even if state hasn't flushed
       setTimeout(() => {
         if (active) {
+          const currentUserId = userIdRef.current;
           navigate('/computer-mode/game', {
             state: {
               ...(data.room.settings || roomState?.settings || roomData),
@@ -181,11 +191,11 @@ const LobbyPage = () => {
               players: data.room.players.length,
               roomState: data.room,
               playerBots,
-              userId,
+              userId: currentUserId,
             },
           });
         }
-      }, 3200);
+      }, 3500);
     });
     const unsubChat = onChatMessage((msg) => {
       if (active) {
@@ -197,7 +207,7 @@ const LobbyPage = () => {
       active = false;
       unsubJoined(); unsubLeft(); unsubStatus(); unsubStarting(); unsubChat();
     };
-  }, [userId]);
+  }, []); // ⚠️ Empty deps: run once on mount. Use refs for mutable values.
 
   const handleReadyChange = (checked) => {
     setAccepted(checked);

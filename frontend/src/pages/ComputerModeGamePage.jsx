@@ -211,54 +211,53 @@ export default function ComputerModeGamePage() {
   }, [userId]);
 
 
-  // WebSocket
+  // WebSocket — Register listeners ONCE on mount (stable, never re-registered)
   useEffect(() => {
     if (!socket) return;
 
-    // Register listeners first
-    socket.on('game-init', d => {
+    const onGameInit = (d) => {
       console.log('[Socket] Received game-init event:', d);
-      setChallenge(d.challenge); setCurrentRound(d.currentRound); setPlayers(d.players);
+      setChallenge(d.challenge);
+      setCurrentRound(d.currentRound);
+      setPlayers(d.players);
       setTestResults((d.challenge?.testCases || []).map(() => false));
-      setLoading(false); startTimer();
-    });
-    socket.on('round-ended', d => {
+      setLoading(false);
+      startTimer();
+    };
+    const onRoundEnded = (d) => {
       stopTimer(); roundEndedRef.current = true;
       const w = d.roundWinner;
       setRoundWinner(w.type === 'player' ? (w.name === username ? 'player' : 'competitor') : 'ai');
       setNextRoundIn(d.nextRoundIn || 5);
       setScores({ player: d.players?.find(p => p.userId === userId)?.score || 0, ai: d.aiScore || 0 });
       setRoundModal(true);
-    });
-    socket.on('next-round', d => {
+    };
+    const onNextRound = (d) => {
       roundEndedRef.current = false; setChallenge(d.challenge); setCurrentRound(d.round);
       setTestResults((d.challenge?.testCases||[]).map(()=>false));
       setProgress(0); setUserCode(''); setAllPassed(false); setRoundModal(false);
       msCurRef.current = totalMs; setPlayerMs(totalMs); startRef.current = Date.now(); startTimer();
       setBots(prev => prev.map(b => ({ ...b, progress: 0, finished: false })));
-    });
-    socket.on('game-state-tick', d => {
+    };
+    const onGameStateTick = (d) => {
       if (d.timer !== undefined) {
         msCurRef.current = d.timer * 1000;
         setPlayerMs(d.timer * 1000);
       }
-      if (d.players) {
-        setPlayers(d.players);
-      }
+      if (d.players) setPlayers(d.players);
       if (d.bots) {
-        setBots(prev => d.bots.map(b => {
+        setBots(d.bots.map(b => {
           const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
           return {
-            name: b.name,
-            cfg,
+            name: b.name, cfg,
             completesAtSecond: b.delaySeconds + b.completionTime,
             progress: b.progress,
             finished: b.finished
           };
         }));
       }
-    });
-    socket.on('game-over', d => {
+    };
+    const onGameOver = (d) => {
       stopTimer();
       const totalHumanScore = d.players?.reduce((sum, p) => sum + (p.score || 0), 0) || 0;
       const aiScore = d.aiScore || 0;
@@ -271,8 +270,6 @@ export default function ComputerModeGamePage() {
         fw = isMeTop ? 'player' : 'competitor';
       } else if (totalHumanScore === aiScore) {
         fw = 'draw';
-      } else {
-        fw = 'ai';
       }
       navigate('/computer-mode/results', {
         state: {
@@ -282,21 +279,32 @@ export default function ComputerModeGamePage() {
           timeUsed: totalMs - msCurRef.current, totalRounds, language, difficulty, playerMode,
         },
       });
-    });
-
-    // Then emit join-game
-    if (roomId !== 'SOLO' && userId) {
-      console.log(`[Socket] Emitting join-game: Room = ${roomId}, User = ${userId}`);
-      socket.emit('join-game', { roomId, userId });
-    }
-    return () => { 
-      socket.off('game-init'); 
-      socket.off('round-ended'); 
-      socket.off('next-round'); 
-      socket.off('game-state-tick');
-      socket.off('game-over'); 
     };
-  }, [roomId, userId, socket]);
+
+    socket.on('game-init', onGameInit);
+    socket.on('round-ended', onRoundEnded);
+    socket.on('next-round', onNextRound);
+    socket.on('game-state-tick', onGameStateTick);
+    socket.on('game-over', onGameOver);
+
+    return () => {
+      socket.off('game-init', onGameInit);
+      socket.off('round-ended', onRoundEnded);
+      socket.off('next-round', onNextRound);
+      socket.off('game-state-tick', onGameStateTick);
+      socket.off('game-over', onGameOver);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]); // Register once when socket is available
+
+  // Emit join-game once we have both roomId (non-SOLO) and userId
+  useEffect(() => {
+    if (!socket || roomId === 'SOLO') return;
+    const uid = userId || rd.userId;
+    if (!uid) return;
+    console.log(`[Socket] Emitting join-game: Room = ${roomId}, User = ${uid}`);
+    socket.emit('join-game', { roomId, userId: uid });
+  }, [socket, roomId, userId]); // Re-emit if userId resolves late
 
   // Solo challenge load
   useEffect(() => {
