@@ -214,9 +214,10 @@ export default function ComputerModeGamePage() {
   // WebSocket
   useEffect(() => {
     if (!socket) return;
-    if (roomId !== 'SOLO' && userId) socket.emit('join-game', { roomId, userId });
 
+    // Register listeners first
     socket.on('game-init', d => {
+      console.log('[Socket] Received game-init event:', d);
       setChallenge(d.challenge); setCurrentRound(d.currentRound); setPlayers(d.players);
       setTestResults((d.challenge?.testCases || []).map(() => false));
       setLoading(false); startTimer();
@@ -282,6 +283,21 @@ export default function ComputerModeGamePage() {
         },
       });
     });
+
+    // Then emit join-game (safeguard connection status)
+    if (roomId !== 'SOLO' && userId) {
+      console.log(`[Socket] Attempting to join game: Room = ${roomId}, User = ${userId}`);
+      const emitJoin = () => {
+        console.log('[Socket] Socket connected. Emitting join-game event.');
+        socket.emit('join-game', { roomId, userId });
+      };
+      if (socket.connected) {
+        emitJoin();
+      } else {
+        socket.once('connect', emitJoin);
+        socket.connect();
+      }
+    }
     return () => { 
       socket.off('game-init'); 
       socket.off('round-ended'); 

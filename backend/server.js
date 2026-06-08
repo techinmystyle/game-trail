@@ -554,9 +554,12 @@ io.on('connection', (socket) => {
 
   // ─── JOIN GAME ───
   socket.on('join-game', ({ roomId, userId }) => {
+    console.log(`[Socket] join-game event received from socket ID: ${socket.id}`);
+    console.log(`   Room ID: ${roomId}, User ID: ${userId}`);
     socket.join(roomId);
     const sess = gameSessions.get(roomId);
     if (sess) {
+      console.log(`   Session found. Emitting game-init to socket ${socket.id}`);
       socket.emit('game-init', {
         challenge: sess.challenge,
         currentRound: sess.currentRound,
@@ -568,6 +571,9 @@ io.on('connection', (socket) => {
         difficulty: sess.difficulty,
         aiScore: sess.aiScore || 0
       });
+    } else {
+      console.log(`   ⚠️ Session not found for Room ID: ${roomId}`);
+      console.log(`   Available sessions:`, Array.from(gameSessions.keys()));
     }
   });
 
