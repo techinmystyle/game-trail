@@ -261,12 +261,20 @@ io.on('connection', (socket) => {
   };
   const ALL_BOT_NAMES = ['Beginner Bot', 'Lazy Compiler', 'Logic Bot', 'Flash Coder', 'Test Case Destroyer'];
 
-  function buildBotRoster(primaryBot, playerMode) {
-    const primaryName = primaryBot?.name || 'Logic Bot';
-    const others = ALL_BOT_NAMES.filter(n => n !== primaryName);
-    const extras = [others[1], others[3], others[0]]; // logic spread
-    const names = [primaryName];
-    for (let i = 0; i < playerMode - 1; i++) names.push(extras[i] || others[i]);
+  function buildBotRoster(playerBots, playerMode) {
+    // playerBots is an array of bot objects or bot names, one per player slot
+    // Use each player's selected bot directly
+    const names = [];
+    for (let i = 0; i < playerMode; i++) {
+      const raw = playerBots?.[i];
+      let name;
+      if (typeof raw === 'string') name = raw;
+      else if (raw?.name) name = raw.name;
+      else name = 'Logic Bot'; // Fallback only if truly not set
+      // Validate the bot name exists in our config
+      if (!BOT_CONFIGS[name]) name = 'Logic Bot';
+      names.push(name);
+    }
     return names;
   }
 
@@ -455,7 +463,9 @@ io.on('connection', (socket) => {
 
     try {
       const challenge = await generateChallenge(room.settings.language, room.settings.difficulty, room.settings.roomTime);
-      const botNames = buildBotRoster(room.settings.bot, room.settings.playerMode);
+      // Use per-player bot selections from room settings (array of bot objects/names)
+      const botNames = buildBotRoster(room.settings.playerBots || [room.settings.bot], room.settings.playerMode);
+      console.log(`[Bot Roster] Player bots: ${botNames.join(', ')}`);
 
       const session = {
         roomId,

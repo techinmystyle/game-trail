@@ -306,7 +306,11 @@ export default function ComputerModeGamePage() {
     };
     const onGameStateTick = (d) => {
       if (d.timer !== undefined) {
+        // Sync client timer to server: reset both the remaining time AND the start reference
+        // Without resetting startRef, the client subtracts elapsed time PLUS server-decremented time
+        // causing double-speed countdown. By resetting startRef, client timer perfectly mirrors server.
         msCurRef.current = d.timer * 1000;
+        startRef.current = Date.now(); // ← KEY FIX: reset elapsed baseline to now
         setPlayerMs(d.timer * 1000);
       }
       if (d.players) setPlayers(d.players);
@@ -315,7 +319,7 @@ export default function ComputerModeGamePage() {
           const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
           return {
             name: b.name, cfg,
-            completesAtSecond: b.delaySeconds + b.completionTime,
+            completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
             progress: b.progress,
             finished: b.finished
           };
