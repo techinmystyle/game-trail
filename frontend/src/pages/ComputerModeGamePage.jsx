@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Play, Trash2, Trophy, ChevronUp, ChevronDown, Zap } from 'lucide-react';
+import { X, Play, Trash2, Trophy, Zap, BookOpen, Lock } from 'lucide-react';
 import { computerModeAPI, profileAPI } from '../utils/api';
 import { getSocket } from '../utils/socket';
 
@@ -13,15 +13,70 @@ const THEMES = {
 };
 
 const BOT_CONFIGS = {
-  'Beginner Bot':        { color: '#10b981', image: '/assets/BEGINNER-BOT-BG.png', tag: 'EASY',   emoji: '🤖', offsetSeconds: 2  },
-  'Lazy Compiler':       { color: '#f59e0b', image: '/assets/LAZY-COMPILER-BG.png', tag: 'EASY',   emoji: '😴', offsetSeconds: 5  },
-  'Logic Bot':           { color: '#3b82f6', image: '/assets/LOGIC-BOT-BG.png', tag: 'MED',    emoji: '🧠', offsetSeconds: 10 },
-  'Flash Coder':         { color: '#8b5cf6', image: '/assets/FLASH-CODER-BG.png', tag: 'HARD',   emoji: '⚡', offsetSeconds: 15 },
-  'Test Case Destroyer': { color: '#ef4444', image: '/assets/TEST-CASE-DESTROYER-BG.png', tag: 'EXPERT', emoji: '💀', offsetSeconds: 30 },
+  'Beginner Bot':        { color: '#10b981', image: '/assets/BEGINNER-BOT-BG.png', tag: 'BOT-1',   emoji: '🤖' },
+  'Lazy Compiler':       { color: '#f59e0b', image: '/assets/LAZY-COMPILER-BG.png', tag: 'BOT-2',   emoji: '😴' },
+  'Logic Bot':           { color: '#3b82f6', image: '/assets/LOGIC-BOT-BG.png', tag: 'BOT-6',    emoji: '🧠' },
+  'Flash Coder':         { color: '#8b5cf6', image: '/assets/FLASH-CODER-BG.png', tag: 'BOT-7',   emoji: '⚡' },
+  'Test Case Destroyer': { color: '#ef4444', image: '/assets/TEST-CASE-DESTROYER-BG.png', tag: 'BOT-15', emoji: '💀' },
 };
+
+// Precise solo bot submit windows (seconds before end)
+const BOT_SUBMIT_WINDOWS = {
+  'Beginner Bot':        { 3:3,  4:5,  5:8,  6:10, 7:12, 8:15 },
+  'Lazy Compiler':       { 3:4,  4:6,  5:9,  6:11, 7:13, 8:16 },
+  'Logic Bot':           { 3:5,  4:7,  5:10, 6:12, 7:14, 8:17 },
+  'Flash Coder':         { 3:6,  4:8,  5:11, 6:13, 7:15, 8:18 },
+  'Test Case Destroyer': { 3:10, 4:12, 5:15, 6:20, 7:25, 8:30 },
+};
+
+// Bot phase ratios (fraction of submitSecond)
+const BOT_PHASE_RATIOS = {
+  'Beginner Bot':        [0.15, 0.38, 0.22, 0.25],
+  'Lazy Compiler':       [0.18, 0.35, 0.20, 0.27],
+  'Logic Bot':           [0.12, 0.40, 0.25, 0.23],
+  'Flash Coder':         [0.10, 0.42, 0.28, 0.20],
+  'Test Case Destroyer': [0.08, 0.45, 0.30, 0.17],
+};
+
+const BOT_PHASE_LABELS = [
+  { icon: '📖', label: 'READING PROBLEM...' },
+  { icon: '⌨️', label: 'WRITING CODE...' },
+  { icon: '⚙️', label: 'COMPILING...' },
+  { icon: '🔍', label: 'RE-CHECKING...' },
+  { icon: '🚀', label: 'SUBMITTING...' },
+];
 
 const ALL_BOTS = Object.keys(BOT_CONFIGS);
 const ext = l => ({ HTML: 'html', CSS: 'css', JavaScript: 'js', Python: 'py', Java: 'java' }[l] || 'txt');
+
+function getBotSubmitSecond(botName, totalSecs) {
+  const timeMin = Math.round(totalSecs / 60);
+  const wk = [3,4,5,6,7,8].includes(timeMin) ? timeMin : 5;
+  const windows = BOT_SUBMIT_WINDOWS[botName] || BOT_SUBMIT_WINDOWS['Logic Bot'];
+  const windowSecs = windows[wk] || 10;
+  const submitAt = totalSecs - Math.floor(Math.random() * windowSecs) - 1;
+  return Math.max(5, submitAt);
+}
+
+function getBotPhaseBoundaries(botName, submitSecond) {
+  const ratios = BOT_PHASE_RATIOS[botName] || BOT_PHASE_RATIOS['Logic Bot'];
+  const phases = [];
+  let elapsed = 0;
+  for (let i = 0; i < 4; i++) {
+    const dur = Math.round(submitSecond * ratios[i]);
+    phases.push({ start: elapsed, end: elapsed + dur });
+    elapsed += dur;
+  }
+  phases.push({ start: submitSecond, end: submitSecond + 1 });
+  return phases;
+}
+
+function getBotPhaseIndex(phaseBoundaries, elapsedSecs) {
+  for (let i = 4; i >= 0; i--) {
+    if (elapsedSecs >= phaseBoundaries[i].start) return i;
+  }
+  return 0;
+}
 
 // ─── Animated Binary Matrix (compact, 4 rows) ────────────────────────────────
 const BinaryMatrix = ({ color, progress }) => {
@@ -62,6 +117,90 @@ const BinaryMatrix = ({ color, progress }) => {
   );
 };
 
+// ─── 15-Second Reading Phase Overlay ────────────────────────────────────────
+const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
+  <div style={{
+    position: 'fixed', inset: 0, zIndex: 500,
+    background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    padding: 24,
+  }}>
+    {/* Header */}
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24,
+      padding: '10px 24px', borderRadius: 30,
+      background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)',
+    }}>
+      <BookOpen size={18} style={{ color: '#10b981' }} />
+      <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: '#10b981', letterSpacing: 3 }}>
+        READING PHASE — STUDY THE CHALLENGE
+      </span>
+      <Lock size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
+    </div>
+
+    {/* Countdown ring */}
+    <div style={{
+      width: 100, height: 100, borderRadius: '50%', marginBottom: 24,
+      border: `4px solid ${countdown <= 5 ? '#ef4444' : '#10b981'}40`,
+      boxShadow: `0 0 30px ${countdown <= 5 ? '#ef4444' : '#10b981'}30`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'relative',
+    }}>
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+        <circle cx="50" cy="50" r="46" fill="none" stroke={countdown <= 5 ? '#ef4444' : '#10b981'}
+          strokeWidth="4" strokeDasharray={`${2 * Math.PI * 46}`}
+          strokeDashoffset={`${2 * Math.PI * 46 * (1 - countdown / 15)}`}
+          style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }} />
+      </svg>
+      <div style={{
+        fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 36,
+        color: countdown <= 5 ? '#ef4444' : '#10b981',
+        textShadow: `0 0 20px ${countdown <= 5 ? '#ef4444' : '#10b981'}60`,
+      }}>{countdown}</div>
+    </div>
+
+    <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 28, letterSpacing: 2 }}>
+      {countdown <= 5 ? '⚠️ GET READY — TIMER STARTS SOON!' : 'Editor locked · Read the problem carefully'}
+    </div>
+
+    {/* Challenge preview */}
+    {challenge && (
+      <div style={{
+        maxWidth: 680, width: '100%',
+        background: 'rgba(255,255,255,0.04)', border: `1px solid ${ac}30`,
+        borderRadius: 16, padding: '24px 28px',
+        boxShadow: `0 0 40px ${ac}10`,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div style={{ width: 3, height: 16, borderRadius: 2, background: ac }} />
+          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: 'white', letterSpacing: 2 }}>
+            {challenge.title}
+          </span>
+        </div>
+        <div style={{
+          borderLeft: `3px solid ${ac}`, paddingLeft: 16,
+          fontFamily: 'monospace', fontSize: 12, color: '#e2e8f0', lineHeight: 1.7, marginBottom: 16,
+        }}>
+          {challenge.objective}
+        </div>
+        {challenge.testCases && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {challenge.testCases.map((tc, i) => (
+              <div key={i} style={{
+                padding: '4px 12px', borderRadius: 20,
+                background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)',
+                fontFamily: 'monospace', fontSize: 9, color: '#6ee7b7',
+              }}>
+                Test {i + 1}: {tc.description}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+);
+
 // ─── Main ──────────────────────────────────────────────────────────────────────
 export default function ComputerModeGamePage() {
   const navigate = useNavigate();
@@ -84,12 +223,15 @@ export default function ComputerModeGamePage() {
   const [currentRound, setCurrentRound] = useState(() => rd.gameData?.currentRound || 1);
   const [scores, setScores]     = useState({ player: 0, ai: 0 });
   const [challenge, setChallenge] = useState(() => rd.gameData?.challenge || null);
-  // For multiplayer: initialize from gameData sent in game-starting event (no join-game needed)
-  // For solo: loading stays true until we fetch from API
   const [loading, setLoading]   = useState(() => {
     if (roomId === 'SOLO' || rd.roomId === 'SOLO') return true;
-    return !(rd.gameData?.challenge); // false if we already have challenge data
+    return !(rd.gameData?.challenge);
   });
+
+  // ─── Reading Phase ───────────────────────────────────────────────────────
+  const [readingPhase, setReadingPhase] = useState(false);
+  const [readingCountdown, setReadingCountdown] = useState(15);
+  const readingDoneRef = useRef(false);
 
   // Editor
   const [userCode, setUserCode] = useState('');
@@ -104,40 +246,40 @@ export default function ComputerModeGamePage() {
 
   // Timer (ms precision)
   const totalMs    = roomTime * 60 * 1000;
-  // For multiplayer, sync timer to server's current timer value
   const initMs     = rd.gameData?.timer ? rd.gameData.timer * 1000 : totalMs;
   const [playerMs, setPlayerMs] = useState(initMs);
   const msCurRef   = useRef(initMs);
   const startRef   = useRef(null);
   const timerIdRef = useRef(null);
 
-  // Bots — initialize from gameData (multiplayer) or room settings (solo)
+  // Solo bots initialized with precise timing
   const [bots, setBots] = useState(() => {
-    // Multiplayer: use bots from server session
     if (rd.gameData?.bots && rd.gameData.bots.length > 0) {
       return rd.gameData.bots.map(b => {
         const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
         return {
           name: b.name, cfg,
-          completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+          submitSecond: b.submitSecond || (roomTime * 60 - 10),
+          phaseBoundaries: b.phaseBoundaries || null,
           progress: b.progress || 0,
-          finished: b.finished || false
+          finished: b.finished || false,
+          phase: b.phase || 1,
         };
       });
     }
-    // Solo or fallback: compute from room settings
     return Array.from({ length: playerMode }, (_, i) => {
       const raw  = playerBotsRaw[i];
       const name = typeof raw === 'string' ? raw : (raw?.name || ALL_BOTS[i % ALL_BOTS.length]);
       const cfg  = BOT_CONFIGS[name] || BOT_CONFIGS['Logic Bot'];
-      return { name, cfg, completesAtSecond: roomTime * 60 - cfg.offsetSeconds, progress: 0, finished: false };
+      const totalSecs = roomTime * 60;
+      const submitSecond = getBotSubmitSecond(name, totalSecs);
+      const phaseBoundaries = getBotPhaseBoundaries(name, submitSecond);
+      return { name, cfg, submitSecond, phaseBoundaries, progress: 0, finished: false, phase: 1 };
     });
   });
 
   const botsRef = useRef(bots);
-  useEffect(() => {
-    botsRef.current = bots;
-  }, [bots]);
+  useEffect(() => { botsRef.current = bots; }, [bots]);
 
   // Modals
   const [exitModal,  setExitModal]  = useState(false);
@@ -157,7 +299,6 @@ export default function ComputerModeGamePage() {
     setLogs(p => [...p.slice(-80), { msg, type, ts: new Date().toLocaleTimeString() }]);
   }, []);
 
-  // ms formatter  MM:SS.mm
   const fmtMs = ms => {
     const t = Math.max(0, ms);
     const m = Math.floor(t / 60000);
@@ -187,30 +328,45 @@ export default function ComputerModeGamePage() {
     }
   }, []);
 
-  // Bot progress simulation
+  // Start reading phase then main timer
+  const startReadingPhase = useCallback(() => {
+    if (readingDoneRef.current) return;
+    setReadingPhase(true);
+    setReadingCountdown(15);
+    let remaining = 15;
+    const iv = setInterval(() => {
+      remaining -= 1;
+      setReadingCountdown(remaining);
+      if (remaining <= 0) {
+        clearInterval(iv);
+        setReadingPhase(false);
+        readingDoneRef.current = true;
+        // Start actual timer and bots
+        startTimer();
+      }
+    }, 1000);
+  }, [startTimer]);
+
   // Bot progress simulation (Solo mode only)
   useEffect(() => {
     if (loading) return;
     if (roomId !== 'SOLO') return;
+    if (readingPhase) return; // Don't tick bots during reading phase
     const iv = setInterval(() => {
       const elSec = (totalMs - playerMs) / 1000;
       let botFinished = false;
       setBots(prev => prev.map(b => {
-        if (b.finished) {
-          botFinished = true;
-          return b;
-        }
-        const pct = Math.min(100, (elSec / b.completesAtSecond) * 100);
-        const finished = elSec >= b.completesAtSecond;
+        if (b.finished) { botFinished = true; return b; }
+        const pct = Math.min(100, (elSec / b.submitSecond) * 100);
+        const finished = elSec >= b.submitSecond;
+        const phaseIdx = b.phaseBoundaries ? getBotPhaseIndex(b.phaseBoundaries, elSec) : 0;
         if (finished) botFinished = true;
-        return { ...b, progress: Math.max(0, pct), finished };
+        return { ...b, progress: Math.max(0, pct), finished, phase: finished ? 4 : phaseIdx };
       }));
 
-      // If in Solo Mode, and a bot has finished, and we haven't submitted yet
       if (botFinished && !allPassed) {
         clearInterval(iv);
         stopTimer();
-        // Go to results screen with AI victory
         navigate('/computer-mode/results', {
           state: {
             roomId: 'SOLO', winner: 'ai',
@@ -223,7 +379,7 @@ export default function ComputerModeGamePage() {
       }
     }, 300);
     return () => clearInterval(iv);
-  }, [loading, playerMs, totalMs, roomId, allPassed, username, language, difficulty, playerMode]);
+  }, [loading, playerMs, totalMs, roomId, allPassed, readingPhase, username, language, difficulty, playerMode]);
 
   // Profile
   useEffect(() => {
@@ -234,17 +390,14 @@ export default function ComputerModeGamePage() {
 
   const multiplayerInitDone = useRef(false);
 
-  // Multiplayer init: if we got gameData from navigation state, start immediately
+  // Multiplayer init from gameData
   useEffect(() => {
-    if (roomId === 'SOLO') return; // Solo handled separately
+    if (roomId === 'SOLO') return;
     if (multiplayerInitDone.current) return;
     const gd = rd.gameData;
-    if (!gd?.challenge) return; // No gameData, will wait for game-init socket event
+    if (!gd?.challenge) return;
 
     multiplayerInitDone.current = true;
-    console.log('[Game] Initializing from gameData in navigation state (fast path)');
-
-    // State is already initialized from useState initializers, just need to ensure consistency
     setChallenge(gd.challenge);
     setCurrentRound(gd.currentRound || 1);
     setPlayers(gd.players || []);
@@ -255,9 +408,11 @@ export default function ComputerModeGamePage() {
         const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
         return {
           name: b.name, cfg,
-          completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+          submitSecond: b.submitSecond || (roomTime * 60 - 10),
+          phaseBoundaries: b.phaseBoundaries || null,
           progress: b.progress || 0,
-          finished: b.finished || false
+          finished: b.finished || false,
+          phase: b.phase || 1,
         };
       }));
     }
@@ -268,27 +423,23 @@ export default function ComputerModeGamePage() {
     }
 
     setLoading(false);
-
-    // Start timer in sync with backend's 4s delay from game-starting event
-    // Navigation takes ~3.5s, so we add a 500ms buffer before starting
-    setTimeout(() => startTimer(), 500);
+    // Start reading phase (after 500ms navigation buffer)
+    setTimeout(() => startReadingPhase(), 500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
+  }, []);
 
-
-  // WebSocket — Register listeners ONCE on mount (stable, never re-registered)
+  // WebSocket listeners
   useEffect(() => {
     const sock = getSocket();
     if (!sock) return;
 
     const onGameInit = (d) => {
-      console.log('[Socket] Received game-init event:', d);
       setChallenge(d.challenge);
       setCurrentRound(d.currentRound);
       setPlayers(d.players);
       setTestResults((d.challenge?.testCases || []).map(() => false));
       setLoading(false);
-      startTimer();
+      startReadingPhase();
     };
     const onRoundEnded = (d) => {
       stopTimer(); roundEndedRef.current = true;
@@ -302,16 +453,15 @@ export default function ComputerModeGamePage() {
       roundEndedRef.current = false; setChallenge(d.challenge); setCurrentRound(d.round);
       setTestResults((d.challenge?.testCases||[]).map(()=>false));
       setProgress(0); setUserCode(''); setAllPassed(false); setRoundModal(false);
-      msCurRef.current = totalMs; setPlayerMs(totalMs); startRef.current = Date.now(); startTimer();
-      setBots(prev => prev.map(b => ({ ...b, progress: 0, finished: false })));
+      msCurRef.current = totalMs; setPlayerMs(totalMs); startRef.current = Date.now();
+      setBots(prev => prev.map(b => ({ ...b, progress: 0, finished: false, phase: 1 })));
+      readingDoneRef.current = false;
+      startReadingPhase();
     };
     const onGameStateTick = (d) => {
       if (d.timer !== undefined) {
-        // Sync client timer to server: reset both the remaining time AND the start reference
-        // Without resetting startRef, the client subtracts elapsed time PLUS server-decremented time
-        // causing double-speed countdown. By resetting startRef, client timer perfectly mirrors server.
         msCurRef.current = d.timer * 1000;
-        startRef.current = Date.now(); // ← KEY FIX: reset elapsed baseline to now
+        startRef.current = Date.now();
         setPlayerMs(d.timer * 1000);
       }
       if (d.players) setPlayers(d.players);
@@ -320,9 +470,11 @@ export default function ComputerModeGamePage() {
           const cfg = BOT_CONFIGS[b.name] || BOT_CONFIGS['Logic Bot'];
           return {
             name: b.name, cfg,
-            completesAtSecond: (b.delaySeconds || 0) + (b.completionTime || 60),
+            submitSecond: b.submitSecond || (roomTime * 60 - 10),
+            phaseBoundaries: b.phaseBoundaries || null,
             progress: b.progress,
-            finished: b.finished
+            finished: b.finished,
+            phase: b.phase || 1,
           };
         }));
       }
@@ -347,6 +499,7 @@ export default function ComputerModeGamePage() {
           scores: { player: d.players?.find(p=>p.userId === userId)?.score||0, ai: d.aiScore||0 },
           botsUsed: botsRef.current.map(b=>({name:b.name,progress:b.progress,finished:b.finished})),
           timeUsed: totalMs - msCurRef.current, totalRounds, language, difficulty, playerMode,
+          playerResults: d.playerResults || [],
         },
       });
     };
@@ -365,29 +518,24 @@ export default function ComputerModeGamePage() {
       sock.off('game-over', onGameOver);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Register once when socket is available
+  }, []);
 
-  // Emit join-game for session tracking (backend still needs to know player is in session)
-  // Also serves as robust fallback if gameData was missing from navigation state
+  // Emit join-game for session tracking
   useEffect(() => {
     const sock = getSocket();
     if (!sock || roomId === 'SOLO') return;
     const uid = userId || rd.userId;
     if (!uid) return;
 
-    // Emit immediately
-    console.log(`[Socket] Emitting join-game: Room = ${roomId}, User = ${uid}`);
     sock.emit('join-game', { roomId, userId: uid });
 
-    // If still loading, poll every 2 seconds just in case we missed the game-init or game-starting events
     if (loading) {
       const interval = setInterval(() => {
-        console.log(`[Socket] Still loading, re-emitting join-game...`);
         sock.emit('join-game', { roomId, userId: uid });
       }, 2000);
       return () => clearInterval(interval);
     }
-  }, [roomId, userId, loading]); // Re-emit if userId resolves late or while loading
+  }, [roomId, userId, loading]);
 
   // Solo challenge load
   useEffect(() => {
@@ -399,7 +547,7 @@ export default function ComputerModeGamePage() {
         setChallenge(ch); setTestResults((ch?.testCases||[]).map(()=>false));
         addLog(`✅ ${difficulty} ${language} challenge loaded`, 'success');
       } catch {
-        const n = difficulty==='Hard'?5:difficulty==='Moderate'?4:3;
+        const n = difficulty==='Advanced'?5:difficulty==='Moderate'?4:3;
         setChallenge({
           title: `${language} ${difficulty} Challenge`,
           objective: `Write a ${language} solution. Pass all ${n} test cases to submit.`,
@@ -409,40 +557,37 @@ export default function ComputerModeGamePage() {
         setTestResults(Array.from({length:n},()=>false));
         addLog('⚠️ Offline mode — local challenge loaded','warning');
       }
-      setLoading(false); startTimer();
+      setLoading(false);
+      startReadingPhase();
     })();
   }, [roomId, loading]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const h = e => {
+      if (readingPhase) return; // Block during reading phase
       if ((e.ctrlKey||e.metaKey) && !e.shiftKey && e.key==='Enter') { e.preventDefault(); if(!compiling&&!roundEndedRef.current) handleCompile(); }
       if ((e.ctrlKey||e.metaKey) && e.shiftKey && e.key==='Enter')  { e.preventDefault(); if(allPassed) handleSubmit(); }
       if (e.key==='Escape') { e.preventDefault(); setExitModal(v=>!v); }
     };
     window.addEventListener('keydown',h); return ()=>window.removeEventListener('keydown',h);
-  }, [compiling, allPassed]);
+  }, [compiling, allPassed, readingPhase]);
 
-  // Output iframe
+  // Output iframes
   useEffect(() => {
     if (!iframeRef.current || !compiledOutput) return;
     try {
       const d = iframeRef.current.contentDocument;
       if (d) { d.open(); d.write(compiledOutput); d.close(); }
-    } catch (err) {
-      console.error('Error writing user output:', err);
-    }
+    } catch (err) { console.error(err); }
   }, [compiledOutput, previewTab]);
 
-  // Expected Output iframe
   useEffect(() => {
     if (!expectedIframeRef.current || !challenge?.expectedOutput) return;
     try {
       const d = expectedIframeRef.current.contentDocument;
       if (d) { d.open(); d.write(challenge.expectedOutput); d.close(); }
-    } catch (err) {
-      console.error('Error writing expected output:', err);
-    }
+    } catch (err) { console.error(err); }
   }, [challenge?.expectedOutput, previewTab]);
 
   const handleCompile = async () => {
@@ -473,7 +618,7 @@ export default function ComputerModeGamePage() {
     addLog('🚀 SUBMITTED! System judging...','success');
     if (roomId!=='SOLO') { socket.emit('player-finished',{roomId,userId}); return; }
     const myTimeSec = (totalMs-playerMs)/1000;
-    const fastestBot = bots.reduce((min,b)=>b.completesAtSecond<min?b.completesAtSecond:min,Infinity);
+    const fastestBot = bots.reduce((min,b)=>b.submitSecond<min?b.submitSecond:min,Infinity);
     const won = myTimeSec<fastestBot || !bots.some(b=>b.finished);
     navigate('/computer-mode/results',{
       state:{
@@ -502,6 +647,11 @@ export default function ComputerModeGamePage() {
   return (
     <div style={{height:'100vh',display:'flex',flexDirection:'column',background:pageBg,color:'white',overflow:'hidden'}}>
 
+      {/* ══════════ READING PHASE OVERLAY ══════════ */}
+      {readingPhase && (
+        <ReadingPhaseOverlay challenge={challenge} countdown={readingCountdown} ac={ac} />
+      )}
+
       {/* ══════════════════ TOP BAR ══════════════════ */}
       <div style={{
         height:44,flexShrink:0,
@@ -509,7 +659,6 @@ export default function ComputerModeGamePage() {
         background:'rgba(0,0,0,0.7)',
         borderBottom:`1px solid ${ac}28`,
       }}>
-        {/* Brand */}
         <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 14px',borderRight:'1px solid rgba(255,255,255,0.06)'}}>
           <Zap size={12} fill={ac} style={{color:ac}}/>
           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:11,color:ac,letterSpacing:2,whiteSpace:'nowrap'}}>GAME IN MY STYLE</span>
@@ -529,12 +678,20 @@ export default function ComputerModeGamePage() {
           <span style={{fontFamily:'monospace',fontSize:9,color:'rgba(255,255,255,0.35)'}}>R{currentRound}/{totalRounds}</span>
         </div>
 
-        {/* Title — center flex */}
+        {/* Title */}
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:13,color:'white',textTransform:'uppercase',letterSpacing:1}}>{challenge.title}</span>
           <span style={{fontFamily:'monospace',fontSize:9,padding:'2px 8px',borderRadius:3,background:`${ac}20`,color:ac}}>{language}</span>
           <span style={{fontFamily:'monospace',fontSize:9,padding:'2px 8px',borderRadius:3,background:'rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.45)'}}>{difficulty}</span>
         </div>
+
+        {/* Reading phase indicator in top bar */}
+        {readingPhase && (
+          <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 12px',borderLeft:'1px solid rgba(255,255,255,0.06)',color:'#10b981'}}>
+            <BookOpen size={12}/>
+            <span style={{fontFamily:'monospace',fontSize:9,color:'#10b981',fontWeight:700}}>READING {readingCountdown}s</span>
+          </div>
+        )}
 
         {/* Score */}
         <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 14px',borderLeft:'1px solid rgba(255,255,255,0.06)'}}>
@@ -593,10 +750,12 @@ export default function ComputerModeGamePage() {
              flex:1,
              display:'flex',flexDirection:'column',
              background:'#0b0e17',
-             border:`1px solid ${ac}25`,
+             border:`1px solid ${readingPhase ? 'rgba(255,255,255,0.08)' : ac+'25'}`,
              borderRadius:10,
              boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
              minHeight:0,overflow:'hidden',
+             opacity: readingPhase ? 0.5 : 1,
+             transition: 'opacity 0.3s',
            }}>
              {/* Header */}
              <div style={{
@@ -615,6 +774,11 @@ export default function ComputerModeGamePage() {
                  </span>
                </div>
                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                 {readingPhase && (
+                   <span style={{fontFamily:'monospace',fontSize:8,background:'rgba(16,185,129,0.15)',color:'#10b981',padding:'2px 8px',borderRadius:4,fontWeight:700,display:'flex',alignItems:'center',gap:4}}>
+                     <Lock size={8}/> LOCKED DURING READING
+                   </span>
+                 )}
                  <span style={{fontFamily:'monospace',fontSize:8,background:`${ac}20`,color:ac,padding:'2px 8px',borderRadius:4,fontWeight:700,letterSpacing:0.5}}>{language}</span>
                  <span style={{fontFamily:'monospace',fontSize:8,color:'#64748b'}}>Ctrl+Enter: Compile</span>
                </div>
@@ -624,13 +788,15 @@ export default function ComputerModeGamePage() {
              <textarea
                value={userCode}
                onChange={e=>setUserCode(e.target.value)}
-               placeholder={`// ${challenge.objective}\n\n// Write your ${language} solution here...`}
+               placeholder={readingPhase ? '// Editor locked during reading phase...' : `// ${challenge.objective}\n\n// Write your ${language} solution here...`}
+               disabled={readingPhase}
                spellCheck={false}
                style={{
                  flex:1,minHeight:0,background:'#07090e',color:'#f8fafc',
                  fontFamily:"'JetBrains Mono','Fira Code',monospace",fontSize:13,
                  lineHeight:1.8,padding:'16px',border:'none',resize:'none',outline:'none',
                  caretColor:ac,
+                 cursor: readingPhase ? 'not-allowed' : 'text',
                }}
              />
 
@@ -642,18 +808,18 @@ export default function ComputerModeGamePage() {
              }}>
                <button
                  onClick={handleCompile}
-                 disabled={compiling||roundEndedRef.current}
+                 disabled={compiling||roundEndedRef.current||readingPhase}
                  style={{
                    padding:'12px 0',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',
-                   background: compiling?'rgba(16,185,129,0.18)':'#10b981',
-                   color:'white',cursor:compiling?'not-allowed':'pointer',
+                   background: readingPhase?'rgba(255,255,255,0.04)':compiling?'rgba(16,185,129,0.18)':'#10b981',
+                   color: readingPhase?'rgba(255,255,255,0.3)':'white',cursor:compiling||readingPhase?'not-allowed':'pointer',
                    fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:13,
                    letterSpacing:2,textTransform:'uppercase',
                    display:'flex',alignItems:'center',justifyContent:'center',gap:7,
                    transition:'all 0.2s',
                  }}
-                 onMouseEnter={e=>{ if(!compiling) e.currentTarget.style.background='#059669'; }}
-                 onMouseLeave={e=>{ if(!compiling) e.currentTarget.style.background='#10b981'; }}
+                 onMouseEnter={e=>{ if(!compiling&&!readingPhase) e.currentTarget.style.background='#059669'; }}
+                 onMouseLeave={e=>{ if(!compiling&&!readingPhase) e.currentTarget.style.background='#10b981'; }}
                >
                  {compiling
                    ?<><div style={{width:11,height:11,border:'2px solid rgba(255,255,255,0.25)',borderTopColor:'white',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/> COMPILING...</>
@@ -662,16 +828,16 @@ export default function ComputerModeGamePage() {
 
                <button
                  onClick={handleSubmit}
-                 disabled={!allPassed||compiling||roundEndedRef.current}
+                 disabled={!allPassed||compiling||roundEndedRef.current||readingPhase}
                  style={{
                    padding:'12px 0',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',
-                   background: allPassed?`linear-gradient(135deg,${ac},${ui})`:'rgba(255,255,255,0.04)',
-                   color: allPassed?'white':'rgba(255,255,255,0.2)',
-                   cursor: allPassed?'pointer':'not-allowed',
+                   background: allPassed&&!readingPhase?`linear-gradient(135deg,${ac},${ui})`:'rgba(255,255,255,0.04)',
+                   color: allPassed&&!readingPhase?'white':'rgba(255,255,255,0.2)',
+                   cursor: allPassed&&!readingPhase?'pointer':'not-allowed',
                    fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:13,
                    letterSpacing:2,textTransform:'uppercase',
                    display:'flex',alignItems:'center',justifyContent:'center',gap:7,
-                   boxShadow: allPassed?`0 0 20px ${ac}40`:'none',
+                   boxShadow: allPassed&&!readingPhase?`0 0 20px ${ac}40`:'none',
                    transition:'all 0.3s',
                  }}
                >
@@ -708,67 +874,44 @@ export default function ComputerModeGamePage() {
              boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
              minHeight:0,overflow:'hidden',
            }}>
-             {/* Tabs Header */}
              <div style={{
                background:'#07090e',padding:'4px 6px',flexShrink:0,
                borderBottom:'1px solid rgba(255,255,255,0.06)',
                display:'flex',alignItems:'center',gap:4
              }}>
-               <button 
-                 onClick={() => setPreviewTab('yours')}
-                 style={{
-                   border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
-                   background: previewTab === 'yours' ? `${ac}1e` : 'transparent',
-                   color: previewTab === 'yours' ? ac : '#94a3b8',
-                   fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
-                   letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
-                   borderBottom: previewTab === 'yours' ? `2px solid ${ac}` : '2px solid transparent',
-                 }}
-               >
-                 YOUR OUTPUT
-               </button>
-               <button 
-                 onClick={() => setPreviewTab('expected')}
-                 style={{
-                   border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
-                   background: previewTab === 'expected' ? `${ac}1e` : 'transparent',
-                   color: previewTab === 'expected' ? ac : '#94a3b8',
-                   fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
-                   letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
-                   borderBottom: previewTab === 'expected' ? `2px solid ${ac}` : '2px solid transparent',
-                 }}
-               >
-                 EXPECTED OUTPUT
-               </button>
+               <button onClick={() => setPreviewTab('yours')} style={{
+                 border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
+                 background: previewTab === 'yours' ? `${ac}1e` : 'transparent',
+                 color: previewTab === 'yours' ? ac : '#94a3b8',
+                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
+                 letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
+                 borderBottom: previewTab === 'yours' ? `2px solid ${ac}` : '2px solid transparent',
+               }}>YOUR OUTPUT</button>
+               <button onClick={() => setPreviewTab('expected')} style={{
+                 border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
+                 background: previewTab === 'expected' ? `${ac}1e` : 'transparent',
+                 color: previewTab === 'expected' ? ac : '#94a3b8',
+                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
+                 letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
+                 borderBottom: previewTab === 'expected' ? `2px solid ${ac}` : '2px solid transparent',
+               }}>EXPECTED OUTPUT</button>
              </div>
 
-             {/* Preview Body */}
              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: '#07090e', padding: 10 }}>
-               {/* Yours Iframe Container */}
                <div style={{ display: previewTab === 'yours' ? 'block' : 'none', width: '100%', height: '100%' }}>
                  {compiledOutput ? (
-                   <iframe
-                     ref={iframeRef}
-                     title="your-output"
-                     sandbox="allow-same-origin allow-scripts"
-                     style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }}
-                   />
+                   <iframe ref={iframeRef} title="your-output" sandbox="allow-same-origin allow-scripts"
+                     style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
                  ) : (
                    <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>Compile code to view live output.</span>
                    </div>
                  )}
                </div>
-
-               {/* Expected Iframe Container */}
                <div style={{ display: previewTab === 'expected' ? 'block' : 'none', width: '100%', height: '100%' }}>
                  {challenge?.expectedOutput ? (
-                   <iframe
-                     ref={expectedIframeRef}
-                     title="expected-output"
-                     sandbox="allow-same-origin allow-scripts"
-                     style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }}
-                   />
+                   <iframe ref={expectedIframeRef} title="expected-output" sandbox="allow-same-origin allow-scripts"
+                     style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
                  ) : (
                    <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>No expected output available.</span>
@@ -801,11 +944,9 @@ export default function ComputerModeGamePage() {
                    <span style={{fontFamily:'monospace',fontSize:8.5,padding:'1px 6px',borderRadius:8,background:`${ac}20`,color:ac,fontWeight:700}}>{logs.length}</span>
                  )}
                </div>
-               <button
-                 onClick={() => setLogs([])}
+               <button onClick={() => setLogs([])}
                  style={{color:'#64748b',background:'transparent',border:'none',cursor:'pointer',display:'flex',alignItems:'center',padding:4}}
-                 title="Clear Console"
-               >
+                 title="Clear Console">
                  <Trash2 size={12}/>
                </button>
              </div>
@@ -835,24 +976,25 @@ export default function ComputerModeGamePage() {
            <div style={{
              flexShrink:0,padding:'12px 16px',
              background:'#0b0e17',
-             border:`1px solid ${ac}25`,
+             border:`1px solid ${readingPhase ? 'rgba(16,185,129,0.4)' : ac+'25'}`,
              borderRadius:10,
-             boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
+             boxShadow:`0 4px 20px ${readingPhase ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.4)'}`,
              height:115,
              display:'flex',flexDirection:'column',justifyContent:'space-between',
+             transition: 'border-color 0.3s',
            }}>
              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                <div>
-                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:9,color:'#94a3b8',textTransform:'uppercase',letterSpacing:1.5,marginBottom:2}}>
-                   ⏱ TIME REMAINING
+                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:9,color: readingPhase?'#10b981':'#94a3b8',textTransform:'uppercase',letterSpacing:1.5,marginBottom:2}}>
+                   {readingPhase ? '📖 READING TIME' : '⏱ TIME REMAINING'}
                  </div>
                  <div style={{
                    fontFamily:"'JetBrains Mono',monospace",fontWeight:900,fontSize:32,
-                   color:timerColor,lineHeight:1,letterSpacing:0.5,
-                   textShadow:`0 0 20px ${timerColor}55`,
+                   color: readingPhase ? '#10b981' : timerColor,lineHeight:1,letterSpacing:0.5,
+                   textShadow:`0 0 20px ${readingPhase ? '#10b981' : timerColor}55`,
                    fontVariantNumeric:'tabular-nums',transition:'color 0.3s',
                  }}>
-                   {fmtMs(playerMs)}
+                   {readingPhase ? `00:${String(readingCountdown).padStart(2,'0')}.00` : fmtMs(playerMs)}
                  </div>
                </div>
 
@@ -871,17 +1013,17 @@ export default function ComputerModeGamePage() {
                <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:2,overflow:'hidden',marginBottom:4}}>
                  <div style={{
                    height:'100%',borderRadius:2,
-                   width:`${timerPct}%`,
-                   background:timerColor,
-                   boxShadow:`0 0 8px ${timerColor}80`,
+                   width: readingPhase ? `${(readingCountdown/15)*100}%` : `${timerPct}%`,
+                   background: readingPhase ? '#10b981' : timerColor,
+                   boxShadow:`0 0 8px ${readingPhase ? '#10b981' : timerColor}80`,
                    transition:'width 0.1s linear,background 0.3s',
                  }}/>
                </div>
                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                  <span style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.25)'}}>
-                   {Math.round(progress)}% complete · {testResults.filter(Boolean).length}/{testResults.length} tests
+                   {readingPhase ? '🔒 Editor locked' : `${Math.round(progress)}% complete · ${testResults.filter(Boolean).length}/${testResults.length} tests`}
                  </span>
-                 {allPassed && (
+                 {allPassed && !readingPhase && (
                    <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:9,color:'#10b981',animation:'pulse 1s infinite',letterSpacing:0.5}}>
                      ✅ READY TO SUBMIT
                    </span>
@@ -955,7 +1097,6 @@ export default function ComputerModeGamePage() {
              boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
              minHeight:0,overflow:'hidden',
            }}>
-             {/* Header */}
              <div style={{
                display:'flex',alignItems:'center',gap:6,
                padding:'8px 14px',borderBottom:'1px solid rgba(255,255,255,0.06)',
@@ -970,12 +1111,13 @@ export default function ComputerModeGamePage() {
                </span>
              </div>
 
-             {/* Scrollable bots container */}
              <div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',padding:'12px 14px 4px'}}>
                {bots.map((bot,idx)=>{
                  const cfg = BOT_CONFIGS[bot.name] || BOT_CONFIGS['Logic Bot'];
-                 const remSec = Math.max(0, bot.completesAtSecond - elapsedSec);
+                 const remSec = Math.max(0, bot.submitSecond - elapsedSec);
                  const playerName = players[idx]?.username || (idx===0?username:`Player ${idx+1}`);
+                 const phaseIdx = bot.finished ? 4 : (bot.phase ? bot.phase - 1 : 0);
+                 const phaseInfo = BOT_PHASE_LABELS[Math.min(phaseIdx, 4)];
 
                  return (
                    <div key={idx} style={{
@@ -1006,7 +1148,7 @@ export default function ComputerModeGamePage() {
                        <div style={{flex:1,minWidth:0}}>
                          <div style={{display:'flex',alignItems:'center',gap:4,marginBottom:1}}>
                            <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:12,color:cfg.color,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{bot.name}</span>
-                           <span style={{fontFamily:'monospace',fontSize:7,padding:'0.5px 4px',borderRadius:2,background:`${cfg.color}20`,color:cfg.color,flexShrink:0}}>{cfg.tag}</span>
+                           <span style={{fontFamily:'monospace',fontSize:7,padding:'0.5px 4px',borderRadius:2,background:`${cfg.color}20`,color:cfg.color,flexShrink:0,fontWeight:700}}>{cfg.tag}</span>
                          </div>
                          <div style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.3)'}}>
                            vs <span style={{color:'rgba(255,255,255,0.5)'}}>{playerName}</span>
@@ -1037,17 +1179,26 @@ export default function ComputerModeGamePage() {
                        }}/>
                      </div>
 
-                     {/* Binary Matrix */}
+                     {/* Phase + Binary Matrix */}
                      <div style={{
                        background:'#04060a',borderRadius:8,
                        padding:'8px 10px',border:`1px solid ${cfg.color}35`,
                        overflow:'hidden',
                        boxShadow: `inset 0 0 10px rgba(0,0,0,0.8)`,
                      }}>
+                       {/* Phase label */}
                        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
-                         <span style={{fontFamily:'monospace',fontSize:7.5,color:`${cfg.color}aa`,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>
-                           {bot.finished ? '✅ DONE' : `${cfg.emoji} AI PROCESSING`}
+                         <span style={{fontFamily:'monospace',fontSize:8,color:`${cfg.color}cc`,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>
+                           {bot.finished
+                             ? '✅ SUBMITTED'
+                             : `${phaseInfo.icon} ${phaseInfo.label}`
+                           }
                          </span>
+                         {!bot.finished && (
+                           <span style={{fontFamily:'monospace',fontSize:7,color:`${cfg.color}60`,marginLeft:'auto'}}>
+                             PHASE {Math.min((bot.phase||1), 5)}/5
+                           </span>
+                         )}
                          <div style={{flex:1,height:1,background:`${cfg.color}10`}}/>
                        </div>
                        {bot.finished ? (

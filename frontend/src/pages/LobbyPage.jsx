@@ -37,8 +37,8 @@ function getBotForPlayer(playerBots, playerIndex) {
   return ALL_BOTS[playerIndex % ALL_BOTS.length];
 }
 
-// Room expiry: 5 minutes = 300 seconds
-const ROOM_EXPIRY_SECONDS = 300;
+// Room expiry: 15 minutes = 900 seconds
+const ROOM_EXPIRY_SECONDS = 900;
 
 const LobbyPage = () => {
   const navigate = useNavigate();
@@ -100,7 +100,7 @@ const LobbyPage = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Room expiry countdown (5 min)
+  // Room expiry countdown (15 min)
   useEffect(() => {
     if (roomExpired) return;
     const iv = setInterval(() => {
@@ -110,7 +110,7 @@ const LobbyPage = () => {
           setRoomExpired(true);
           setChatMessages(m => [...m, {
             id: Date.now(), from: 'SYSTEM',
-            text: '⚠️ Room expired after 5 minutes of inactivity. Please create a new room.',
+            text: '⚠️ Room expired after 15 minutes of inactivity. Please create a new room.',
             isSystem: true, isWarning: true,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }]);
@@ -367,7 +367,7 @@ const LobbyPage = () => {
         width: 800, height: 400, background: `radial-gradient(ellipse, ${ac}10 0%, transparent 70%)`,
         pointerEvents: 'none', zIndex: 0 }} />
 
-      {/* Top strip — Room ID, Password, Profile */}
+      {/* Top strip — Room ID, Password, Profile (multiplayer only) */}
       {totalPlayers > 1 && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',

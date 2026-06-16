@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Trophy, Repeat, Home, Clock, Target, Zap, RotateCcw } from 'lucide-react';
+import { Trophy, Repeat, Home, Clock, Target, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 import { profileAPI } from '../utils/api';
@@ -13,27 +13,26 @@ const THEMES = {
 };
 
 const BOT_CONFIGS = {
-  'Beginner Bot':        { image: '/assets/BEGINNER-BOT-BG.png', color: '#10b981', tag: 'EASY'   },
-  'Lazy Compiler':       { image: '/assets/LAZY-COMPILER-BG.png', color: '#f59e0b', tag: 'EASY'   },
-  'Logic Bot':           { image: '/assets/LOGIC-BOT-BG.png', color: '#3b82f6', tag: 'MED'    },
-  'Flash Coder':         { image: '/assets/FLASH-CODER-BG.png', color: '#8b5cf6', tag: 'HARD'   },
-  'Test Case Destroyer': { image: '/assets/TEST-CASE-DESTROYER-BG.png', color: '#ef4444', tag: 'EXPERT' },
+  'Beginner Bot':        { image: '/assets/BEGINNER-BOT-BG.png', color: '#10b981', tag: 'BOT-1'  },
+  'Lazy Compiler':       { image: '/assets/LAZY-COMPILER-BG.png', color: '#f59e0b', tag: 'BOT-2'  },
+  'Logic Bot':           { image: '/assets/LOGIC-BOT-BG.png', color: '#3b82f6', tag: 'BOT-6'  },
+  'Flash Coder':         { image: '/assets/FLASH-CODER-BG.png', color: '#8b5cf6', tag: 'BOT-7'  },
+  'Test Case Destroyer': { image: '/assets/TEST-CASE-DESTROYER-BG.png', color: '#ef4444', tag: 'BOT-15' },
 };
 
 const fmtMs = ms => {
   const total = Math.max(0, ms);
-  const mins = Math.floor(total / 60000);
-  const secs = Math.floor((total % 60000) / 1000);
-  const millis = Math.floor((total % 1000) / 10);
-  return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${String(millis).padStart(2,'0')}`;
+  const mins  = Math.floor(total / 60000);
+  const secs  = Math.floor((total % 60000) / 1000);
+  const ms2   = Math.floor((total % 1000) / 10);
+  return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${String(ms2).padStart(2,'0')}`;
 };
-
 const fmtSec = s => {
-  const total = Math.max(0, Math.round(s));
-  return `${Math.floor(total / 60)}m ${total % 60}s`;
+  const t = Math.max(0, Math.round(s));
+  return `${Math.floor(t/60)}m ${t%60}s`;
 };
 
-/* Particles floating up */
+/* Confetti particle */
 const Particle = ({ color, x, delay, size }) => (
   <div style={{
     position: 'fixed', left: `${x}%`, bottom: '-20px',
@@ -52,8 +51,8 @@ const ComputerModeResultsPage = () => {
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
-  const ac = THEMES[themeKey].accent;
-  const ui = THEMES[themeKey].ui;
+  const ac  = THEMES[themeKey].accent;
+  const ui  = THEMES[themeKey].ui;
   const pageBg = THEMES[themeKey].bg;
   const themes = {
     red: { accent: '#ff5252', ui: '#ff6b6b' },
@@ -63,7 +62,7 @@ const ComputerModeResultsPage = () => {
   };
 
   const profileImage = localStorage.getItem('profileImage') || null;
-  const username = localStorage.getItem('username') || 'YOU';
+  const username     = localStorage.getItem('username') || 'YOU';
 
   const winner       = data.winner || 'player';
   const scores       = data.scores || { player: 1, ai: 0 };
@@ -74,38 +73,37 @@ const ComputerModeResultsPage = () => {
   const language     = data.language || 'JavaScript';
   const difficulty   = data.difficulty || 'Moderate';
   const playerMode   = data.playerMode || 1;
+  const playerResults = data.playerResults || [];
 
   const playerWon     = winner === 'player';
   const competitorWon = winner === 'competitor';
   const isDraw        = winner === 'draw';
   const aiWon         = winner === 'ai';
 
-  // Derive result visuals
-  const heading = playerWon ? 'VICTORY!' : competitorWon ? 'TEAM WIN!' : isDraw ? "IT'S A TIE" : 'DEFEATED';
+  const heading      = playerWon ? 'VICTORY!' : competitorWon ? 'TEAM WIN!' : isDraw ? "IT'S A TIE" : 'DEFEATED';
   const headingColor = playerWon ? '#10b981' : competitorWon ? '#a855f7' : isDraw ? '#f59e0b' : '#ef4444';
-  const bigEmoji = playerWon ? '🏆' : competitorWon ? '👾' : isDraw ? '🤝' : '💀';
-  const subText = playerWon
+  const bigEmoji     = playerWon ? '🏆' : competitorWon ? '👾' : isDraw ? '🤝' : '💀';
+  const subText      = playerWon
     ? 'You outpaced the AI bots with superior code! The System declares you WINNER!'
     : competitorWon
     ? 'Your teammate crushed the AI! Outstanding team performance!'
     : isDraw
-    ? 'Multiple players tied against the AI. An honorable result!'
+    ? 'You and the AI bots tied it out. An honorable result!'
     : 'The AI bots were faster this time. Train harder and return!';
 
-  // Particles
-  const particleColors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4'];
-  const particles = Array.from({ length: (playerWon || isDraw) ? 40 : 0 }, (_, i) => ({
-    id: i, x: Math.random() * 100, delay: Math.random() * 3,
-    color: particleColors[Math.floor(Math.random() * particleColors.length)],
-    size: Math.random() * 8 + 4,
+  const particleColors = ['#a855f7','#3b82f6','#10b981','#f59e0b','#ef4444','#ec4899','#06b6d4'];
+  const particles = Array.from({ length: (playerWon||isDraw) ? 40 : 0 }, (_,i) => ({
+    id: i, x: Math.random()*100, delay: Math.random()*3,
+    color: particleColors[Math.floor(Math.random()*particleColors.length)],
+    size: Math.random()*8+4,
   }));
 
-  // Animated counters
   const [displayPlayer, setDisplayPlayer] = useState(0);
-  const [displayAi, setDisplayAi] = useState(0);
-  const [phase, setPhase] = useState(0); // 0=entering, 1=counters, 2=full
-  const [saveStatus, setSaveStatus] = useState('idle');
-  const [saveError, setSaveError] = useState('');
+  const [displayAi, setDisplayAi]         = useState(0);
+  const [phase, setPhase]                 = useState(0);
+  const [saveStatus, setSaveStatus]       = useState('idle');
+  const [saveError, setSaveError]         = useState('');
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase(1), 400);
@@ -121,7 +119,6 @@ const ComputerModeResultsPage = () => {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
-  // Save results
   const submittedRef = useRef(false);
   useEffect(() => {
     if (submittedRef.current) return;
@@ -129,9 +126,9 @@ const ComputerModeResultsPage = () => {
     const save = async () => {
       setSaveStatus('saving');
       try {
-        const outcome = playerWon || competitorWon ? 'player_win' : aiWon ? 'ai_win' : 'draw';
+        const outcome = playerWon||competitorWon ? 'player_win' : aiWon ? 'ai_win' : 'draw';
         for (const bot of botsUsed) {
-          await profileAPI.submitComputerGameResult({ botName: bot.name || 'Logic Bot', outcome });
+          await profileAPI.submitComputerGameResult({ botName: bot.name||'Logic Bot', outcome });
         }
         setSaveStatus('saved');
       } catch (err) {
@@ -155,6 +152,13 @@ const ComputerModeResultsPage = () => {
     borderRadius: 16, padding: '20px 24px',
   };
 
+  // Derive per-player outcome text
+  const getOutcomeLabel = (outcome) => {
+    if (outcome === 'player_wins') return { text: 'BEAT THE BOT', color: '#10b981', icon: '✅' };
+    if (outcome === 'bot_wins')    return { text: 'LOST TO BOT',  color: '#ef4444', icon: '❌' };
+    return { text: 'TIE',    color: '#f59e0b', icon: '🤝' };
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: pageBg, color: 'white', position: 'relative', overflow: 'hidden' }}>
       <CustomCursor theme={{ accent: ac, ui }} />
@@ -168,7 +172,7 @@ const ComputerModeResultsPage = () => {
         pointerEvents: 'none', zIndex: 0, transition: 'all 1s',
       }} />
 
-      {/* Particles for win/tie */}
+      {/* Particles */}
       {particles.map(p => <Particle key={p.id} {...p} />)}
 
       {/* System judge strip */}
@@ -188,7 +192,7 @@ const ComputerModeResultsPage = () => {
 
         {/* ══ MAIN RESULT CARD ══ */}
         <div style={{
-          background: playerWon || competitorWon ? 'linear-gradient(160deg, rgba(16,185,129,0.1), rgba(0,0,0,0))'
+          background: playerWon||competitorWon ? 'linear-gradient(160deg, rgba(16,185,129,0.1), rgba(0,0,0,0))'
             : isDraw ? 'linear-gradient(160deg, rgba(245,158,11,0.08), rgba(0,0,0,0))'
             : 'linear-gradient(160deg, rgba(239,68,68,0.1), rgba(0,0,0,0))',
           border: `2px solid ${headingColor}30`,
@@ -197,7 +201,6 @@ const ComputerModeResultsPage = () => {
           transition: 'all 0.7s cubic-bezier(0.34,1.56,0.64,1)',
           boxShadow: `0 0 80px ${headingColor}12, 0 40px 80px rgba(0,0,0,0.5)`,
         }}>
-          {/* System judge badge */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20,
             padding: '6px 20px', borderRadius: 20,
@@ -255,7 +258,7 @@ const ComputerModeResultsPage = () => {
               { icon: '🎯', label: difficulty },
               { icon: '🔄', label: `${totalRounds} round${totalRounds > 1 ? 's' : ''}` },
               { icon: '⚔️', label: `${playerMode}P vs ${playerMode} AI` },
-              { icon: '⏱️', label: typeof timeUsed === 'number' && timeUsed > 1000 ? fmtMs(timeUsed) : fmtSec(timeUsed / 1000 || 0) },
+              { icon: '⏱️', label: typeof timeUsed === 'number' && timeUsed > 1000 ? fmtMs(timeUsed) : fmtSec(timeUsed/1000||0) },
             ].map(({ icon, label }) => (
               <span key={label} style={{
                 padding: '5px 14px', borderRadius: 20,
@@ -274,11 +277,11 @@ const ComputerModeResultsPage = () => {
           <div style={{
             ...card, textAlign: 'center',
             boxShadow: playerWon ? `0 0 40px ${ac}20` : 'none',
-            border: `1px solid ${playerWon ? ac + '40' : 'rgba(255,255,255,0.07)'}`,
+            border: `1px solid ${playerWon ? ac+'40' : 'rgba(255,255,255,0.07)'}`,
           }}>
             <div style={{ marginBottom: 12 }}>
               {profileImage
-                ? <img src={profileImage} alt="You" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${playerWon ? '#10b981' : ac + '50'}`, margin: '0 auto' }} />
+                ? <img src={profileImage} alt="You" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${playerWon?'#10b981':ac+'50'}`, margin: '0 auto' }} />
                 : <div style={{ width: 52, height: 52, borderRadius: '50%', background: `${ac}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 20, color: ac, border: `3px solid ${ac}50` }}>{username[0]}</div>
               }
             </div>
@@ -305,8 +308,8 @@ const ComputerModeResultsPage = () => {
             border: `1px solid ${aiWon ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.07)'}`,
           }}>
             <div style={{ marginBottom: 12 }}>
-              {botsUsed[0] && (BOT_CONFIGS[botsUsed[0].name]?.image)
-                ? <img src={BOT_CONFIGS[botsUsed[0].name].image} alt="AI" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${aiWon ? '#ef4444' : 'rgba(255,255,255,0.15)'}`, margin: '0 auto', background: '#111' }} />
+              {botsUsed[0] && BOT_CONFIGS[botsUsed[0].name]?.image
+                ? <img src={BOT_CONFIGS[botsUsed[0].name].image} alt="AI" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${aiWon?'#ef4444':'rgba(255,255,255,0.15)'}`, margin: '0 auto', background: '#111' }} />
                 : <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 24, border: '3px solid rgba(239,68,68,0.3)' }}>🤖</div>
               }
             </div>
@@ -321,6 +324,72 @@ const ComputerModeResultsPage = () => {
           </div>
         </div>
 
+        {/* ══ PER-PLAYER vs PER-BOT RESULTS (multiplayer) ══ */}
+        {playerMode > 1 && playerResults.length > 0 && (
+          <div style={{ ...card, marginBottom: 24, ...showFade(0.05) }}>
+            <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>
+              ⚔️ PLAYER vs BOT RESULTS
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {playerResults.map((pr, i) => {
+                const bot = botsUsed[i];
+                const botCfg = bot ? (BOT_CONFIGS[bot.name] || { color: '#6b7280', tag: '?' }) : null;
+                const ol = getOutcomeLabel(pr.outcome);
+                const isMe = pr.username === username;
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+                    borderRadius: 12,
+                    background: isMe ? `${ac}08` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${isMe ? ac+'30' : 'rgba(255,255,255,0.06)'}`,
+                  }}>
+                    {/* Player */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 160, flexShrink: 0 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${ac}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 14, color: ac, border: `2px solid ${ac}50` }}>
+                        {pr.username[0]}
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: isMe ? ac : 'white' }}>
+                          {pr.username} {isMe && <span style={{ fontSize: 9, opacity: 0.6 }}>(YOU)</span>}
+                        </div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>
+                          Player {i + 1}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* vs */}
+                    <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>vs</div>
+
+                    {/* Bot */}
+                    {bot && botCfg && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                        {BOT_CONFIGS[bot.name]?.image && (
+                          <img src={BOT_CONFIGS[bot.name].image} alt={bot.name} style={{ width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${botCfg.color}`, objectFit: 'cover', background: '#111' }} />
+                        )}
+                        <div>
+                          <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: botCfg.color }}>{bot.name}</div>
+                          <div style={{ fontFamily: 'monospace', fontSize: 8, padding: '0 5px', borderRadius: 3, background: `${botCfg.color}20`, color: botCfg.color, display: 'inline-block' }}>{botCfg.tag}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Outcome badge */}
+                    <div style={{
+                      padding: '6px 14px', borderRadius: 20, flexShrink: 0,
+                      background: `${ol.color}15`, border: `1px solid ${ol.color}40`,
+                      fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 12,
+                      color: ol.color, letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 5,
+                    }}>
+                      {ol.icon} {ol.text}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ══ MULTIPLAYER LEADERBOARD ══ */}
         {players.length > 1 && (
           <div style={{ ...card, marginBottom: 24, ...showFade(0.1) }}>
@@ -328,15 +397,18 @@ const ComputerModeResultsPage = () => {
               🏆 PLAYER LEADERBOARD
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[...players].sort((a, b) => b.score - a.score).map((p, i) => {
+              {[...players].sort((a,b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return (a.timeUsed||Infinity) - (b.timeUsed||Infinity); // tie-break by time
+              }).map((p, i) => {
                 const isMe = p.username === username;
-                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+                const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
                 return (
-                  <div key={p.userId || i} style={{
+                  <div key={p.userId||i} style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '10px 16px', borderRadius: 10,
                     background: isMe ? `${ac}10` : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${isMe ? ac + '35' : 'rgba(255,255,255,0.05)'}`,
+                    border: `1px solid ${isMe ? ac+'35' : 'rgba(255,255,255,0.05)'}`,
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <span style={{ fontSize: 18 }}>{medal}</span>
@@ -344,12 +416,22 @@ const ComputerModeResultsPage = () => {
                         {p.username} {isMe ? '(YOU)' : ''}
                       </span>
                     </div>
-                    <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: isMe ? ac : 'rgba(255,255,255,0.7)' }}>
-                      {p.score} {p.score === 1 ? 'round' : 'rounds'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {p.timeUsed ? (
+                        <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>
+                          ⏱ {fmtSec(p.timeUsed)}
+                        </span>
+                      ) : null}
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: isMe ? ac : 'rgba(255,255,255,0.7)' }}>
+                        {p.score} {p.score===1?'round':'rounds'}
+                      </div>
                     </div>
                   </div>
                 );
               })}
+            </div>
+            <div style={{ marginTop: 10, fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5 }}>
+              * Ties broken by time — fastest submission wins
             </div>
           </div>
         )}
@@ -369,14 +451,14 @@ const ComputerModeResultsPage = () => {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, color: cfg.color }}>{bot.name}</span>
-                        <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 6px', borderRadius: 3, background: `${cfg.color}20`, color: cfg.color }}>{cfg.tag}</span>
+                        <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 6px', borderRadius: 3, background: `${cfg.color}20`, color: cfg.color, fontWeight: 700 }}>{cfg.tag}</span>
                       </div>
                       <div style={{ height: 4, background: 'rgba(255,255,255,0.07)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${bot.progress || 0}%`, background: cfg.color, borderRadius: 2, boxShadow: `0 0 6px ${cfg.color}60`, transition: 'width 1.5s ease' }} />
+                        <div style={{ height: '100%', width: `${bot.progress||0}%`, background: cfg.color, borderRadius: 2, boxShadow: `0 0 6px ${cfg.color}60`, transition: 'width 1.5s ease' }} />
                       </div>
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, color: cfg.color }}>{Math.round(bot.progress || 0)}%</div>
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, color: cfg.color }}>{Math.round(bot.progress||0)}%</div>
                       <div style={{ fontFamily: 'monospace', fontSize: 9, color: bot.finished ? '#ef4444' : '#10b981' }}>
                         {bot.finished ? '🏁 FINISHED' : '✓ Competed'}
                       </div>
@@ -388,10 +470,95 @@ const ComputerModeResultsPage = () => {
           </div>
         )}
 
+        {/* ══ ROUND BREAKDOWN (collapsible) ══ */}
+        {totalRounds > 1 && (
+          <div style={{ ...card, marginBottom: 24, ...showFade(0.25) }}>
+            <button
+              onClick={() => setBreakdownOpen(v => !v)}
+              style={{
+                width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 2 }}>
+                📊 ROUND-BY-ROUND BREAKDOWN
+              </div>
+              {breakdownOpen
+                ? <ChevronUp size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
+                : <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
+              }
+            </button>
+
+            {breakdownOpen && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, textAlign: 'left', padding: '6px 10px' }}>Round</th>
+                        <th style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, textAlign: 'left', padding: '6px 10px' }}>Participant</th>
+                        <th style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, textAlign: 'left', padding: '6px 10px' }}>Opponent</th>
+                        <th style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, textAlign: 'center', padding: '6px 10px' }}>Result</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({ length: totalRounds }, (_, rIdx) => (
+                        playerMode === 1 ? (
+                          <tr key={rIdx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                            <td style={{ fontFamily: 'monospace', fontSize: 11, color: ac, padding: '8px 10px', fontWeight: 700 }}>Round {rIdx + 1}</td>
+                            <td style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: 'white', padding: '8px 10px' }}>{username}</td>
+                            <td style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: BOT_CONFIGS[botsUsed[0]?.name]?.color || '#f97316', padding: '8px 10px' }}>
+                              {botsUsed[0]?.name || 'Bot'}
+                            </td>
+                            <td style={{ textAlign: 'center', padding: '8px 10px' }}>
+                              <span style={{
+                                padding: '3px 10px', borderRadius: 20, fontSize: 10,
+                                fontFamily: 'monospace', fontWeight: 700,
+                                background: rIdx === 0 && playerWon ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                                color: rIdx === 0 && playerWon ? '#10b981' : '#ef4444',
+                              }}>
+                                {rIdx < 1 ? (playerWon ? '✅ WIN' : '❌ LOSS') : '—'}
+                              </span>
+                            </td>
+                          </tr>
+                        ) : (
+                          players.map((p, pIdx) => (
+                            <tr key={`${rIdx}-${pIdx}`} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                              <td style={{ fontFamily: 'monospace', fontSize: 11, color: ac, padding: '8px 10px', fontWeight: 700 }}>{pIdx === 0 ? `Round ${rIdx + 1}` : ''}</td>
+                              <td style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: p.username === username ? ac : 'white', padding: '8px 10px' }}>
+                                {p.username} {p.username === username ? '(YOU)' : ''}
+                              </td>
+                              <td style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: BOT_CONFIGS[botsUsed[pIdx]?.name]?.color || '#f97316', padding: '8px 10px' }}>
+                                {botsUsed[pIdx]?.name || `Bot ${pIdx + 1}`}
+                              </td>
+                              <td style={{ textAlign: 'center', padding: '8px 10px' }}>
+                                <span style={{
+                                  padding: '3px 10px', borderRadius: 20, fontSize: 9,
+                                  fontFamily: 'monospace', fontWeight: 700,
+                                  background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)',
+                                }}>
+                                  —
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={{ marginTop: 10, fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>
+                  Detailed per-round data requires multi-round support from the server session.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ══ STATS GRID ══ */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 36, ...showFade(0.3) }}>
           {[
-            { icon: Clock, label: 'Time Used', value: typeof timeUsed === 'number' && timeUsed > 1000 ? fmtMs(timeUsed) : fmtSec(timeUsed / 1000 || 0), color: ac },
+            { icon: Clock,  label: 'Time Used', value: typeof timeUsed==='number'&&timeUsed>1000?fmtMs(timeUsed):fmtSec(timeUsed/1000||0), color: ac },
             { icon: Target, label: 'Language',  value: language,   color: '#10b981' },
             { icon: Zap,    label: 'Difficulty', value: difficulty, color: '#f59e0b' },
           ].map(({ icon: Icon, label, value, color }) => (
@@ -439,7 +606,7 @@ const ComputerModeResultsPage = () => {
             letterSpacing: 2, textTransform: 'uppercase',
             display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = ac; e.currentTarget.style.borderColor = ac + '40'; }}
+          onMouseEnter={e => { e.currentTarget.style.color = ac; e.currentTarget.style.borderColor = ac+'40'; }}
           onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}>
             VIEW PROFILE
           </button>

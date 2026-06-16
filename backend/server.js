@@ -252,12 +252,66 @@ io.on('connection', (socket) => {
   });
 
   // ─── BOT CONFIGS AND ROSTER GENERATOR FOR SERVER-SIDE SIMULATION ───
+  // Submission windows: how many seconds BEFORE the end the bot submits
+  // Each entry is [minWindow, maxWindow] in seconds from end of timer
+  const BOT_SUBMIT_WINDOWS = {
+    'Beginner Bot':        { 3:3,  4:5,  5:8,  6:10, 7:12, 8:15 },
+    'Lazy Compiler':       { 3:4,  4:6,  5:9,  6:11, 7:13, 8:16 },
+    'Logic Bot':           { 3:5,  4:7,  5:10, 6:12, 7:14, 8:17 },
+    'Flash Coder':         { 3:6,  4:8,  5:11, 6:13, 7:15, 8:18 },
+    'Test Case Destroyer': { 3:10, 4:12, 5:15, 6:20, 7:25, 8:30 },
+  };
+
+  // Phase durations as fractions of total time (excluding submit window)
+  const BOT_PHASE_RATIOS = {
+    'Beginner Bot':        [0.15, 0.38, 0.22, 0.25],
+    'Lazy Compiler':       [0.18, 0.35, 0.20, 0.27],
+    'Logic Bot':           [0.12, 0.40, 0.25, 0.23],
+    'Flash Coder':         [0.10, 0.42, 0.28, 0.20],
+    'Test Case Destroyer': [0.08, 0.45, 0.30, 0.17],
+  };
+
+  // Returns the second at which bot submits (random within its window)
+  function getBotSubmitSecond(botName, totalSecs) {
+    const timeMin = Math.round(totalSecs / 60);
+    const windowKey = [3,4,5,6,7,8].includes(timeMin) ? timeMin : 5;
+    const windows = BOT_SUBMIT_WINDOWS[botName] || BOT_SUBMIT_WINDOWS['Logic Bot'];
+    const windowSecs = windows[windowKey] || 10;
+    // Bot submits randomly within [totalSecs - windowSecs, totalSecs - 1]
+    const submitAt = totalSecs - Math.floor(Math.random() * windowSecs) - 1;
+    return Math.max(0, submitAt);
+  }
+
+  // Compute phase boundaries for a bot based on submitSecond
+  function getBotPhaseBoundaries(botName, submitSecond) {
+    const ratios = BOT_PHASE_RATIOS[botName] || BOT_PHASE_RATIOS['Logic Bot'];
+    const phases = [];
+    let elapsed = 0;
+    for (let i = 0; i < 4; i++) {
+      const dur = Math.round(submitSecond * ratios[i]);
+      phases.push({ start: elapsed, end: elapsed + dur });
+      elapsed += dur;
+    }
+    // Phase 5 (submit) starts at submitSecond
+    phases.push({ start: submitSecond, end: submitSecond + 1 });
+    return phases;
+  }
+
+  // Get bot's current phase (1-5) based on elapsed seconds
+  function getBotPhase(phaseBoundaries, elapsedSecs, finished) {
+    if (finished) return 5;
+    for (let i = 4; i >= 0; i--) {
+      if (elapsedSecs >= phaseBoundaries[i].start) return i + 1;
+    }
+    return 1;
+  }
+
   const BOT_CONFIGS = {
-    'Beginner Bot': { delaySeconds: 22, completionRatio: 0.92 },
-    'Lazy Compiler': { delaySeconds: 38, completionRatio: 1.18 },
-    'Logic Bot': { delaySeconds: 9, completionRatio: 0.70 },
-    'Flash Coder': { delaySeconds: 5, completionRatio: 0.58 },
-    'Test Case Destroyer': { delaySeconds: 2, completionRatio: 0.45 }
+    'Beginner Bot':        { tag: 'BOT-1'  },
+    'Lazy Compiler':       { tag: 'BOT-2'  },
+    'Logic Bot':           { tag: 'BOT-6'  },
+    'Flash Coder':         { tag: 'BOT-7'  },
+    'Test Case Destroyer': { tag: 'BOT-15' },
   };
   const ALL_BOT_NAMES = ['Beginner Bot', 'Lazy Compiler', 'Logic Bot', 'Flash Coder', 'Test Case Destroyer'];
 
@@ -289,6 +343,20 @@ io.on('connection', (socket) => {
       sess.intervalId = null;
     }
 
+    // Per-player vs per-bot results
+    // Each player[i] competes against bot[i]
+    const playerResults = sess.players.map((p, idx) => {
+      const bot = sess.bots[idx];
+      const playerTime = p.finished ? p.timeUsed : Infinity;
+      const botTime = bot && bot.finished ? (bot.finishedAt || bot.submitSecond) : Infinity;
+      let outcome;
+      if (!p.finished && (!bot || !bot.finished)) outcome = 'tie';
+      else if (playerTime < botTime) outcome = 'player_wins';
+      else if (botTime < playerTime) outcome = 'bot_wins';
+      else outcome = 'tie'; // same time => tie
+      return { userId: p.userId, username: p.username, outcome, playerTime, botTime };
+    });
+
     let bestTime = Infinity;
     let roundWinnerName = 'AI';
     let roundWinnerType = 'ai';
@@ -304,7 +372,7 @@ io.on('connection', (socket) => {
     });
 
     sess.bots.forEach(b => {
-      const botTotalTime = b.delaySeconds + b.completionTime;
+      const botTotalTime = b.finishedAt || b.submitSecond;
       if (b.finished && botTotalTime < bestTime) {
         bestTime = botTotalTime;
         roundWinnerName = b.name;
@@ -326,7 +394,8 @@ io.on('connection', (socket) => {
         players: sess.players,
         aiScore: sess.aiScore || 0,
         currentRound: sess.currentRound,
-        nextRoundIn: 5
+        nextRoundIn: 5,
+        playerResults,
       });
 
       setTimeout(async () => {
@@ -346,18 +415,18 @@ io.on('connection', (socket) => {
             p.timeUsed = 0;
           });
 
-          currentSess.bots.forEach((bot, idx) => {
-            const cfg = BOT_CONFIGS[bot.name] || { delaySeconds: 10, completionRatio: 1.0 };
+          currentSess.bots.forEach((bot) => {
             const totalSecs = currentSess.roomTime * 60;
-            const completionTime = Math.max(20, Math.round(totalSecs * cfg.completionRatio));
-            const stagger = idx * 4;
-            bot.delaySeconds = cfg.delaySeconds + stagger;
-            bot.completionTime = completionTime;
+            const submitSecond = getBotSubmitSecond(bot.name, totalSecs);
+            const phaseBoundaries = getBotPhaseBoundaries(bot.name, submitSecond);
+            bot.submitSecond = submitSecond;
+            bot.phaseBoundaries = phaseBoundaries;
             bot.started = false;
             bot.progress = 0;
             bot.finished = false;
             bot.won = false;
-            bot.timeLeft = null;
+            bot.phase = 1;
+            bot.finishedAt = null;
           });
 
           currentSess.intervalId = setInterval(async () => {
@@ -369,18 +438,14 @@ io.on('connection', (socket) => {
 
             currentTickSess.bots.forEach(bot => {
               if (bot.finished) return;
-              if (!bot.started && elapsedSecs >= bot.delaySeconds) {
-                bot.started = true;
-                bot.timeLeft = bot.completionTime;
-              }
-              if (bot.started) {
-                bot.timeLeft -= 1;
-                bot.progress = Math.min(100, ((bot.completionTime - bot.timeLeft) / bot.completionTime) * 100);
-                if (bot.timeLeft <= 0) {
-                  bot.finished = true;
-                  bot.timeLeft = 0;
-                  bot.progress = 100;
-                }
+              bot.phase = getBotPhase(bot.phaseBoundaries, elapsedSecs, false);
+              const pct = Math.min(100, (elapsedSecs / bot.submitSecond) * 100);
+              bot.progress = Math.max(0, pct);
+              if (elapsedSecs >= bot.submitSecond) {
+                bot.finished = true;
+                bot.progress = 100;
+                bot.phase = 5;
+                bot.finishedAt = elapsedSecs;
               }
             });
 
@@ -393,7 +458,6 @@ io.on('connection', (socket) => {
             });
 
             const allHumansFinished = currentTickSess.players.every(p => p.finished);
-            // Only end when timer is up or all humans finished
             if (currentTickSess.timer <= 0 || allHumansFinished) {
               clearInterval(currentTickSess.intervalId);
               currentTickSess.intervalId = null;
@@ -424,7 +488,13 @@ io.on('connection', (socket) => {
          if (winnersList.length === 1) {
            finalWinner = winnersList[0].userId;
          } else {
-           finalWinner = 'draw';
+           // Tie-break by average time
+           let minAvgTime = Infinity;
+           let tieWinner = null;
+           winnersList.forEach(p => {
+             if (p.timeUsed < minAvgTime) { minAvgTime = p.timeUsed; tieWinner = p; }
+           });
+           finalWinner = tieWinner ? tieWinner.userId : 'draw';
          }
        } else if (totalHumanScore === aiScore) {
          finalWinner = 'draw';
@@ -487,19 +557,18 @@ io.on('connection', (socket) => {
           score: 0
         })),
         bots: botNames.map((name, idx) => {
-          const cfg = BOT_CONFIGS[name] || { delaySeconds: 10, completionRatio: 1.0 };
           const totalSecs = room.settings.roomTime * 60;
-          const completionTime = Math.max(20, Math.round(totalSecs * cfg.completionRatio));
-          const stagger = idx * 4;
+          const submitSecond = getBotSubmitSecond(name, totalSecs);
+          const phaseBoundaries = getBotPhaseBoundaries(name, submitSecond);
           return {
             name,
-            delaySeconds: cfg.delaySeconds + stagger,
-            completionTime,
+            submitSecond,
+            phaseBoundaries,
             started: false,
             progress: 0,
             finished: false,
             won: false,
-            timeLeft: null
+            phase: 1,
           };
         }),
         aiScore: 0,
@@ -544,18 +613,17 @@ io.on('connection', (socket) => {
 
           currentTickSess.bots.forEach(bot => {
             if (bot.finished) return;
-            if (!bot.started && elapsedSecs >= bot.delaySeconds) {
-              bot.started = true;
-              bot.timeLeft = bot.completionTime;
-            }
-            if (bot.started) {
-              bot.timeLeft -= 1;
-              bot.progress = Math.min(100, ((bot.completionTime - bot.timeLeft) / bot.completionTime) * 100);
-              if (bot.timeLeft <= 0) {
-                bot.finished = true;
-                bot.timeLeft = 0;
-                bot.progress = 100;
-              }
+            // Update phase
+            bot.phase = getBotPhase(bot.phaseBoundaries, elapsedSecs, false);
+            // Bot submits at its exact submitSecond
+            const pct = Math.min(100, (elapsedSecs / bot.submitSecond) * 100);
+            bot.progress = Math.max(0, pct);
+            if (elapsedSecs >= bot.submitSecond) {
+              bot.finished = true;
+              bot.progress = 100;
+              bot.phase = 5;
+              bot.finishedAt = elapsedSecs;
+              console.log(`🤖 Bot ${bot.name} submitted at ${elapsedSecs}s (window: last ${currentTickSess.roomTime * 60 - bot.submitSecond}s)`);
             }
           });
 
