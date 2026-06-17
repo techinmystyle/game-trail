@@ -6,82 +6,57 @@ export const HtmlIcon = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    {/* Shield background */}
+    {/* HTML label */}
     <path
       d="M108.4 0h23v22.8h21.2V0h23v69h-23V46h-21.1v23h-23.1V0zM206 22.9h-20.3V0h63.7v22.9h-20.3V69H206V22.9zM259.5 0h24l14.9 24.3L313.2 0h24v69h-23V34.8l-16 24.8h-.4l-16-24.8V69h-22.3V0zM348.7 0h23.1v46.2h32.5V69h-55.6V0z"
       fill="white"
     />
     {/* Main shield */}
-    <path
-      d="M107.6 471l-33-370.4h362.8l-33 370.2L255.7 512z"
-      fill="white"
-    />
-    {/* Right side highlight */}
-    <path
-      d="M256 480.5V131H404.3L376 447z"
-      fill="rgba(255,255,255,0.7)"
-    />
-    {/* Left side details - the "5" */}
-    <path
-      d="M142 176.3h114v45.4h-64.2l4.2 46.5h60v45.3H154.4M156.4 336.3H202.3l3.2 36.3 50.8 13.6v47.4l-93.2-26z"
-      fill="rgba(0,0,0,0.4)"
-    />
-    {/* Right side details - the "5" */}
-    <path
-      d="M369.6 176.3H255.8v45.4h109.6M361.3 268.2H255.8v45.4h56l-5.3 59-50.7 13.6v47.2l93-25.8z"
-      fill="rgba(0,0,0,0.4)"
-    />
+    <path d="M107.6 471l-33-370.4h362.8l-33 370.2L255.7 512z" fill="white" />
+    {/* Right side depth */}
+    <path d="M256 480.5V131H404.3L376 447z" fill="rgba(255,255,255,0.7)" />
+    {/* Left "5" */}
+    <path d="M142 176.3h114v45.4h-64.2l4.2 46.5h60v45.3H154.4M156.4 336.3H202.3l3.2 36.3 50.8 13.6v47.4l-93.2-26z" fill="rgba(0,0,0,0.4)" />
+    {/* Right "5" */}
+    <path d="M369.6 176.3H255.8v45.4h109.6M361.3 268.2H255.8v45.4h56l-5.3 59-50.7 13.6v47.2l93-25.8z" fill="rgba(0,0,0,0.4)" />
   </svg>
 );
 
+/* ── CSS3 Icon — proper official-style shield with visible "3" ── */
 export const CssIcon = () => (
   <svg
     width="70"
     height="70"
-    viewBox="0 0 452 600"
+    viewBox="0 0 512 560"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    {/* CSS Text */}
+    {/* "CSS" label */}
     <text
-      x="226"
-      y="60"
+      x="256" y="62"
       textAnchor="middle"
-      fontFamily="Arial, sans-serif"
-      fontSize="75"
-      fontWeight="bold"
-      fill="white"
-    >
-      CSS
-    </text>
+      fontFamily="Arial Black, Arial, sans-serif"
+      fontSize="76" fontWeight="900"
+      fill="white" letterSpacing="2"
+    >CSS</text>
 
-    {/* Icon Group - Shifted Down */}
-    <g transform="translate(0, 88)">
-      {/* Main shield */}
-      <path
-        d="M41 460L0 0H451L410 460L225 512L41 460Z"
-        fill="white"
-      />
-      {/* Right Side Fold (3D Effect) */}
-      <path
-        d="M226 472L376 430L411 38H226V472Z"
-        fill="white"
-        fillOpacity="0.8"
-      />
-      {/* HTML5-emulated reversed 3 symbol */}
-      <path
-        d="M113 94 
-           H380 L375 147 H168 V200 H380 L375 253 H168 
-           V310 L320 290 L330 355 L113 410 
-           V94 Z"
-        fill="rgba(0,0,0,0.4)"
-        fillRule="evenodd"
-        stroke="rgba(0,0,0,0.2)"
-        strokeWidth="10"
-        strokeLinejoin="round"
-        transform="translate(452 0) scale(-1 1)"
-      />
-    </g>
+    {/* Shield body */}
+    <path d="M74 90 L438 90 L405 488 L256 538 L107 488 Z" fill="white" />
+    {/* Right half depth */}
+    <path d="M256 90 L256 528 L370 450 L404 138 Z" fill="rgba(255,255,255,0.72)" />
+
+    {/* "3" numeral — constructed from 3 horizontal bars with a right notch */}
+    {/* Top bar */}
+    <rect x="134" y="158" width="246" height="52" rx="4" fill="rgba(0,0,0,0.36)" />
+    {/* Middle bar */}
+    <rect x="162" y="268" width="218" height="52" rx="4" fill="rgba(0,0,0,0.36)" />
+    {/* Bottom bar */}
+    <rect x="134" y="378" width="246" height="52" rx="4" fill="rgba(0,0,0,0.36)" />
+    {/* Left gap (makes the left open side of "3") */}
+    <rect x="134" y="210" width="62" height="58" fill="white" fillOpacity="0.0" />
+    {/* Mask left side of middle & top/bottom to create "3" shape */}
+    <rect x="134" y="210" width="68" height="58" fill="#ffffff" fillOpacity="0.45" />
+    <rect x="134" y="320" width="68" height="58" fill="#ffffff" fillOpacity="0.45" />
   </svg>
 );
 
@@ -140,28 +115,23 @@ export const JavaIcon = () => (
   >
     <path
       d="M102.681 291.324s-14.178 8.245 10.09 11.035c29.4 3.354 44.426 2.873 76.825-3.259 0 0 8.518 5.341 20.414 9.967-72.63 31.128-164.376-1.803-107.329-17.743M93.806 251.067s-15.902 11.771 8.384 14.283c31.406 3.24 56.208 3.505 99.125-4.759 0 0 5.937 6.018 15.271 9.309-87.815 25.678-185.624 2.025-122.78-18.833"
-      fill="white"
-      fillOpacity="0.9"
+      fill="white" fillOpacity="0.9"
     />
     <path
       d="M168.625 181.799c17.896 20.604-4.701 39.146-4.701 39.146s45.439-23.458 24.571-52.833c-19.491-27.394-34.438-41.005 46.479-87.934 0-.001-127.013 31.721-66.349 101.621"
-      fill="white"
-      fillOpacity="0.85"
+      fill="white" fillOpacity="0.85"
     />
     <path
       d="M269.59 321.181s10.484 8.645-11.534 15.333c-41.858 12.714-174.214 16.553-210.922.507-13.176-5.761 11.534-13.755 19.296-15.438 8.106-1.762 12.732-1.438 12.732-1.438-14.631-10.301-94.565 20.239-40.589 28.999 147.867 24.011 269.566-10.799 230.017-27.963M110.537 211.512s-66.991 15.914-23.729 21.697c18.261 2.441 54.743 1.887 88.702-.958 27.756-2.323 55.655-7.281 55.655-7.281s-9.799 4.199-16.871 9.039c-68.041 17.9-199.485 9.57-161.625-8.74 31.992-15.479 57.868-13.757 57.868-13.757M241.811 281.978c69.117-35.927 37.186-70.466 14.866-65.803-5.458 1.14-7.901 2.13-7.901 2.13s2.031-3.179 5.897-4.547c44.041-15.485 77.935 45.755-14.263 70.047 0 0 1.071-.962 1.401-1.827"
-      fill="white"
-      fillOpacity="0.9"
+      fill="white" fillOpacity="0.9"
     />
     <path
       d="M188.462 6.916s38.293 38.293-36.315 97.169c-59.909 47.256-13.658 74.235-.025 105.056-34.979-31.559-60.677-59.339-43.463-85.225C133.974 88.502 204.021 68.605 188.462 6.916"
-      fill="white"
-      fillOpacity="0.85"
+      fill="white" fillOpacity="0.85"
     />
     <path
       d="M116.814 374.379c66.402 4.25 168.371-2.363 170.717-33.799 0 0-4.641 11.906-54.849 21.363-56.684 10.717-126.552 9.461-168.059 2.598 0-.001 8.502 7.028 52.191 9.838"
-      fill="white"
-      fillOpacity="0.9"
+      fill="white" fillOpacity="0.9"
     />
   </svg>
 );
