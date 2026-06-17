@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 import { PrismThemeToggle } from '../components/landing/PrismThemeToggle';
+import { Swords3DIcon, Target3DIcon } from '../components/landing/ModeIcons';
 
 // THEMES structure similar to the rest of the application
 const THEMES = {
@@ -179,8 +180,10 @@ const ModeCard = ({ type, onClick, theme }) => {
         background: `${cardAccent}18`, border: `1px solid ${cardAccent}35`,
         fontFamily: 'monospace', fontSize: 8, color: cardAccent,
         letterSpacing: 3, textTransform: 'uppercase', fontWeight: 700,
+        display: 'flex', alignItems: 'center', gap: 6,
       }}>
-        {isCreate ? '⚔ HOST' : '🎯 GUEST'}
+        {isCreate ? <Swords3DIcon size={14} /> : <Target3DIcon size={14} />}
+        {isCreate ? 'HOST' : 'GUEST'}
       </div>
 
       {/* Data corner top-left */}
@@ -217,10 +220,14 @@ const ModeCard = ({ type, onClick, theme }) => {
           border: `1.5px solid ${cardAccent}45`,
           boxShadow: hovered ? `0 0 40px ${cardAccent}35, inset 0 0 20px ${cardAccent}10` : 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 34, transition: 'all 0.4s',
+          transition: 'all 0.4s',
           transform: hovered ? 'scale(1.12)' : 'scale(1)',
         }}>
-          {isCreate ? '⚔️' : '🎯'}
+          {isCreate ? (
+            <Swords3DIcon size={44} />
+          ) : (
+            <Target3DIcon size={44} />
+          )}
         </div>
       </div>
 

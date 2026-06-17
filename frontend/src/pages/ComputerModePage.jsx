@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
+import { Swords, KeyRound } from 'lucide-react';
 
 const THEMES = {
   red:    { accent: '#ff5252', ui: '#ff6b6b', bg: '#0d0305' },
@@ -123,10 +124,14 @@ const ModeCard = ({ type, ac, ui, onClick }) => {
           border: `2px solid ${cardAccent}40`,
           boxShadow: hovered ? `0 0 30px ${cardAccent}40, inset 0 0 30px ${cardAccent}10` : 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 38, transition: 'all 0.4s',
+          transition: 'all 0.4s',
           transform: hovered ? 'scale(1.1)' : 'scale(1)',
         }}>
-          {isCreate ? '⚔️' : '🔐'}
+          {isCreate ? (
+            <Swords size={42} strokeWidth={1.5} color={cardAccent} style={{ filter: `drop-shadow(0 0 10px ${cardAccent})` }} />
+          ) : (
+            <KeyRound size={42} strokeWidth={1.5} color={cardAccent} style={{ filter: `drop-shadow(0 0 10px ${cardAccent})` }} />
+          )}
         </div>
       </div>
 
