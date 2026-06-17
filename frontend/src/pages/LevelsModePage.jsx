@@ -4,6 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { CustomCursor } from "../components/landing/CustomCursor";
 import { HtmlIcon, CssIcon, JsIcon, PythonIcon, JavaIcon } from "../components/landing/TechIcons";
 import { ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import PixelBlast from "../components/landing/PixelBlast";
 
 /* ─── Themes ─────────────────────────────────────────────────────── */
 const THEMES = {
@@ -87,205 +88,6 @@ const COURSES = [
   },
 ];
 
-/* ════════════════════════════════════════════════════════════════════
-   PIXEL BLAST BACKGROUND
-   — Pixels explode outward from random origins in bursts,
-     drift, fade, and respawn. Completely unique to Levels Mode.
-   — Not binary rain, not hexagons.
-════════════════════════════════════════════════════════════════════ */
-const PixelBlast = ({ accent, asteroid }) => {
-  const canvasRef   = useRef(null);
-  const accentRef   = useRef(accent);
-  const asteroidRef = useRef(asteroid);
-
-  useEffect(() => { accentRef.current = accent; asteroidRef.current = asteroid; }, [accent, asteroid]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    let W = canvas.offsetWidth;
-    let H = canvas.offsetHeight;
-    canvas.width = W;
-    canvas.height = H;
-
-    const hexToRgb = hex => {
-      const h = hex.replace('#', '');
-      return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
-    };
-
-    /* ── Pixel particle pool ── */
-    const POOL = 320;
-    const SZ   = [2, 2, 2, 3, 3, 4];   // pixel sizes (weighted toward small)
-
-    const makePixel = () => {
-      const angle  = Math.random() * Math.PI * 2;
-      const speed  = Math.random() * 1.4 + 0.3;
-      const useAst = Math.random() > 0.62;
-      const size   = SZ[Math.floor(Math.random() * SZ.length)];
-      // Blast origins scattered across canvas
-      const ox = Math.random() * W;
-      const oy = Math.random() * H;
-      return {
-        x: ox, y: oy, ox, oy,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 1,                             // 1 → 0
-        decay: Math.random() * 0.006 + 0.003,
-        size,
-        useAst,
-        // Gravity: very slight downward pull
-        gravity: Math.random() * 0.012,
-        // Occasional square burst vs round pixel
-        square: Math.random() > 0.45,
-      };
-    };
-
-    const pixels = Array.from({ length: POOL }, makePixel);
-
-    /* ── Burst emitters ── */
-    const EMITTERS = 5;
-    const emitters = Array.from({ length: EMITTERS }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      timer: 0,
-      interval: Math.floor(Math.random() * 40 + 20), // burst every N frames
-    }));
-
-    let frame;
-    let tick = 0;
-
-    const draw = () => {
-      tick++;
-
-      /* Faint trail fade */
-      ctx.fillStyle = 'rgba(0,0,0,0.18)';
-      ctx.fillRect(0, 0, W, H);
-
-      const ac  = accentRef.current;
-      const ast = asteroidRef.current;
-      const [ar,ag,ab] = hexToRgb(ac);
-      const [xr,xg,xb] = hexToRgb(ast);
-
-      /* Fire bursts from emitters */
-      emitters.forEach(em => {
-        em.timer++;
-        if (em.timer >= em.interval) {
-          em.timer = 0;
-          em.interval = Math.floor(Math.random() * 50 + 18);
-          // Reposition emitter occasionally
-          if (Math.random() > 0.7) {
-            em.x = Math.random() * W;
-            em.y = Math.random() * H;
-          }
-          /* Spawn 8–16 pixels from this emitter */
-          const burst = Math.floor(Math.random() * 9 + 8);
-          let spawned = 0;
-          for (let i = 0; i < pixels.length && spawned < burst; i++) {
-            if (pixels[i].life <= 0) {
-              const angle  = Math.random() * Math.PI * 2;
-              const speed  = Math.random() * 2.2 + 0.6;
-              pixels[i] = {
-                x: em.x, y: em.y, ox: em.x, oy: em.y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1,
-                decay: Math.random() * 0.007 + 0.003,
-                size: SZ[Math.floor(Math.random() * SZ.length)],
-                useAst: Math.random() > 0.55,
-                gravity: Math.random() * 0.018,
-                square: Math.random() > 0.4,
-              };
-              spawned++;
-            }
-          }
-        }
-      });
-
-      /* Update & draw pixels */
-      pixels.forEach(p => {
-        if (p.life <= 0) return;
-
-        p.x    += p.vx;
-        p.y    += p.vy;
-        p.vy   += p.gravity;
-        p.vx   *= 0.994;  // mild air resistance
-        p.life -= p.decay;
-
-        const alpha = Math.max(0, p.life);
-        const cr = p.useAst ? xr : ar;
-        const cg = p.useAst ? xg : ag;
-        const cb = p.useAst ? xb : ab;
-
-        ctx.globalAlpha = alpha * 0.85;
-
-        if (p.square) {
-          /* Pixel square */
-          ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
-          ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-
-          /* Tiny inner highlight */
-          ctx.fillStyle = `rgba(255,255,255,${alpha * 0.45})`;
-          ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size / 2, p.size / 2);
-        } else {
-          /* Round pixel */
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
-          ctx.fill();
-        }
-
-        /* Glow for large pixels */
-        if (p.size >= 4 && p.life > 0.4) {
-          ctx.globalAlpha = alpha * 0.2;
-          const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 4);
-          grd.addColorStop(0, `rgba(${cr},${cg},${cb},1)`);
-          grd.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
-          ctx.fillStyle = grd;
-          ctx.fill();
-        }
-
-        ctx.globalAlpha = 1;
-      });
-
-      /* Floating drift dust — very subtle large dim pixels */
-      if (tick % 3 === 0) {
-        const dx = Math.random() * W;
-        const dy = Math.random() * H;
-        const da = Math.random() * 0.06 + 0.01;
-        const [cr,cg,cb] = Math.random() > 0.5 ? [ar,ag,ab] : [xr,xg,xb];
-        ctx.globalAlpha = da;
-        ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
-        ctx.fillRect(dx, dy, 1, 1);
-        ctx.globalAlpha = 1;
-      }
-
-      frame = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    const onResize = () => {
-      W = canvas.offsetWidth;
-      H = canvas.offsetHeight;
-      canvas.width = W;
-      canvas.height = H;
-    };
-    window.addEventListener('resize', onResize);
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', onResize); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-    />
-  );
-};
 
 /* ─── Stat badge ─────────────────────────────────────────────────── */
 const StatBadge = ({ icon, value, label, color }) => (
@@ -500,7 +302,7 @@ const LevelsModePage = () => {
 
       {/* ── PIXEL BLAST BACKGROUND (unique to Levels Mode) ── */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <PixelBlast accent={ac} asteroid={theme.asteroid} />
+        <PixelBlast color={ac} />
       </div>
 
       {/* Ambient glows */}
