@@ -87,7 +87,7 @@ const Section = ({ title, subtitle, children, ac }) => (
         <div style={{ width: 3, height: 14, borderRadius: 2, background: ac || '#a855f7' }} />
         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, color: 'white' }}>{title}</div>
       </div>
-      <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)', paddingLeft: 11 }}>{subtitle}</div>
+      <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', paddingLeft: 11 }}>{subtitle}</div>
     </div>
     {children}
   </div>
@@ -103,7 +103,7 @@ const PillSel = ({ options, value, onChange, color }) => (
           padding: '8px 20px', borderRadius: 100,
           border: `1.5px solid ${isSelected ? color : 'rgba(255,255,255,0.08)'}`,
           background: isSelected ? `${color}18` : 'rgba(255,255,255,0.02)',
-          color: isSelected ? color : 'rgba(255,255,255,0.5)',
+          color: isSelected ? color : 'rgba(255,255,255,0.8)',
           fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16,
           cursor: 'pointer', transition: 'all 0.2s',
           boxShadow: isSelected ? `0 0 16px ${color}25` : 'none',
@@ -119,8 +119,8 @@ const PillSel = ({ options, value, onChange, color }) => (
 const MiniBar = ({ label, value, color }) => (
   <div style={{ flex: 1, minWidth: 0 }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-      <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>{label}</span>
-      <span style={{ fontFamily: 'monospace', fontSize: 9, color }}>{value}%</span>
+      <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontFamily: 'monospace', fontSize: 14, color }}>{value}%</span>
     </div>
     <div style={{ height: 3, background: 'rgba(255,255,255,0.07)', borderRadius: 2, overflow: 'hidden' }}>
       <div style={{ height: '100%', width: `${value}%`, background: color, borderRadius: 2, transition: 'width 0.5s' }} />
@@ -239,7 +239,7 @@ const ComputerModeRoomCreationPage = () => {
           </button>
 
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 10, letterSpacing: 4, color: ac, textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 4, color: ac, textTransform: 'uppercase', marginBottom: 4 }}>
               CONFIGURE YOUR BATTLE
             </div>
             <h1 style={{
@@ -270,7 +270,7 @@ const ComputerModeRoomCreationPage = () => {
                     <div style={{ fontSize: 24, marginBottom: 4 }}><PremiumIcon name={m.iconName} size={32} color={config.playerMode === m.value ? ac : 'rgba(255,255,255,0.7)'} /></div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15,
                       color: config.playerMode === m.value ? ac : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>{m.sub}</div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>{m.sub}</div>
                     {config.playerMode === m.value && <CheckCircle2 size={13} style={{ color: ac, marginTop: 4 }} />}
                   </div>
                 ))}
@@ -297,20 +297,20 @@ const ComputerModeRoomCreationPage = () => {
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: diffInfo.color, letterSpacing: 2 }}>
                     {diffInfo.label} ACTIVATED
                   </div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
                     {config.timeLimit} min → {diffInfo.tests} test cases per challenge
                   </div>
                 </div>
                 <div style={{
                   marginLeft: 'auto', padding: '4px 12px', borderRadius: 20,
                   background: `${diffInfo.color}20`, border: `1px solid ${diffInfo.color}40`,
-                  fontFamily: 'monospace', fontSize: 10, color: diffInfo.color, fontWeight: 700,
+                  fontFamily: 'monospace', fontSize: 13, color: diffInfo.color, fontWeight: 700,
                 }}>
                   {diffInfo.tests} TESTS
                 </div>
               </div>
 
-              <div style={{ marginTop: 8, fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.25)', lineHeight: 1.6 }}>
+              <div style={{ marginTop: 8, fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
                 3–4 min → Beginner Mode · 5–6 min → Moderate Mode · 7–8 min → Advanced Mode
               </div>
             </Section>
@@ -326,8 +326,8 @@ const ComputerModeRoomCreationPage = () => {
                       <div style={{ fontSize: 20, marginBottom: 4, filter: isSel ? `drop-shadow(0 0 10px ${l.color}80)` : 'none', opacity: isSel ? 1 : 0.4, transition: 'all 0.3s' }}>
                         <PremiumIcon name={l.iconName} size={32} />
                       </div>
-                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 11,
-                        color: isSel ? l.color : 'rgba(255,255,255,0.5)' }}>{l.value}</div>
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13,
+                        color: isSel ? l.color : 'rgba(255,255,255,0.8)' }}>{l.value}</div>
                     </div>
                   );
                 })}
@@ -352,7 +352,7 @@ const ComputerModeRoomCreationPage = () => {
                     }}>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14,
                       color: config.botMode === opt.val ? ac : 'rgba(255,255,255,0.6)' }}>{opt.label}</div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>{opt.desc}</div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{opt.desc}</div>
                   </div>
                 ))}
               </div>
@@ -364,8 +364,8 @@ const ComputerModeRoomCreationPage = () => {
                     <button key={i} onClick={() => setActiveBotSlot(i)} style={{
                       padding: '6px 14px', borderRadius: 8, border: 'none',
                       background: activeBotSlot === i ? ac : 'rgba(255,255,255,0.05)',
-                      color: activeBotSlot === i ? 'white' : 'rgba(255,255,255,0.4)',
-                      fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 12,
+                      color: activeBotSlot === i ? 'white' : 'rgba(255,255,255,0.7)',
+                      fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14,
                       cursor: 'pointer', transition: 'all 0.2s', textTransform: 'uppercase',
                     }}>
                       Player {i + 1}
@@ -398,10 +398,10 @@ const ComputerModeRoomCreationPage = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                           <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13,
                             color: isSelectedForSlot ? bot.color : 'white' }}>{bot.name}</span>
-                          <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 6px',
+                          <span style={{ fontFamily: 'monospace', fontSize: 13, padding: '1px 6px',
                             borderRadius: 3, background: bot.tagColor + '25', color: bot.tagColor, fontWeight: 700 }}>{bot.tag}</span>
                           {assignedToSlots.length > 0 && (
-                            <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
                               also P{assignedToSlots.map(s => s + 1).join(',')}
                             </span>
                           )}
@@ -410,7 +410,7 @@ const ComputerModeRoomCreationPage = () => {
                           <MiniBar label="Speed" value={bot.speed} color={bot.color} />
                           <MiniBar label="Acc" value={bot.accuracy} color={bot.color} />
                         </div>
-                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>
                           Submits: {bot.completesAt}
                         </div>
                       </div>
@@ -424,7 +424,7 @@ const ComputerModeRoomCreationPage = () => {
                 <button onClick={randomizeAllBots} style={{
                   marginTop: 10, width: '100%', padding: '10px', borderRadius: 8,
                   background: `${ac}15`, color: ac, cursor: 'pointer',
-                  fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 12,
+                  fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   border: `1px solid ${ac}30`, transition: 'all 0.2s',
                 }}>
@@ -467,7 +467,7 @@ const ComputerModeRoomCreationPage = () => {
                   <div key={label} style={{
                     background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px',
                   }}>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)',
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)',
                       textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{label}</div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: 'white' }}>{value}</div>
                   </div>
@@ -484,14 +484,14 @@ const ComputerModeRoomCreationPage = () => {
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: diffInfo.color, letterSpacing: 1 }}>
                   {diffInfo.label}
                 </span>
-                <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.4)', marginLeft: 'auto' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.7)', marginLeft: 'auto' }}>
                   {diffInfo.tests} test cases
                 </span>
               </div>
 
               {/* Bot assignments */}
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)',
+                <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)',
                   textTransform: 'uppercase', letterSpacing: 2, marginBottom: 8 }}>Bot Assignments</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {Array.from({ length: config.playerMode }, (_, i) => {
@@ -499,10 +499,10 @@ const ComputerModeRoomCreationPage = () => {
                     const bot = BOTS.find(b => b.name === botName) || BOTS[0];
                     return (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)', width: 60 }}>P{i + 1} vs</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)', width: 60 }}>P{i + 1} vs</div>
                         <img src={bot.image} alt={bot.name} style={{ width: 22, height: 22, borderRadius: '50%', border: `1.5px solid ${bot.color}`, objectFit: 'cover', background: '#111' }} />
-                        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 11, color: bot.color }}>{bot.name}</span>
-                        <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 5px', borderRadius: 3, background: `${bot.color}20`, color: bot.color, marginLeft: 'auto' }}>{bot.tag}</span>
+                        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: bot.color }}>{bot.name}</span>
+                        <span style={{ fontFamily: 'monospace', fontSize: 13, padding: '1px 5px', borderRadius: 3, background: `${bot.color}20`, color: bot.color, marginLeft: 'auto' }}>{bot.tag}</span>
                       </div>
                     );
                   })}
@@ -517,7 +517,7 @@ const ComputerModeRoomCreationPage = () => {
                   display: 'flex', alignItems: 'flex-start', gap: 8,
                 }}>
                   <AlertTriangle size={13} style={{ color: ac, flexShrink: 0, marginTop: 1 }} />
-                  <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+                  <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5 }}>
                     Share <strong style={{ color: ac }}>Room ID + Password</strong> with your {config.playerMode - 1} teammate{config.playerMode > 2 ? 's' : ''} after creating the room.
                   </span>
                 </div>
@@ -530,7 +530,7 @@ const ComputerModeRoomCreationPage = () => {
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <Zap size={12} style={{ color: '#10b981', flexShrink: 0 }} />
-                <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                   <strong style={{ color: '#10b981' }}>15s Reading Phase</strong> before timer starts — read the question carefully!
                 </span>
               </div>
@@ -548,7 +548,7 @@ const ComputerModeRoomCreationPage = () => {
               }}>
                 {isCreating ? (
                   <>
-                    <div style={{ width: 18, height: 18, border: '3px solid rgba(255,255,255,0.3)',
+                    <div style={{ width: 18, height: 18, border: '3px solid rgba(255,255,255,0.6)',
                       borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
                     CREATING BATTLE...
                   </>
@@ -560,7 +560,7 @@ const ComputerModeRoomCreationPage = () => {
               </button>
 
               <div style={{ textAlign: 'center', marginTop: 10, fontFamily: 'monospace',
-                fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: 1 }}>
+                fontSize: 14, color: 'rgba(255,255,255,0.2)', letterSpacing: 1 }}>
                 {config.playerMode === 1 ? 'No room ID needed for Solo mode' : 'Room ID generated on creation'}
               </div>
             </div>

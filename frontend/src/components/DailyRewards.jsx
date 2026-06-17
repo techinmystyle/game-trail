@@ -192,7 +192,7 @@ export const DailyRewards = ({ theme }) => {
               <div 
                 className="text-xs font-bold"
                 style={{ 
-                  color: isActive ? theme.accent : isClaimed ? 'rgba(255,255,255,0.4)' : isWaiting ? `${theme.accent}80` : 'rgba(255,255,255,0.3)' 
+                  color: isActive ? theme.accent : isClaimed ? 'rgba(255,255,255,0.7)' : isWaiting ? `${theme.accent}80` : 'rgba(255,255,255,0.6)' 
                 }}
               >
                 +{reward}

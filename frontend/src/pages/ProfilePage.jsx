@@ -589,7 +589,7 @@ const ProfilePage = () => {
         ))}
 
         {/* Core Center Emblem */}
-        <circle cx={center} cy={center} r="6" fill="#0c071a" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+        <circle cx={center} cy={center} r="6" fill="#0c071a" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" />
       </svg>
     );
   };
@@ -921,7 +921,7 @@ const ProfilePage = () => {
                                     style={{
                                       borderColor: tempGender === 'male' ? currentTheme.accent : 'rgba(255,255,255,0.06)',
                                       background: tempGender === 'male' ? `${currentTheme.accent}15` : 'rgba(255,255,255,0.02)',
-                                      color: tempGender === 'male' ? currentTheme.accent : 'rgba(255,255,255,0.5)'
+                                      color: tempGender === 'male' ? currentTheme.accent : 'rgba(255,255,255,0.8)'
                                     }}
                                   >
                                     MALE CODER
@@ -933,7 +933,7 @@ const ProfilePage = () => {
                                     style={{
                                       borderColor: tempGender === 'female' ? currentTheme.accent : 'rgba(255,255,255,0.06)',
                                       background: tempGender === 'female' ? `${currentTheme.accent}15` : 'rgba(255,255,255,0.02)',
-                                      color: tempGender === 'female' ? currentTheme.accent : 'rgba(255,255,255,0.5)'
+                                      color: tempGender === 'female' ? currentTheme.accent : 'rgba(255,255,255,0.8)'
                                     }}
                                   >
                                     FEMALE CODER

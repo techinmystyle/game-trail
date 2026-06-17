@@ -52,7 +52,7 @@ const BinaryRain = ({ accent }) => {
 const StatBadge = ({ value, label, color }) => (
   <div style={{ textAlign: 'center' }}>
     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 28, color, lineHeight: 1 }}>{value}</div>
-    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
+    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
   </div>
 );
 
@@ -99,7 +99,7 @@ const ModeCard = ({ type, ac, ui, onClick }) => {
         position: 'absolute', top: 20, right: 20,
         padding: '4px 12px', borderRadius: 20,
         background: `${cardAccent}20`, border: `1px solid ${cardAccent}40`,
-        fontFamily: 'monospace', fontSize: 9, color: cardAccent,
+        fontFamily: 'monospace', fontSize: 14, color: cardAccent,
         letterSpacing: 2, textTransform: 'uppercase', fontWeight: 700,
       }}>
         {isCreate ? 'HOST' : 'GUEST'}
@@ -144,7 +144,7 @@ const ModeCard = ({ type, ac, ui, onClick }) => {
           {isCreate ? 'CREATE ROOM' : 'JOIN ROOM'}
         </div>
         <div style={{
-          fontFamily: 'monospace', fontSize: 12, color: 'rgba(255,255,255,0.45)',
+          fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.45)',
           lineHeight: 1.7, marginBottom: 24,
         }}>
           {isCreate
@@ -168,7 +168,7 @@ const ModeCard = ({ type, ac, ui, onClick }) => {
                 width: 6, height: 6, borderRadius: '50%',
                 background: cardAccent, boxShadow: `0 0 8px ${cardAccent}`,
               }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
                 {feat}
               </span>
             </div>
@@ -256,7 +256,7 @@ const ComputerModePage = () => {
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
             background: `${ac}12`, border: `1px solid ${ac}30`,
-            fontFamily: 'monospace', fontSize: 10, color: ac,
+            fontFamily: 'monospace', fontSize: 13, color: ac,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 20,
           }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: ac, animation: 'pulse 2s infinite' }} />
@@ -279,7 +279,7 @@ const ComputerModePage = () => {
 
           <p style={{
             fontFamily: 'monospace', fontSize: 14,
-            color: 'rgba(255,255,255,0.4)', margin: '0 auto', maxWidth: 520, lineHeight: 1.8,
+            color: 'rgba(255,255,255,0.7)', margin: '0 auto', maxWidth: 520, lineHeight: 1.8,
           }}>
             Human vs. Machine. Code faster than the AI or be defeated.
             The System judges. No mercy. No excuses.
@@ -311,7 +311,7 @@ const ComputerModePage = () => {
         {/* Bottom instruction */}
         <div style={{
           textAlign: 'center', marginTop: 48,
-          fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.2)',
+          fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.2)',
           letterSpacing: 2,
         }}>
           HOST A ROOM TO CONFIGURE BATTLE SETTINGS · JOIN A ROOM WITH ROOM ID + PASSWORD

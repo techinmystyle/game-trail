@@ -176,7 +176,7 @@ export const Footer = ({ theme }) => {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p
               className="font-techno text-sm"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
+              style={{ color: 'rgba(255,255,255,0.8)' }}
             >
               © 2024 Game In My Style. All rights reserved.
             </p>
@@ -186,12 +186,12 @@ export const Footer = ({ theme }) => {
                   key={idx}
                   href="#"
                   className="font-techno text-sm transition-all duration-300"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                  style={{ color: 'rgba(255,255,255,0.8)' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = theme.ui;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
                   }}
                 >
                   {link}

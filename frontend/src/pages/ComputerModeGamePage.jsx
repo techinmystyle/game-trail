@@ -98,7 +98,7 @@ const BinaryMatrix = ({ color, progress }) => {
   const filled = Math.floor((progress / 100) * ROWS * COLS);
   let count = 0;
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: 8, lineHeight: 1.5, userSelect: 'none', overflow: 'hidden' }}>
+    <div style={{ fontFamily: 'monospace', fontSize: 13, lineHeight: 1.5, userSelect: 'none', overflow: 'hidden' }}>
       {matrix.map((row, ri) => (
         <div key={ri} style={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
           {row.map((cell, ci) => {
@@ -135,7 +135,7 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
       <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: '#10b981', letterSpacing: 3 }}>
         READING PHASE — STUDY THE CHALLENGE
       </span>
-      <Lock size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
+      <Lock size={14} style={{ color: 'rgba(255,255,255,0.7)' }} />
     </div>
 
     {/* Countdown ring */}
@@ -159,7 +159,7 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
       }}>{countdown}</div>
     </div>
 
-    <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 28, letterSpacing: 2 }}>
+    <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 28, letterSpacing: 2 }}>
       {countdown <= 5 ? '⚠️ GET READY — TIMER STARTS SOON!' : 'Editor locked · Read the problem carefully'}
     </div>
 
@@ -179,7 +179,7 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
         </div>
         <div style={{
           borderLeft: `3px solid ${ac}`, paddingLeft: 16,
-          fontFamily: 'monospace', fontSize: 12, color: '#e2e8f0', lineHeight: 1.7, marginBottom: 16,
+          fontFamily: 'monospace', fontSize: 14, color: '#e2e8f0', lineHeight: 1.7, marginBottom: 16,
         }}>
           {challenge.objective}
         </div>
@@ -189,7 +189,7 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
               <div key={i} style={{
                 padding: '4px 12px', borderRadius: 20,
                 background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)',
-                fontFamily: 'monospace', fontSize: 9, color: '#6ee7b7',
+                fontFamily: 'monospace', fontSize: 14, color: '#6ee7b7',
               }}>
                 Test {i + 1}: {tc.description}
               </div>
@@ -661,7 +661,7 @@ export default function ComputerModeGamePage() {
       }}>
         <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 14px',borderRight:'1px solid rgba(255,255,255,0.06)'}}>
           <Zap size={12} fill={ac} style={{color:ac}}/>
-          <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:11,color:ac,letterSpacing:2,whiteSpace:'nowrap'}}>GAME IN MY STYLE</span>
+          <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize: 13,color:ac,letterSpacing:2,whiteSpace:'nowrap'}}>GAME IN MY STYLE</span>
         </div>
 
         {/* Round indicator */}
@@ -675,28 +675,28 @@ export default function ComputerModeGamePage() {
               }}/>
             ))}
           </div>
-          <span style={{fontFamily:'monospace',fontSize:9,color:'rgba(255,255,255,0.35)'}}>R{currentRound}/{totalRounds}</span>
+          <span style={{fontFamily:'monospace',fontSize: 14,color:'rgba(255,255,255,0.65)'}}>R{currentRound}/{totalRounds}</span>
         </div>
 
         {/* Title */}
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:13,color:'white',textTransform:'uppercase',letterSpacing:1}}>{challenge.title}</span>
-          <span style={{fontFamily:'monospace',fontSize:9,padding:'2px 8px',borderRadius:3,background:`${ac}20`,color:ac}}>{language}</span>
-          <span style={{fontFamily:'monospace',fontSize:9,padding:'2px 8px',borderRadius:3,background:'rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.45)'}}>{difficulty}</span>
+          <span style={{fontFamily:'monospace',fontSize: 14,padding:'2px 8px',borderRadius:3,background:`${ac}20`,color:ac}}>{language}</span>
+          <span style={{fontFamily:'monospace',fontSize: 14,padding:'2px 8px',borderRadius:3,background:'rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.45)'}}>{difficulty}</span>
         </div>
 
         {/* Reading phase indicator in top bar */}
         {readingPhase && (
           <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 12px',borderLeft:'1px solid rgba(255,255,255,0.06)',color:'#10b981'}}>
             <BookOpen size={12}/>
-            <span style={{fontFamily:'monospace',fontSize:9,color:'#10b981',fontWeight:700}}>READING {readingCountdown}s</span>
+            <span style={{fontFamily:'monospace',fontSize: 14,color:'#10b981',fontWeight:700}}>READING {readingCountdown}s</span>
           </div>
         )}
 
         {/* Score */}
         <div style={{display:'flex',alignItems:'center',gap:6,padding:'0 14px',borderLeft:'1px solid rgba(255,255,255,0.06)'}}>
           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:15,color:ac}}>{scores.player}</span>
-          <span style={{fontFamily:'Rajdhani,sans-serif',fontSize:12,color:'rgba(255,255,255,0.2)'}}>:</span>
+          <span style={{fontFamily:'Rajdhani,sans-serif',fontSize: 14,color:'rgba(255,255,255,0.2)'}}>:</span>
           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:15,color:'#f97316'}}>{scores.ai}</span>
         </div>
 
@@ -730,7 +730,7 @@ export default function ComputerModeGamePage() {
            }}>
              <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
                <div style={{width:3,height:14,borderRadius:2,background:ac,flexShrink:0}}/>
-               <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,color:ac,textTransform:'uppercase',letterSpacing:2}}>CHALLENGE OBJECTIVE</span>
+               <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,color:ac,textTransform:'uppercase',letterSpacing:2}}>CHALLENGE OBJECTIVE</span>
              </div>
              <div style={{
                flex:1,overflowY:'auto',
@@ -739,7 +739,7 @@ export default function ComputerModeGamePage() {
                borderRadius:'0 6px 6px 0',
                padding:'10px 14px',
              }}>
-               <p style={{fontFamily:'monospace',fontSize:11.5,color:'#e2e8f0',margin:0,lineHeight:1.6}}>
+               <p style={{fontFamily:'monospace',fontSize: 13.5,color:'#e2e8f0',margin:0,lineHeight:1.6}}>
                  {challenge.objective}
                </p>
              </div>
@@ -769,18 +769,18 @@ export default function ComputerModeGamePage() {
                      <div key={c} style={{width:8,height:8,borderRadius:'50%',background:c}}/>
                    ))}
                  </div>
-                 <span style={{fontFamily:'monospace',fontSize:10,color:'#94a3b8',fontWeight:600}}>
+                 <span style={{fontFamily:'monospace',fontSize: 13,color:'#94a3b8',fontWeight:600}}>
                    solution.{ext(language)}
                  </span>
                </div>
                <div style={{display:'flex',alignItems:'center',gap:8}}>
                  {readingPhase && (
-                   <span style={{fontFamily:'monospace',fontSize:8,background:'rgba(16,185,129,0.15)',color:'#10b981',padding:'2px 8px',borderRadius:4,fontWeight:700,display:'flex',alignItems:'center',gap:4}}>
+                   <span style={{fontFamily:'monospace',fontSize: 13,background:'rgba(16,185,129,0.15)',color:'#10b981',padding:'2px 8px',borderRadius:4,fontWeight:700,display:'flex',alignItems:'center',gap:4}}>
                      <Lock size={8}/> LOCKED DURING READING
                    </span>
                  )}
-                 <span style={{fontFamily:'monospace',fontSize:8,background:`${ac}20`,color:ac,padding:'2px 8px',borderRadius:4,fontWeight:700,letterSpacing:0.5}}>{language}</span>
-                 <span style={{fontFamily:'monospace',fontSize:8,color:'#64748b'}}>Ctrl+Enter: Compile</span>
+                 <span style={{fontFamily:'monospace',fontSize: 13,background:`${ac}20`,color:ac,padding:'2px 8px',borderRadius:4,fontWeight:700,letterSpacing:0.5}}>{language}</span>
+                 <span style={{fontFamily:'monospace',fontSize: 13,color:'#64748b'}}>Ctrl+Enter: Compile</span>
                </div>
              </div>
 
@@ -812,7 +812,7 @@ export default function ComputerModeGamePage() {
                  style={{
                    padding:'12px 0',border:'none',borderRight:'1px solid rgba(255,255,255,0.06)',
                    background: readingPhase?'rgba(255,255,255,0.04)':compiling?'rgba(16,185,129,0.18)':'#10b981',
-                   color: readingPhase?'rgba(255,255,255,0.3)':'white',cursor:compiling||readingPhase?'not-allowed':'pointer',
+                   color: readingPhase?'rgba(255,255,255,0.6)':'white',cursor:compiling||readingPhase?'not-allowed':'pointer',
                    fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:13,
                    letterSpacing:2,textTransform:'uppercase',
                    display:'flex',alignItems:'center',justifyContent:'center',gap:7,
@@ -822,7 +822,7 @@ export default function ComputerModeGamePage() {
                  onMouseLeave={e=>{ if(!compiling&&!readingPhase) e.currentTarget.style.background='#10b981'; }}
                >
                  {compiling
-                   ?<><div style={{width:11,height:11,border:'2px solid rgba(255,255,255,0.25)',borderTopColor:'white',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/> COMPILING...</>
+                   ?<><div style={{width:11,height:11,border:'2px solid rgba(255,255,255,0.55)',borderTopColor:'white',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/> COMPILING...</>
                    :<><Play size={12} fill="white"/> COMPILE</>}
                </button>
 
@@ -850,7 +850,7 @@ export default function ComputerModeGamePage() {
                    padding:'12px 20px',border:'none',
                    background:'rgba(239,68,68,0.08)',color:'rgba(239,68,68,0.7)',
                    cursor:'pointer',fontFamily:'Rajdhani,sans-serif',fontWeight:700,
-                   fontSize:11,letterSpacing:1,textTransform:'uppercase',
+                   fontSize: 13,letterSpacing:1,textTransform:'uppercase',
                    display:'flex',alignItems:'center',gap:5,transition:'all 0.2s',
                  }}
                  onMouseEnter={e=>{ e.currentTarget.style.background='rgba(239,68,68,0.2)'; e.currentTarget.style.color='#ef4444'; }}
@@ -883,7 +883,7 @@ export default function ComputerModeGamePage() {
                  border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
                  background: previewTab === 'yours' ? `${ac}1e` : 'transparent',
                  color: previewTab === 'yours' ? ac : '#94a3b8',
-                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
+                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,
                  letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
                  borderBottom: previewTab === 'yours' ? `2px solid ${ac}` : '2px solid transparent',
                }}>YOUR OUTPUT</button>
@@ -891,7 +891,7 @@ export default function ComputerModeGamePage() {
                  border:'none',outline:'none',padding:'6px 12px',borderRadius:6,
                  background: previewTab === 'expected' ? `${ac}1e` : 'transparent',
                  color: previewTab === 'expected' ? ac : '#94a3b8',
-                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:11,
+                 fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,
                  letterSpacing:1,cursor:'pointer',transition:'all 0.2s',
                  borderBottom: previewTab === 'expected' ? `2px solid ${ac}` : '2px solid transparent',
                }}>EXPECTED OUTPUT</button>
@@ -904,7 +904,7 @@ export default function ComputerModeGamePage() {
                      style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
                  ) : (
                    <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
-                     <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>Compile code to view live output.</span>
+                     <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Compile code to view live output.</span>
                    </div>
                  )}
                </div>
@@ -914,7 +914,7 @@ export default function ComputerModeGamePage() {
                      style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
                  ) : (
                    <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
-                     <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>No expected output available.</span>
+                     <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>No expected output available.</span>
                    </div>
                  )}
                </div>
@@ -937,11 +937,11 @@ export default function ComputerModeGamePage() {
                display:'flex',alignItems:'center',justifyContent:'space-between',
              }}>
                <div style={{display:'flex',alignItems:'center',gap:6}}>
-                 <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:10,color:'#94a3b8',textTransform:'uppercase',letterSpacing:2.5}}>
+                 <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,color:'#94a3b8',textTransform:'uppercase',letterSpacing:2.5}}>
                    Execution Console
                  </span>
                  {logs.length>0 && (
-                   <span style={{fontFamily:'monospace',fontSize:8.5,padding:'1px 6px',borderRadius:8,background:`${ac}20`,color:ac,fontWeight:700}}>{logs.length}</span>
+                   <span style={{fontFamily:'monospace',fontSize: 13.5,padding:'1px 6px',borderRadius:8,background:`${ac}20`,color:ac,fontWeight:700}}>{logs.length}</span>
                  )}
                </div>
                <button onClick={() => setLogs([])}
@@ -953,7 +953,7 @@ export default function ComputerModeGamePage() {
 
              <div style={{
                flex:1,overflowY:'auto',padding:'12px',
-               fontFamily:"'JetBrains Mono',monospace",fontSize:10.5,
+               fontFamily:"'JetBrains Mono',monospace",fontSize: 13.5,
                background:'#07090e',lineHeight:1.6,
              }}>
                {logs.length===0
@@ -985,7 +985,7 @@ export default function ComputerModeGamePage() {
            }}>
              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                <div>
-                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:9,color: readingPhase?'#10b981':'#94a3b8',textTransform:'uppercase',letterSpacing:1.5,marginBottom:2}}>
+                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 14,color: readingPhase?'#10b981':'#94a3b8',textTransform:'uppercase',letterSpacing:1.5,marginBottom:2}}>
                    {readingPhase ? '📖 READING TIME' : '⏱ TIME REMAINING'}
                  </div>
                  <div style={{
@@ -1003,7 +1003,7 @@ export default function ComputerModeGamePage() {
                    ? <img src={profileImg} alt="You" style={{width:38,height:38,borderRadius:'50%',objectFit:'cover',border:`2.5px solid ${ac}60`,display:'block',marginLeft:'auto'}}/>
                    : <div style={{width:38,height:38,borderRadius:'50%',background:`${ac}1a`,border:`2.5px solid ${ac}50`,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:16,color:ac,marginLeft:'auto'}}>{username[0]}</div>
                  }
-                 <div style={{fontFamily:'monospace',fontSize:8,color:'#94a3b8',marginTop:4}}>
+                 <div style={{fontFamily:'monospace',fontSize: 13,color:'#94a3b8',marginTop:4}}>
                    {username.length>10?username.slice(0,10)+'…':username}
                  </div>
                </div>
@@ -1020,11 +1020,11 @@ export default function ComputerModeGamePage() {
                  }}/>
                </div>
                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                 <span style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.25)'}}>
+                 <span style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.55)'}}>
                    {readingPhase ? '🔒 Editor locked' : `${Math.round(progress)}% complete · ${testResults.filter(Boolean).length}/${testResults.length} tests`}
                  </span>
                  {allPassed && !readingPhase && (
-                   <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:9,color:'#10b981',animation:'pulse 1s infinite',letterSpacing:0.5}}>
+                   <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize: 14,color:'#10b981',animation:'pulse 1s infinite',letterSpacing:0.5}}>
                      ✅ READY TO SUBMIT
                    </span>
                  )}
@@ -1044,14 +1044,14 @@ export default function ComputerModeGamePage() {
              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
                <div style={{display:'flex',alignItems:'center',gap:6}}>
                  <div style={{width:2.5,height:12,borderRadius:2,background:'#10b981'}}/>
-                 <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:10,textTransform:'uppercase',letterSpacing:2,color:'white'}}>TEST CASES</span>
+                 <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,textTransform:'uppercase',letterSpacing:2,color:'white'}}>TEST CASES</span>
                </div>
                <div style={{
                  padding:'2px 8px',borderRadius:20,
                  background: testResults.every(Boolean)?'rgba(16,185,129,0.12)':'rgba(255,255,255,0.05)',
                  border: `1px solid ${testResults.every(Boolean)?'rgba(16,185,129,0.35)':'rgba(255,255,255,0.07)'}`,
-                 fontFamily:'monospace',fontSize:8,
-                 color: testResults.every(Boolean)?'#10b981':'rgba(255,255,255,0.35)',
+                 fontFamily:'monospace',fontSize: 13,
+                 color: testResults.every(Boolean)?'#10b981':'rgba(255,255,255,0.65)',
                  transition:'all 0.3s',
                }}>
                  {testResults.filter(Boolean).length} / {testResults.length} PASS
@@ -1070,15 +1070,15 @@ export default function ComputerModeGamePage() {
                      width:18,height:18,borderRadius:'50%',flexShrink:0,
                      background: testResults[i]?'#10b981':'rgba(255,255,255,0.06)',
                      display:'flex',alignItems:'center',justifyContent:'center',
-                     fontWeight:700,fontSize:9,
-                     color: testResults[i]?'white':'rgba(255,255,255,0.3)',
+                     fontWeight:700,fontSize: 14,
+                     color: testResults[i]?'white':'rgba(255,255,255,0.6)',
                      boxShadow: testResults[i]?'0 0 6px rgba(16,185,129,0.4)':'none',
                      transition:'all 0.3s',
                    }}>
                      {testResults[i]?'✓':i+1}
                    </div>
                    <span style={{
-                     fontFamily:'monospace',fontSize:9.5,lineHeight:1.3,
+                     fontFamily:'monospace',fontSize: 14.5,lineHeight:1.3,
                      color: testResults[i]?'#6ee7b7':'#94a3b8',
                      flex:1,
                    }}>{tc.description}</span>
@@ -1103,10 +1103,10 @@ export default function ComputerModeGamePage() {
                background:'#07090e',flexShrink:0,
              }}>
                <div style={{width:2.5,height:12,borderRadius:2,background:'#f97316'}}/>
-               <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:10,color:'#f97316',textTransform:'uppercase',letterSpacing:2}}>
+               <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 13,color:'#f97316',textTransform:'uppercase',letterSpacing:2}}>
                  AI OPPONENTS
                </span>
-               <span style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.25)',marginLeft:4}}>
+               <span style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.55)',marginLeft:4}}>
                  {bots.length} bot{bots.length>1?'s':''}
                </span>
              </div>
@@ -1141,17 +1141,17 @@ export default function ComputerModeGamePage() {
                            transition:'all 0.4s',
                          }}/>
                          {bot.finished && (
-                           <div style={{position:'absolute',top:-4,right:-4,fontSize:8}}>🏁</div>
+                           <div style={{position:'absolute',top:-4,right:-4,fontSize: 13}}>🏁</div>
                          )}
                        </div>
 
                        <div style={{flex:1,minWidth:0}}>
                          <div style={{display:'flex',alignItems:'center',gap:4,marginBottom:1}}>
-                           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize:12,color:cfg.color,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{bot.name}</span>
+                           <span style={{fontFamily:'Rajdhani,sans-serif',fontWeight:800,fontSize: 14,color:cfg.color,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{bot.name}</span>
                            <span style={{fontFamily:'monospace',fontSize:7,padding:'0.5px 4px',borderRadius:2,background:`${cfg.color}20`,color:cfg.color,flexShrink:0,fontWeight:700}}>{cfg.tag}</span>
                          </div>
-                         <div style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.3)'}}>
-                           vs <span style={{color:'rgba(255,255,255,0.5)'}}>{playerName}</span>
+                         <div style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.6)'}}>
+                           vs <span style={{color:'rgba(255,255,255,0.8)'}}>{playerName}</span>
                          </div>
                        </div>
 
@@ -1188,7 +1188,7 @@ export default function ComputerModeGamePage() {
                      }}>
                        {/* Phase label */}
                        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:5}}>
-                         <span style={{fontFamily:'monospace',fontSize:8,color:`${cfg.color}cc`,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>
+                         <span style={{fontFamily:'monospace',fontSize: 13,color:`${cfg.color}cc`,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>
                            {bot.finished
                              ? '✅ SUBMITTED'
                              : `${phaseInfo.icon} ${phaseInfo.label}`
@@ -1203,7 +1203,7 @@ export default function ComputerModeGamePage() {
                        </div>
                        {bot.finished ? (
                          <div style={{
-                           fontFamily: 'monospace', fontSize: 10, color: cfg.color,
+                           fontFamily: 'monospace', fontSize: 13, color: cfg.color,
                            textAlign: 'center', padding: '10px 0', fontWeight: 'bold',
                            textShadow: `0 0 8px ${cfg.color}`,
                          }}>
@@ -1227,7 +1227,7 @@ export default function ComputerModeGamePage() {
           <div style={{background:'#111',border:'1px solid rgba(239,68,68,0.25)',borderRadius:20,padding:'32px',maxWidth:360,width:'90%',textAlign:'center'}}>
             <div style={{fontSize:48,marginBottom:14}}>⚠️</div>
             <h2 style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:22,color:'#ef4444',letterSpacing:2,margin:'0 0 10px',textTransform:'uppercase'}}>FORFEIT MATCH?</h2>
-            <p style={{fontFamily:'monospace',fontSize:11,color:'rgba(255,255,255,0.4)',margin:'0 0 24px',lineHeight:1.65}}>
+            <p style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.7)',margin:'0 0 24px',lineHeight:1.65}}>
               Leaving now counts as a forfeit. The AI will be declared winner.
             </p>
             <div style={{display:'flex',gap:10}}>
@@ -1263,15 +1263,15 @@ export default function ComputerModeGamePage() {
             <div style={{display:'flex',gap:20,justifyContent:'center',margin:'20px 0'}}>
               <div>
                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:48,color:ac}}>{scores.player}</div>
-                <div style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.3)'}}>YOU</div>
+                <div style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.6)'}}>YOU</div>
               </div>
               <div style={{alignSelf:'center',fontFamily:'Rajdhani,sans-serif',fontSize:20,color:'rgba(255,255,255,0.2)'}}>:</div>
               <div>
                 <div style={{fontFamily:'Rajdhani,sans-serif',fontWeight:900,fontSize:48,color:'#f97316'}}>{scores.ai}</div>
-                <div style={{fontFamily:'monospace',fontSize:8,color:'rgba(255,255,255,0.3)'}}>AI</div>
+                <div style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.6)'}}>AI</div>
               </div>
             </div>
-            <div style={{fontFamily:'monospace',fontSize:11,color:'rgba(255,255,255,0.35)',animation:'pulse 1s infinite'}}>
+            <div style={{fontFamily:'monospace',fontSize: 13,color:'rgba(255,255,255,0.65)',animation:'pulse 1s infinite'}}>
               {currentRound<totalRounds?`⏳ Next round in ${nextRoundIn}s...`:'⏳ Computing final results...'}
             </div>
           </div>

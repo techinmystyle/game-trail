@@ -48,7 +48,7 @@ const Section = ({ title, subtitle, children, accent }) => (
         <div style={{ width: 3, height: 14, borderRadius: 2, background: accent }} />
         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, color: 'white' }}>{title}</div>
       </div>
-      <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)', paddingLeft: 11 }}>{subtitle}</div>
+      <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', paddingLeft: 11 }}>{subtitle}</div>
     </div>
     {children}
   </div>
@@ -63,7 +63,7 @@ const PillSel = ({ options, value, onChange, accent }) => (
           padding: '8px 18px', borderRadius: 100,
           border: `1.5px solid ${isSelected ? accent : 'rgba(255,255,255,0.08)'}`,
           background: isSelected ? `${accent}18` : 'rgba(255,255,255,0.02)',
-          color: isSelected ? accent : 'rgba(255,255,255,0.5)',
+          color: isSelected ? accent : 'rgba(255,255,255,0.8)',
           fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16,
           cursor: 'pointer', transition: 'all 0.2s',
           boxShadow: isSelected ? `0 0 16px ${accent}25` : 'none',
@@ -187,7 +187,7 @@ const CustomModeRoomCreationPage = () => {
           </button>
 
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 10, letterSpacing: 4, color: accent, textTransform: 'uppercase', marginBottom: 4, transition: 'color 0.3s' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 4, color: accent, textTransform: 'uppercase', marginBottom: 4, transition: 'color 0.3s' }}>
               CONFIGURE YOUR HUMAN BATTLE
             </div>
             <h1 style={{
@@ -219,7 +219,7 @@ const CustomModeRoomCreationPage = () => {
                     <div style={{ fontSize: 26, marginBottom: 6 }}><PremiumIcon name={m.iconName} size={32} color={config.playerMode === m.value ? accent : 'rgba(255,255,255,0.7)'} /></div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18,
                       color: config.playerMode === m.value ? accent : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>{m.sub}</div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>{m.sub}</div>
                     {config.playerMode === m.value && <CheckCircle2 size={14} style={{ color: accent, marginTop: 5 }} />}
                   </div>
                 ))}
@@ -228,7 +228,7 @@ const CustomModeRoomCreationPage = () => {
               <div style={{
                 marginTop: 12, padding: '8px 14px', borderRadius: 8,
                 background: `${accent}08`, border: `1px solid ${accent}20`,
-                fontFamily: 'monospace', fontSize: 10, color: `${accent}80`,
+                fontFamily: 'monospace', fontSize: 13, color: `${accent}80`,
               }}>
                 ⚠️ Custom Mode is Human vs Human only — No AI bots involved!
               </div>
@@ -246,19 +246,19 @@ const CustomModeRoomCreationPage = () => {
                 <div style={{ fontSize: 24, marginBottom: 4 }}><PremiumIcon name={diffInfo.iconName} size={28} color={diffInfo.color} /></div>
                 <div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: diffInfo.color, letterSpacing: 2 }}>{diffInfo.label} ACTIVATED</div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
                     {config.timeLimit} min → {diffInfo.tests} test cases per challenge
                   </div>
                 </div>
                 <div style={{
                   marginLeft: 'auto', padding: '4px 12px', borderRadius: 20,
                   background: `${diffInfo.color}20`, border: `1px solid ${diffInfo.color}40`,
-                  fontFamily: 'monospace', fontSize: 10, color: diffInfo.color, fontWeight: 700,
+                  fontFamily: 'monospace', fontSize: 13, color: diffInfo.color, fontWeight: 700,
                 }}>
                   {diffInfo.tests} TESTS
                 </div>
               </div>
-              <div style={{ marginTop: 8, fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.25)', lineHeight: 1.6 }}>
+              <div style={{ marginTop: 8, fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
                 3–4 min → Beginner · 5–6 min → Moderate · 7–8 min → Advanced
               </div>
             </Section>
@@ -280,7 +280,7 @@ const CustomModeRoomCreationPage = () => {
                           <PremiumIcon name={l.iconName} size={32} />
                         </div>
                         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15,
-                          color: isSel ? l.color : 'rgba(255,255,255,0.4)', transition: 'all 0.3s' }}>
+                          color: isSel ? l.color : 'rgba(255,255,255,0.7)', transition: 'all 0.3s' }}>
                           {l.value}
                         </div>
                       </div>
@@ -321,7 +321,7 @@ const CustomModeRoomCreationPage = () => {
                   <div key={label} style={{
                     background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '8px 12px',
                   }}>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)',
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)',
                       textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{label}</div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: 'white' }}>{value}</div>
                   </div>
@@ -347,7 +347,7 @@ const CustomModeRoomCreationPage = () => {
                 display: 'flex', alignItems: 'flex-start', gap: 8,
               }}>
                 <AlertTriangle size={13} style={{ color: accent, flexShrink: 0, marginTop: 1 }} />
-                <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5 }}>
                   Share <strong style={{ color: accent }}>Room ID + Password</strong> with your {config.playerMode - 1} opponent{config.playerMode > 2 ? 's' : ''} after creating the room.
                 </span>
               </div>
@@ -359,7 +359,7 @@ const CustomModeRoomCreationPage = () => {
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <span style={{ display: 'flex', alignItems: 'center' }}><Crown size={16} color="#10b981" /></span>
-                <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+                <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                   <strong style={{ color: '#10b981' }}>First to pass all test cases</strong> and submit wins the round!
                 </span>
               </div>
@@ -372,7 +372,7 @@ const CustomModeRoomCreationPage = () => {
                 style={{
                   width: '100%', padding: '16px 0', borderRadius: 12, border: 'none',
                   background: isCreating ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${accent}, ${ui})`,
-                  color: isCreating ? 'rgba(255,255,255,0.4)' : '#ffffff',
+                  color: isCreating ? 'rgba(255,255,255,0.7)' : '#ffffff',
                   cursor: isCreating ? 'not-allowed' : 'pointer',
                   fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
                   fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
@@ -395,7 +395,7 @@ const CustomModeRoomCreationPage = () => {
               </button>
 
               <div style={{ textAlign: 'center', marginTop: 10, fontFamily: 'monospace',
-                fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: 1 }}>
+                fontSize: 14, color: 'rgba(255,255,255,0.2)', letterSpacing: 1 }}>
                 Room ID generated automatically on creation
               </div>
             </div>

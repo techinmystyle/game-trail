@@ -80,7 +80,7 @@ export const PrismThemeToggle = ({ currentThemeKey, onThemeChange, themes }) => 
                 cy={pos.y}
                 r="6"
                 fill={themes[key].accent}
-                stroke="rgba(255,255,255,0.4)"
+                stroke="rgba(255,255,255,0.7)"
                 strokeWidth={active ? "2" : "1"}
                 className="cursor-pointer transition-all duration-300 hover:stroke-white"
                 style={{
@@ -97,7 +97,7 @@ export const PrismThemeToggle = ({ currentThemeKey, onThemeChange, themes }) => 
                 cx={pos.x - 1.5}
                 cy={pos.y - 1.5}
                 r="2"
-                fill="rgba(255,255,255,0.5)"
+                fill="rgba(255,255,255,0.8)"
                 pointerEvents="none"
               />
             </g>

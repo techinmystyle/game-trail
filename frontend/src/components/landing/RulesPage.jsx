@@ -605,7 +605,7 @@ function HeaderSection({ onNav, onBack }) {
           style={{
             fontSize: "11px",
             letterSpacing: "0.45em",
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(255,255,255,0.7)",
             textTransform: "uppercase",
             margin: "0 0 18px",
             fontFamily: FONT_LABEL,
@@ -683,7 +683,7 @@ function HeaderSection({ onNav, onBack }) {
           style={{
             marginTop: "52px",
             fontSize: "10px",
-            color: "rgba(255,255,255,0.25)",
+            color: "rgba(255,255,255,0.55)",
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             fontFamily: FONT_LABEL,

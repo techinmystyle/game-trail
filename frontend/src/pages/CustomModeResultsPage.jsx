@@ -149,7 +149,7 @@ const CustomModeResultsPage = () => {
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
             background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 10, color: CM_ACCENT,
+            fontFamily: 'monospace', fontSize: 13, color: CM_ACCENT,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 24,
           }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: CM_ACCENT, animation: 'pulse 2s infinite' }} />
@@ -171,7 +171,7 @@ const CustomModeResultsPage = () => {
             {winnerData.title}
           </h1>
 
-          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.5)', maxWidth: 450, margin: '0 auto' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.8)', maxWidth: 450, margin: '0 auto' }}>
             {winnerData.subtitle}
           </p>
 
@@ -191,7 +191,7 @@ const CustomModeResultsPage = () => {
               <div key={sublabel} style={{ textAlign: 'center' }}>
                 <Icon size={18} style={{ color: CM_ACCENT, marginBottom: 6 }} />
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: 'white' }}>{label}</div>
-                <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 1 }}>{sublabel}</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>{sublabel}</div>
               </div>
             ))}
           </div>
@@ -230,7 +230,7 @@ const CustomModeResultsPage = () => {
                     background: rank === 0 ? 'linear-gradient(135deg, #f59e0b, #fbbf24)' : rank === 1 ? 'linear-gradient(135deg, #94a3b8, #cbd5e1)' : rank === 2 ? 'linear-gradient(135deg, #cd7c32, #d4975a)' : 'rgba(255,255,255,0.08)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18,
-                    color: rank < 3 ? '#000' : 'rgba(255,255,255,0.4)',
+                    color: rank < 3 ? '#000' : 'rgba(255,255,255,0.7)',
                     boxShadow: rank === 0 ? '0 0 16px rgba(245,158,11,0.5)' : 'none',
                   }}>
                     {rank + 1}
@@ -245,7 +245,7 @@ const CustomModeResultsPage = () => {
                       {isWinner && <span style={{ fontSize: 18 }}>👑</span>}
                       {isDraw && rank === 0 && <span style={{ fontSize: 14 }}>🤝</span>}
                     </div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
                       {player.finished ? '✅ Submitted successfully' : '⏳ Did not submit'}
                     </div>
                   </div>
@@ -255,7 +255,7 @@ const CustomModeResultsPage = () => {
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 36, color: playerColor, lineHeight: 1 }}>
                       {playerScore}
                     </div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>ROUNDS WON</div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROUNDS WON</div>
                   </div>
                 </div>
               );

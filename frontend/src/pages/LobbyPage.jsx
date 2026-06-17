@@ -318,7 +318,7 @@ const LobbyPage = () => {
           {roomData.isJoining ? 'JOINING BATTLE ROOM...' : 'CREATING BATTLE ROOM...'}
         </p>
         {connectingAttempt > 0 && (
-          <p style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 8 }}>
             Retrying... attempt {connectingAttempt + 1} of 5
           </p>
         )}
@@ -332,7 +332,7 @@ const LobbyPage = () => {
       <div style={{ textAlign: 'center', maxWidth: 400, padding: 32, ...cardStyle }}>
         <AlertCircle size={48} style={{ color: '#ef4444', marginBottom: 16 }} />
         <h2 style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 22, color: '#ef4444', marginBottom: 12 }}>CONNECTION FAILED</h2>
-        <p style={{ fontFamily: 'monospace', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>{error}</p>
+        <p style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 20 }}>{error}</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {roomData.isJoining && (
             <button onClick={() => { setError(null); setConnecting(true); setConnectingAttempt(0); setRetryCount(c => c + 1); }}
@@ -379,7 +379,7 @@ const LobbyPage = () => {
               display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
               borderRadius: 7, border: `1px solid ${ac}30`, background: `${ac}10`,
               color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-              fontWeight: 700, fontSize: 12, transition: 'all 0.2s',
+              fontWeight: 700, fontSize: 14, transition: 'all 0.2s',
             }}>
               <ChevronLeft size={14} /> BACK
             </button>
@@ -395,12 +395,12 @@ const LobbyPage = () => {
               }}>
                 <Icon size={12} style={{ color: ac }} />
                 <div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>{label}</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>{label}</div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 14, color: 'white' }}>{value}</div>
                 </div>
                 <button onClick={() => handleCopy(value)} style={{
                   width: 24, height: 24, borderRadius: 5, border: 'none',
-                  background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {copied === value ? <Check size={12} style={{ color: '#10b981' }} /> : <Copy size={12} />}
@@ -418,9 +418,9 @@ const LobbyPage = () => {
               border: `1px solid ${expirySeconds < 60 ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.08)'}`,
               borderRadius: 8, padding: '6px 12px',
             }}>
-              <Clock size={12} style={{ color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.4)' }} />
+              <Clock size={12} style={{ color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.7)' }} />
               <div>
-                <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>ROOM EXPIRES</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROOM EXPIRES</div>
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 13,
                   color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.7)' }}>
                   {formatExpiry(expirySeconds)}
@@ -431,11 +431,11 @@ const LobbyPage = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {profileImage
                 ? <img src={profileImage} alt="You" style={{ width: 32, height: 32, borderRadius: '50%', border: `2px solid ${ac}`, objectFit: 'cover' }} />
-                : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${ac}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 12, color: ac }}>{username[0]}</div>
+                : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${ac}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 14, color: ac }}>{username[0]}</div>
               }
               <div>
-                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 12, color: 'white' }}>{username}</div>
-                <div style={{ fontFamily: 'monospace', fontSize: 8, color: isHost ? ac : 'rgba(255,255,255,0.3)' }}>
+                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, color: 'white' }}>{username}</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 13, color: isHost ? ac : 'rgba(255,255,255,0.6)' }}>
                   {isHost ? '👑 HOST' : 'PLAYER'}
                 </div>
               </div>
@@ -457,7 +457,7 @@ const LobbyPage = () => {
                 display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px',
                 borderRadius: 8, border: `1px solid ${ac}30`, background: `${ac}10`,
                 color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-                fontWeight: 700, fontSize: 12,
+                fontWeight: 700, fontSize: 14,
               }}>
                 <ChevronLeft size={14} /> BACK
               </button>
@@ -484,13 +484,13 @@ const LobbyPage = () => {
                         padding: '6px 12px', borderRadius: 8,
                         background: msg.isWarning ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.04)',
                         border: `1px solid ${msg.isWarning ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)'}`,
-                        fontFamily: 'monospace', fontSize: 10,
-                        color: msg.isWarning ? '#ef4444' : 'rgba(255,255,255,0.35)',
+                        fontFamily: 'monospace', fontSize: 13,
+                        color: msg.isWarning ? '#ef4444' : 'rgba(255,255,255,0.65)',
                         textAlign: 'center', maxWidth: '90%',
                       }}>{msg.text}</div>
                     ) : (
                       <>
-                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)',
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)',
                           marginBottom: 3, paddingLeft: msg.isMine ? 0 : 4, paddingRight: msg.isMine ? 4 : 0 }}>
                           {msg.isMine ? 'You' : msg.from} · {msg.time}
                         </div>
@@ -498,7 +498,7 @@ const LobbyPage = () => {
                           padding: '8px 12px', borderRadius: 10,
                           background: msg.isMine ? `${ac}20` : 'rgba(255,255,255,0.06)',
                           border: `1px solid ${msg.isMine ? ac + '30' : 'rgba(255,255,255,0.06)'}`,
-                          fontFamily: 'monospace', fontSize: 12, color: 'white', maxWidth: '85%',
+                          fontFamily: 'monospace', fontSize: 14, color: 'white', maxWidth: '85%',
                           lineHeight: 1.5,
                         }}>{msg.text}</div>
                       </>
@@ -519,7 +519,7 @@ const LobbyPage = () => {
                     style={{
                       flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)',
                       background: 'rgba(255,255,255,0.03)', color: 'white',
-                      fontFamily: 'monospace', fontSize: 12, outline: 'none',
+                      fontFamily: 'monospace', fontSize: 14, outline: 'none',
                       caretColor: ac,
                     }}
                   />
@@ -546,11 +546,11 @@ const LobbyPage = () => {
                 display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px',
                 borderRadius: 8, border: `1px solid ${ac}30`, background: `${ac}10`,
                 color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-                fontWeight: 700, fontSize: 12,
+                fontWeight: 700, fontSize: 14,
               }}>
                 <ChevronLeft size={14} /> BACK
               </button>
-              <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: 2 }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', letterSpacing: 2 }}>
                 SOLO MODE — NO ROOM ID REQUIRED
               </div>
             </div>
@@ -558,7 +558,7 @@ const LobbyPage = () => {
 
           {/* Title */}
           <div style={{ textAlign: 'center', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 10, letterSpacing: 4, color: ac, textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 4, color: ac, textTransform: 'uppercase', marginBottom: 4 }}>
               {totalPlayers > 1 ? 'MULTIPLAYER BATTLE LOBBY' : 'SOLO BATTLE LOBBY'}
             </div>
             <h1 style={{
@@ -584,7 +584,7 @@ const LobbyPage = () => {
                 display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
                 borderRadius: 20, background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 12, color: 'rgba(255,255,255,0.6)',
+                fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 14, color: 'rgba(255,255,255,0.6)',
               }}>
                 <Icon size={12} style={{ color: ac }} /> {label}
               </div>
@@ -600,13 +600,13 @@ const LobbyPage = () => {
                 <User size={16} style={{ color: ac }} />
                 <div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, textTransform: 'uppercase' }}>PLAYERS</div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>
+                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
                     {playersReady} / {totalPlayers} Ready
                   </div>
                 </div>
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Wifi size={12} style={{ color: '#10b981' }} />
-                  <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#10b981' }}>LIVE</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 14, color: '#10b981' }}>LIVE</span>
                 </div>
               </div>
 
@@ -624,19 +624,19 @@ const LobbyPage = () => {
                       <div style={{ position: 'relative' }}>
                         {isMe && profileImage
                           ? <img src={profileImage} alt="You" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${ac}` }} />
-                          : <div style={{ width: 36, height: 36, borderRadius: '50%', background: player.ready ? `${ac}30` : 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 13, color: player.ready ? ac : 'rgba(255,255,255,0.4)' }}>
+                          : <div style={{ width: 36, height: 36, borderRadius: '50%', background: player.ready ? `${ac}30` : 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 13, color: player.ready ? ac : 'rgba(255,255,255,0.7)' }}>
                               {player.username?.[0]?.toUpperCase() || (idx + 1)}
                             </div>
                         }
                         {player.isHost && (
-                          <div style={{ position: 'absolute', top: -4, right: -4, fontSize: 12 }}>👑</div>
+                          <div style={{ position: 'absolute', top: -4, right: -4, fontSize: 14 }}>👑</div>
                         )}
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: isMe ? ac : 'white' }}>
                           {player.username} {isMe && '(YOU)'}
                         </div>
-                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: player.ready ? '#10b981' : 'rgba(255,255,255,0.3)' }}>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, color: player.ready ? '#10b981' : 'rgba(255,255,255,0.6)' }}>
                           {player.ready ? '✅ Ready to battle' : '⏳ Waiting...'}
                         </div>
                       </div>
@@ -662,7 +662,7 @@ const LobbyPage = () => {
                       <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>
                         Waiting for player...
                       </div>
-                      <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.12)' }}>Slot Open</div>
+                      <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.12)' }}>Slot Open</div>
                     </div>
                   </div>
                 ))}
@@ -675,7 +675,7 @@ const LobbyPage = () => {
                 <Bot size={16} style={{ color: '#f97316' }} />
                 <div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', color: '#f97316' }}>AI OPPONENTS</div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>
+                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
                     Each player vs their own bot
                   </div>
                 </div>
@@ -697,10 +697,10 @@ const LobbyPage = () => {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
                           <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: bot.color }}>{bot.name}</span>
-                          <span style={{ fontFamily: 'monospace', fontSize: 8, padding: '1px 5px', borderRadius: 3,
+                          <span style={{ fontFamily: 'monospace', fontSize: 13, padding: '1px 5px', borderRadius: 3,
                             background: `${bot.color}20`, color: bot.color }}>{bot.tag}</span>
                         </div>
-                        <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>
+                        <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
                           vs {assignedPlayer ? assignedPlayer.username : `Player ${i + 1}`}
                         </div>
                       </div>
@@ -720,7 +720,7 @@ const LobbyPage = () => {
               display: 'flex', alignItems: 'center', gap: 10,
             }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', animation: 'pulse 1s infinite' }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#f59e0b' }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 13, color: '#f59e0b' }}>
                 WAITING FOR {totalPlayers - (roomState?.players?.length || 0)} MORE PLAYER(S) — Share: {roomId} / {roomPassword}
               </span>
             </div>
@@ -744,7 +744,7 @@ const LobbyPage = () => {
                   {accepted && <span style={{ color: 'white', fontSize: 13, lineHeight: 1 }}>✓</span>}
                 </div>
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15,
-                  color: accepted ? ac : 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  color: accepted ? ac : 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: 1 }}>
                   {accepted ? "✅ I'M READY TO BATTLE!" : "CLICK TO MARK READY"}
                 </span>
               </label>
@@ -784,8 +784,8 @@ const LobbyPage = () => {
           backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }}>
-          <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: 5,
-            color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 20 }}>
+          <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 5,
+            color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: 20 }}>
             BATTLE COMMENCING IN
           </div>
           <div style={{
@@ -815,7 +815,7 @@ const LobbyPage = () => {
         }}>
           <div style={{ fontSize: 72 }}>⏰</div>
           <h2 style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 36, color: '#ef4444', letterSpacing: 3, margin: 0 }}>ROOM EXPIRED</h2>
-          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'center', maxWidth: 360 }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', textAlign: 'center', maxWidth: 360 }}>
             The lobby was inactive for 5 minutes. Create a new room to battle again.
           </p>
           <button onClick={() => navigate('/computer-mode/create-room')} style={{
