@@ -301,7 +301,7 @@ const LevelsModePage = () => {
       />
 
       {/* ── PIXEL BLAST BACKGROUND (unique to Levels Mode) ── */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.25 }}>
         <PixelBlast color={ac} />
       </div>
 

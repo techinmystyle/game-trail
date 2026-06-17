@@ -10,18 +10,20 @@ export const HtmlIcon = () => (
 
 /* ─── CSS3 Official Logo ─────────────────────────────────────────── */
 export const CssIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* CSS text label at top */}
-    <path d="M108 0h23v22.8h21.1V0h23v69h-23V46h-21.1v23H108V0zM205 22.9h-20.3V0h63.6v22.9h-20.3V69H205V22.9zM259 0h23.9l14.9 24.3L312.7 0h24v69h-23V34.8l-16 24.8h-.4l-16-24.8V69H259V0z" fill="white" />
-    {/* Shield main body */}
-    <path d="M107.6 471l-33-370.4h362.8l-33 370.2L255.7 512z" fill="white" />
-    {/* Right half depth */}
-    <path d="M256 480.5V131H404.3L376 447z" fill="rgba(255,255,255,0.75)" />
-    {/* "3" numeral — left dark fill (open left = shows "3" shape) */}
-    <path d="M144.4 191.1l7.9 87.6h103.5V191H144.4z" fill="rgba(0,0,0,0.38)" />
-    <path d="M152.3 321l11.3 126.8L256 474.5V386l-71.5-19.7-4.6-51.3z" fill="rgba(0,0,0,0.38)" />
-    {/* "3" numeral — right side (complete right bar of "3") */}
-    <path d="M256 191.1v87.6h99.4l-9.4 103.4L256 401.4v88.1l92.1-25.6 1.2-13.9 14.5-161.9 1.5-16.4L367.8 191z" fill="rgba(0,0,0,0.22)" />
+  <svg width="70" height="70" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Whole shield base (white) */}
+    <path fill="white" d="M18.814 114.123L8.76 1.352h110.48l-10.064 112.754-45.243 12.543-45.119-12.526z"/>
+    {/* Right half depth (slight transparent black for shadow) */}
+    <path fill="rgba(0, 0, 0, 0.15)" d="M64.001 117.062l36.559-10.136 8.601-96.354h-45.16v106.49z"/>
+    
+    {/* The 3 - right top */}
+    <path fill="rgba(0, 0, 0, 0.4)" d="M64.001 51.429h18.302l1.264-14.163H64.001V23.435h34.682l-.332 3.711-3.4 38.114h-30.95V51.429z"/>
+    {/* The 3 - left bottom curve */}
+    <path fill="rgba(0, 0, 0, 0.25)" d="M64.083 87.349l-.061.018-15.403-4.159-.985-11.031H33.752l1.937 21.717 28.331 7.863.063-.018v-14.39z"/>
+    {/* The 3 - right bottom curve */}
+    <path fill="rgba(0, 0, 0, 0.4)" d="M81.127 64.675l-1.666 18.522-15.426 4.164v14.39l28.354-7.858.208-2.337 2.406-26.881H81.127z"/>
+    {/* The 3 - left top bars */}
+    <path fill="rgba(0, 0, 0, 0.25)" d="M64.048 23.435v13.831H30.64l-.277-3.108-.63-7.012-.331-3.711h34.646zm-.047 27.996v13.831H48.792l-.277-3.108-.631-7.012-.33-3.711h16.447z"/>
   </svg>
 );
 
