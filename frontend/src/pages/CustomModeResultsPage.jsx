@@ -5,6 +5,12 @@ import { CustomCursor } from '../components/landing/CustomCursor';
 import { Trophy, Zap, RotateCcw, Home, Clock, Target, Code } from 'lucide-react';
 
 
+const THEMES = {
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
+};
 
 
 
@@ -77,15 +83,7 @@ const CustomModeResultsPage = () => {
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
   
-const THEMES = {
-  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
-  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
-  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
-  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
-};
-
-
-  const players   = rd.players || [];
+const players   = rd.players || [];
   const scores    = rd.scores || {};
   const winner    = rd.winner; // userId of winner, 'draw', or null
   const myUserId  = rd.myUserId;

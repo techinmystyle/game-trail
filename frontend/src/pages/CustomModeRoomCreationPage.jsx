@@ -5,14 +5,17 @@ import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 import { PremiumIcon } from '../components/landing/PremiumIcon';
 
-/* ── Theme map (synced with rest of app) ─────────────────────────── */
+
 const THEMES = {
-  red:    { accent: '#ff5252', ui: '#ff6b6b', bg: '#0a0005', asteroid: '#ff6b6b' },
-  blue:   { accent: '#0099ff', ui: '#00ccff', bg: '#000a1a', asteroid: '#00d4ff' },
-  green:  { accent: '#00ff88', ui: '#00ff99', bg: '#000a05', asteroid: '#39ff14' },
-  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0a0515', asteroid: '#c084fc' },
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14', asteroid: '#c084fc' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120', asteroid: '#60a5fa' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411', asteroid: '#34d399' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b', asteroid: '#f87171' },
 };
 
+
+
+/* ── Theme map (synced with rest of app) ─────────────────────────── */
 const PLAYER_MODES = [
   { value: 2, iconName: '2P', label: '2P',  sub: '2 Humans battle' },
   { value: 3, iconName: '3P', label: '3P',  sub: '3 Humans battle' },
@@ -82,7 +85,8 @@ const CustomModeRoomCreationPage = () => {
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
   /* Derive live theme colors from themeKey */
-  const theme = THEMES[themeKey] || THEMES.purple;
+
+const theme = THEMES[themeKey] || THEMES.purple;
   const accent = theme.accent;
   const ui     = theme.ui;
   const bg     = theme.bg;

@@ -5,7 +5,12 @@ import { CustomCursor } from '../components/landing/CustomCursor';
 import { Lock, Hash, ChevronLeft, ArrowRight } from 'lucide-react';
 
 
-
+const THEMES = {
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
+};
 
 
 
@@ -22,15 +27,7 @@ const CustomModeJoinPage = () => {
   const [joining, setJoining] = useState(false);
 
   
-const THEMES = {
-  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
-  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
-  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
-  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
-};
-
-
-  const handleJoin = () => {
+const handleJoin = () => {
     if (!roomId.trim()) return;
     setJoining(true);
 
@@ -190,7 +187,8 @@ const THEMES = {
                 fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6,
               }}>
                 🎯 Get your Room ID and Password from the host's battle lobby screen. Room IDs start with <strong style={{ color: ac }}>CUST-</strong>
-              </div>
+
+</div>
 
               {/* Join Button */}
               <button id="custom-join-btn" onClick={handleJoin} disabled={!canJoin || joining} style={{

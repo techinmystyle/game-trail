@@ -6,34 +6,17 @@ import { PrismThemeToggle } from '../components/landing/PrismThemeToggle';
 import { Swords3DIcon, Target3DIcon } from '../components/landing/ModeIcons';
 import { PremiumIcon } from '../components/landing/PremiumIcon';
 
-// THEMES structure similar to the rest of the application
+
 const THEMES = {
-  red: {
-    accent: '#ff5252',
-    ui: '#ff6b6b',
-    asteroid: '#ff6b6b',
-    bg: '#0a0005',
-  },
-  blue: {
-    accent: '#0099ff',
-    ui: '#00ccff',
-    asteroid: '#00d4ff',
-    bg: '#000a1a',
-  },
-  green: {
-    accent: '#00ff88',
-    ui: '#00ff99',
-    asteroid: '#39ff14',
-    bg: '#000a05',
-  },
-  purple: {
-    accent: '#a855f7',
-    ui: '#d8b4fe',
-    asteroid: '#c084fc',
-    bg: '#0a0515',
-  },
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
 };
 
+
+
+// THEMES structure similar to the rest of the application
 /* Hexagon grid background */
 const HexGrid = ({ theme }) => {
   const canvasRef = useRef(null);

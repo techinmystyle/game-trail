@@ -16,7 +16,12 @@ import {
 import { getSocket } from '../utils/socket';
 
 
-
+const THEMES = {
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
+};
 
 
 
@@ -64,15 +69,7 @@ const CustomModeLobbyPage = () => {
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
   
-const THEMES = {
-  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
-  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
-  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
-  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
-};
-
-
-  // State
+// State
   const [copied, setCopied] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
@@ -737,7 +734,8 @@ const THEMES = {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
         @keyframes countdownPop { from { transform:scale(1.6); opacity:0; } to { transform:scale(1); opacity:1; } }
-        * { box-sizing: border-box; }
+
+* { box-sizing: border-box; }
       `}</style>
     </div>
   );
