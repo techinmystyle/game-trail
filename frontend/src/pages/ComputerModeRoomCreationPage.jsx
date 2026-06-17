@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ChevronLeft, ChevronRight, Rocket, Shuffle,
-  CheckCircle2, AlertTriangle, Cpu, RefreshCw, Zap
-} from 'lucide-react';
+import { Play, ChevronLeft, Cpu, Crown, RefreshCw, AlertTriangle, CheckCircle2, Gamepad2, Settings } from 'lucide-react';
+import { PremiumIcon } from '../components/landing/PremiumIcon';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 
@@ -16,35 +14,35 @@ const THEMES = {
 
 const BOTS = [
   {
-    name: 'Beginner Bot', emoji: '🤖', image: '/assets/BEGINNER-BOT-BG.png',
+    name: 'Beginner Bot', iconName: 'Bot', image: '/assets/BEGINNER-BOT-BG.png',
     tag: 'BOT-1', tagColor: '#10b981', color: '#10b981',
     personality: 'Steady & predictable — great for learning',
     speed: 25, accuracy: 85, winRate: '30%',
     completesAt: 'Last 3–15s before end',
   },
   {
-    name: 'Lazy Compiler', emoji: '😴', image: '/assets/LAZY-COMPILER-BG.png',
+    name: 'Lazy Compiler', iconName: 'Moon', image: '/assets/LAZY-COMPILER-BG.png',
     tag: 'BOT-2', tagColor: '#f59e0b', color: '#f59e0b',
     personality: 'Inconsistent & procrastinates — unpredictable',
     speed: 15, accuracy: 70, winRate: '25%',
     completesAt: 'Last 4–16s before end',
   },
   {
-    name: 'Logic Bot', emoji: '🧠', image: '/assets/LOGIC-BOT-BG.png',
+    name: 'Logic Bot', iconName: 'Brain', image: '/assets/LOGIC-BOT-BG.png',
     tag: 'BOT-6', tagColor: '#3b82f6', color: '#3b82f6',
     personality: 'Methodical & efficient — follows patterns',
     speed: 60, accuracy: 92, winRate: '60%',
     completesAt: 'Last 5–17s before end',
   },
   {
-    name: 'Flash Coder', emoji: '⚡', image: '/assets/FLASH-CODER-BG.png',
+    name: 'Flash Coder', iconName: 'Zap', image: '/assets/FLASH-CODER-BG.png',
     tag: 'BOT-7', tagColor: '#8b5cf6', color: '#8b5cf6',
     personality: 'Lightning fast — uses shortcuts & macros',
     speed: 85, accuracy: 88, winRate: '72%',
     completesAt: 'Last 6–18s before end',
   },
   {
-    name: 'Test Case Destroyer', emoji: '💀', image: '/assets/TEST-CASE-DESTROYER-BG.png',
+    name: 'Test Case Destroyer', iconName: 'Skull', image: '/assets/TEST-CASE-DESTROYER-BG.png',
     tag: 'BOT-15', tagColor: '#ef4444', color: '#ef4444',
     personality: 'Near-perfect — handles every edge case',
     speed: 97, accuracy: 99, winRate: '88%',
@@ -53,18 +51,18 @@ const BOTS = [
 ];
 
 const LANGUAGES = [
-  { value: 'HTML',       icon: '🌐', color: '#e34c26' },
-  { value: 'CSS',        icon: '🎨', color: '#1572b6' },
-  { value: 'JavaScript', icon: '⚡', color: '#f7df1e' },
-  { value: 'Python',     icon: '🐍', color: '#3776ab' },
-  { value: 'Java',       icon: '☕', color: '#007396' },
+  { value: 'HTML',       iconName: 'HTML', color: '#e34c26' },
+  { value: 'CSS',        iconName: 'CSS', color: '#1572b6' },
+  { value: 'JavaScript', iconName: 'JavaScript', color: '#f7df1e' },
+  { value: 'Python',     iconName: 'Python', color: '#3776ab' },
+  { value: 'Java',       iconName: 'Java', color: '#007396' },
 ];
 
 const PLAYER_MODES = [
-  { value: 1, icon: '👤', label: 'SOLO',  sub: '1 Human vs 1 Bot' },
-  { value: 2, icon: '👥', label: '2P',    sub: '2 Humans vs 2 Bots' },
-  { value: 3, icon: '🔱', label: '3P',    sub: '3 Humans vs 3 Bots' },
-  { value: 4, icon: '⚔️', label: '4P',    sub: '4 Humans vs 4 Bots' },
+  { value: 1, iconName: '1P', label: 'SOLO',  sub: '1 Human vs 1 Bot' },
+  { value: 2, iconName: '2P', label: '2P',    sub: '2 Humans vs 2 Bots' },
+  { value: 3, iconName: '3P', label: '3P',    sub: '3 Humans vs 3 Bots' },
+  { value: 4, iconName: '4P', label: '4P',    sub: '4 Humans vs 4 Bots' },
 ];
 
 const TIME_OPTIONS = [3, 4, 5, 6, 7, 8];
@@ -72,9 +70,9 @@ const ROUND_OPTIONS = [1, 2, 3, 4, 5];
 
 // Auto-detect difficulty from time limit
 function getDifficultyFromTime(timeLimit) {
-  if (timeLimit <= 4) return { value: 'Beginner', tests: 3, color: '#10b981', icon: '⭐', label: 'BEGINNER MODE' };
-  if (timeLimit <= 6) return { value: 'Moderate', tests: 4, color: '#f59e0b', icon: '🛡️', label: 'MODERATE MODE' };
-  return { value: 'Advanced', tests: 5, color: '#ef4444', icon: '🔥', label: 'ADVANCED MODE' };
+  if (timeLimit <= 4) return { value: 'Beginner', tests: 3, color: '#10b981', iconName: 'Beginner', label: 'BEGINNER MODE' };
+  if (timeLimit <= 6) return { value: 'Moderate', tests: 4, color: '#f59e0b', iconName: 'Moderate', label: 'MODERATE MODE' };
+  return { value: 'Advanced', tests: 5, color: '#ef4444', iconName: 'Advanced', label: 'ADVANCED MODE' };
 }
 
 /* Section wrapper */
@@ -264,12 +262,12 @@ const ComputerModeRoomCreationPage = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Player Mode */}
-            <Section title="⚔️ Battle Mode" subtitle="How many humans and bots will clash" ac={ac}>
+            <Section title={<><PremiumIcon name="Swords" size={16} color={ac} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Battle Mode</span></>} subtitle="How many humans and bots will clash" ac={ac}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
                 {PLAYER_MODES.map(m => (
                   <div key={m.value} onClick={() => { update('playerMode', m.value); setActiveBotSlot(0); }}
                     style={{ ...selStyle(config.playerMode === m.value, ac), padding: '14px 6px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 24, marginBottom: 4 }}>{m.icon}</div>
+                    <div style={{ fontSize: 24, marginBottom: 4 }}><PremiumIcon name={m.iconName} size={32} color={config.playerMode === m.value ? ac : 'rgba(255,255,255,0.7)'} /></div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15,
                       color: config.playerMode === m.value ? ac : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
                     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>{m.sub}</div>
@@ -280,12 +278,12 @@ const ComputerModeRoomCreationPage = () => {
             </Section>
 
             {/* Rounds */}
-            <Section title="🔄 Rounds" subtitle="Number of rounds — best of the chosen rounds wins" ac={ac}>
+            <Section title={<><PremiumIcon name="Rounds" size={16} color={ac} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Rounds</span></>} subtitle="Number of rounds — best of the chosen rounds wins" ac={ac}>
               <PillSel options={ROUND_OPTIONS} value={config.rounds} onChange={v => update('rounds', v)} color={ac} />
             </Section>
 
             {/* Time Limit — auto-sets difficulty */}
-            <Section title="⏱️ Time Limit" subtitle="Minutes per round — automatically sets difficulty & test cases" ac={ac}>
+            <Section title={<><PremiumIcon name="Time" size={16} color={ac} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Time Limit</span></>} subtitle="Minutes per round — automatically sets difficulty & test cases" ac={ac}>
               <PillSel options={TIME_OPTIONS} value={config.timeLimit} onChange={v => update('timeLimit', v)} color={ac} />
 
               {/* Auto-detected mode badge */}
@@ -294,7 +292,7 @@ const ComputerModeRoomCreationPage = () => {
                 background: `${diffInfo.color}12`, border: `1.5px solid ${diffInfo.color}35`,
                 display: 'flex', alignItems: 'center', gap: 12,
               }}>
-                <div style={{ fontSize: 22 }}>{diffInfo.icon}</div>
+                <div style={{ fontSize: 24, marginBottom: 4 }}><PremiumIcon name={diffInfo.iconName} size={28} color={diffInfo.color} /></div>
                 <div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: diffInfo.color, letterSpacing: 2 }}>
                     {diffInfo.label} ACTIVATED
@@ -318,16 +316,21 @@ const ComputerModeRoomCreationPage = () => {
             </Section>
 
             {/* Language */}
-            <Section title="💻 Language" subtitle="Programming language for the coding challenge" ac={ac}>
+            <Section title={<><PremiumIcon name="Language" size={16} color={ac} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Language</span></>} subtitle="Programming language for the coding challenge" ac={ac}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
-                {LANGUAGES.map(l => (
-                  <div key={l.value} onClick={() => update('language', l.value)}
-                    style={{ ...selStyle(config.language === l.value, l.color), padding: '12px 4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 20, marginBottom: 4 }}>{l.icon}</div>
-                    <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 11,
-                      color: config.language === l.value ? l.color : 'rgba(255,255,255,0.5)' }}>{l.value}</div>
-                  </div>
-                ))}
+                {LANGUAGES.map(l => {
+                  const isSel = config.language === l.value;
+                  return (
+                    <div key={l.value} onClick={() => update('language', l.value)}
+                      style={{ ...selStyle(isSel, l.color), padding: '12px 4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 20, marginBottom: 4, filter: isSel ? `drop-shadow(0 0 10px ${l.color}80)` : 'none', opacity: isSel ? 1 : 0.4, transition: 'all 0.3s' }}>
+                        <PremiumIcon name={l.iconName} size={32} />
+                      </div>
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 11,
+                        color: isSel ? l.color : 'rgba(255,255,255,0.5)' }}>{l.value}</div>
+                    </div>
+                  );
+                })}
               </div>
             </Section>
           </div>
@@ -336,7 +339,7 @@ const ComputerModeRoomCreationPage = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Bot Mode Toggle */}
-            <Section title="🤖 AI Bot Selection" subtitle="Choose bots manually or let System assign randomly" ac={ac}>
+            <Section title={<><PremiumIcon name="Bot" size={16} color={ac} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>AI Bot Selection</span></>} subtitle="Choose bots manually or let System assign randomly" ac={ac}>
               <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
                 {[
                   { val: 'select', label: '🎮 SELECT', desc: 'Choose per player' },
@@ -477,7 +480,7 @@ const ComputerModeRoomCreationPage = () => {
                 background: `${diffInfo.color}10`, border: `1px solid ${diffInfo.color}30`,
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span style={{ fontSize: 16 }}>{diffInfo.icon}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}><PremiumIcon name={diffInfo.iconName} size={20} color={diffInfo.color} /></span>
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: diffInfo.color, letterSpacing: 1 }}>
                   {diffInfo.label}
                 </span>

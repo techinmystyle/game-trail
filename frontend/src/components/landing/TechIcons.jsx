@@ -1,5 +1,5 @@
-export const HtmlIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const HtmlIcon = ({ size = 70 }) => (
+  <svg width={size} height={size} viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M108.4 0h23v22.8h21.2V0h23v69h-23V46h-21.1v23h-23.1V0zM206 22.9h-20.3V0h63.7v22.9h-20.3V69H206V22.9zM259.5 0h24l14.9 24.3L313.2 0h24v69h-23V34.8l-16 24.8h-.4l-16-24.8V69h-22.3V0zM348.7 0h23.1v46.2h32.5V69h-55.6V0z" fill="white" />
     <path d="M107.6 471l-33-370.4h362.8l-33 370.2L255.7 512z" fill="white" />
     <path d="M256 480.5V131H404.3L376 447z" fill="rgba(255,255,255,0.7)" />
@@ -9,8 +9,8 @@ export const HtmlIcon = () => (
 );
 
 /* ─── CSS3 Official Logo ─────────────────────────────────────────── */
-export const CssIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const CssIcon = ({ size = 70 }) => (
+  <svg width={size} height={size} viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Whole shield base (white) */}
     <path fill="white" d="M18.814 114.123L8.76 1.352h110.48l-10.064 112.754-45.243 12.543-45.119-12.526z"/>
     {/* Right half depth (slight transparent black for shadow) */}
@@ -27,15 +27,15 @@ export const CssIcon = () => (
   </svg>
 );
 
-export const JsIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const JsIcon = ({ size = 70 }) => (
+  <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="256" height="256" fill="white" fillOpacity="0.95" rx="28" />
     <path d="M67.312 213.932l19.59-11.856c3.78 6.701 7.218 12.371 15.465 12.371 7.905 0 12.889-3.092 12.889-15.12v-81.798h24.057v82.138c0 24.917-14.606 36.259-35.916 36.259-19.245 0-30.416-9.967-36.087-21.996M152.381 211.354l19.588-11.341c5.157 8.421 11.859 14.607 23.715 14.607 9.969 0 16.325-4.984 16.325-11.858 0-8.248-6.53-11.17-17.528-15.98l-6.013-2.58c-17.357-7.387-28.87-16.667-28.87-36.257 0-18.044 13.747-31.792 35.228-31.792 15.294 0 26.292 5.328 34.196 19.247l-18.732 12.03c-4.125-7.389-8.591-10.31-15.465-10.31-7.046 0-11.514 4.468-11.514 10.31 0 7.217 4.468 10.14 14.778 14.608l6.014 2.577c20.45 8.765 31.963 17.7 31.963 37.804 0 21.654-17.012 33.51-39.867 33.51-22.339 0-36.774-10.654-43.819-24.574" fill="rgba(0,0,0,0.15)" />
   </svg>
 );
 
-export const PythonIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 256 255" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const PythonIcon = ({ size = 70 }) => (
+  <svg width={size} height={size} viewBox="0 0 256 255" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="pyG1" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="white" stopOpacity="0.95" />
@@ -51,8 +51,8 @@ export const PythonIcon = () => (
   </svg>
 );
 
-export const JavaIcon = () => (
-  <svg width="70" height="70" viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const JavaIcon = ({ size = 70 }) => (
+  <svg width={size} height={size} viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M102.681 291.324s-14.178 8.245 10.09 11.035c29.4 3.354 44.426 2.873 76.825-3.259 0 0 8.518 5.341 20.414 9.967-72.63 31.128-164.376-1.803-107.329-17.743M93.806 251.067s-15.902 11.771 8.384 14.283c31.406 3.24 56.208 3.505 99.125-4.759 0 0 5.937 6.018 15.271 9.309-87.815 25.678-185.624 2.025-122.78-18.833" fill="white" fillOpacity="0.9" />
     <path d="M168.625 181.799c17.896 20.604-4.701 39.146-4.701 39.146s45.439-23.458 24.571-52.833c-19.491-27.394-34.438-41.005 46.479-87.934 0-.001-127.013 31.721-66.349 101.621" fill="white" fillOpacity="0.85" />
     <path d="M269.59 321.181s10.484 8.645-11.534 15.333c-41.858 12.714-174.214 16.553-210.922.507-13.176-5.761 11.534-13.755 19.296-15.438 8.106-1.762 12.732-1.438 12.732-1.438-14.631-10.301-94.565 20.239-40.589 28.999 147.867 24.011 269.566-10.799 230.017-27.963M110.537 211.512s-66.991 15.914-23.729 21.697c18.261 2.441 54.743 1.887 88.702-.958 27.756-2.323 55.655-7.281 55.655-7.281s-9.799 4.199-16.871 9.039c-68.041 17.9-199.485 9.57-161.625-8.74 31.992-15.479 57.868-13.757 57.868-13.757M241.811 281.978c69.117-35.927 37.186-70.466 14.866-65.803-5.458 1.14-7.901 2.13-7.901 2.13s2.031-3.179 5.897-4.547c44.041-15.485 77.935 45.755-14.263 70.047 0 0 1.071-.962 1.401-1.827" fill="white" fillOpacity="0.9" />

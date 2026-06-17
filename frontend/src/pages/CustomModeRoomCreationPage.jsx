@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Rocket, CheckCircle2, AlertTriangle, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Rocket, CheckCircle2, AlertTriangle, Zap, Play, Crown } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
+import { PremiumIcon } from '../components/landing/PremiumIcon';
 
 /* ── Theme map (synced with rest of app) ─────────────────────────── */
 const THEMES = {
@@ -13,26 +14,26 @@ const THEMES = {
 };
 
 const PLAYER_MODES = [
-  { value: 2, icon: '⚔️', label: '2P',  sub: '2 Humans battle' },
-  { value: 3, icon: '🔱', label: '3P',  sub: '3 Humans battle' },
-  { value: 4, icon: '👑', label: '4P',  sub: '4 Humans battle' },
+  { value: 2, iconName: '2P', label: '2P',  sub: '2 Humans battle' },
+  { value: 3, iconName: '3P', label: '3P',  sub: '3 Humans battle' },
+  { value: 4, iconName: '4P', label: '4P',  sub: '4 Humans battle' },
 ];
 
 const TIME_OPTIONS = [3, 4, 5, 6, 7, 8];
 const ROUND_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const LANGUAGES = [
-  { value: 'HTML',       icon: '🌐', color: '#e34c26' },
-  { value: 'CSS',        icon: '🎨', color: '#1572b6' },
-  { value: 'JavaScript', icon: '⚡', color: '#f7df1e' },
-  { value: 'Python',     icon: '🐍', color: '#3776ab' },
-  { value: 'Java',       icon: '☕', color: '#007396' },
+  { value: 'HTML',       iconName: 'HTML', color: '#e34c26' },
+  { value: 'CSS',        iconName: 'CSS', color: '#1572b6' },
+  { value: 'JavaScript', iconName: 'JavaScript', color: '#f7df1e' },
+  { value: 'Python',     iconName: 'Python', color: '#3776ab' },
+  { value: 'Java',       iconName: 'Java', color: '#007396' },
 ];
 
 function getDifficultyFromTime(t) {
-  if (t <= 4) return { value: 'Beginner', tests: 3, color: '#10b981', icon: '⭐', label: 'BEGINNER MODE' };
-  if (t <= 6) return { value: 'Moderate', tests: 4, color: '#f59e0b', icon: '🛡️', label: 'MODERATE MODE' };
-  return { value: 'Advanced', tests: 5, color: '#ef4444', icon: '🔥', label: 'ADVANCED MODE' };
+  if (t <= 4) return { value: 'Beginner', tests: 3, color: '#10b981', iconName: 'Beginner', label: 'BEGINNER MODE' };
+  if (t <= 6) return { value: 'Moderate', tests: 4, color: '#f59e0b', iconName: 'Moderate', label: 'MODERATE MODE' };
+  return { value: 'Advanced', tests: 5, color: '#ef4444', iconName: 'Advanced', label: 'ADVANCED MODE' };
 }
 
 const Section = ({ title, subtitle, children, accent }) => (
@@ -210,12 +211,12 @@ const CustomModeRoomCreationPage = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Player Mode */}
-            <Section title="👥 Player Mode" subtitle="Choose the number of human players — no solo, no bots!" accent={accent}>
+            <Section title={<><PremiumIcon name="2P" size={16} color={accent} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Player Mode</span></>} subtitle="Choose the number of human players — no solo, no bots!" accent={accent}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
                 {PLAYER_MODES.map(m => (
                   <div key={m.value} onClick={() => update('playerMode', m.value)}
                     style={{ ...selStyle(config.playerMode === m.value), padding: '16px 8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 26, marginBottom: 6 }}>{m.icon}</div>
+                    <div style={{ fontSize: 26, marginBottom: 6 }}><PremiumIcon name={m.iconName} size={32} color={config.playerMode === m.value ? accent : 'rgba(255,255,255,0.7)'} /></div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18,
                       color: config.playerMode === m.value ? accent : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
                     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>{m.sub}</div>
@@ -234,7 +235,7 @@ const CustomModeRoomCreationPage = () => {
             </Section>
 
             {/* Time Limit */}
-            <Section title="⏱️ Time Limit" subtitle="Minutes per round — auto-detects difficulty" accent={accent}>
+            <Section title={<><PremiumIcon name="Time" size={16} color={accent} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Time Limit</span></>} subtitle="Minutes per round — auto-detects difficulty" accent={accent}>
               <PillSel options={TIME_OPTIONS} value={config.timeLimit} onChange={v => update('timeLimit', v)} accent={accent} />
               {/* Difficulty badge */}
               <div style={{
@@ -242,11 +243,9 @@ const CustomModeRoomCreationPage = () => {
                 background: `${diffInfo.color}12`, border: `1.5px solid ${diffInfo.color}35`,
                 display: 'flex', alignItems: 'center', gap: 12,
               }}>
-                <div style={{ fontSize: 22 }}>{diffInfo.icon}</div>
+                <div style={{ fontSize: 24, marginBottom: 4 }}><PremiumIcon name={diffInfo.iconName} size={28} color={diffInfo.color} /></div>
                 <div>
-                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15, color: diffInfo.color, letterSpacing: 2 }}>
-                    {diffInfo.label} ACTIVATED
-                  </div>
+                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: diffInfo.color, letterSpacing: 2 }}>{diffInfo.label} ACTIVATED</div>
                   <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
                     {config.timeLimit} min → {diffInfo.tests} test cases per challenge
                   </div>
@@ -265,21 +264,28 @@ const CustomModeRoomCreationPage = () => {
             </Section>
 
             {/* Rounds */}
-            <Section title="🔄 Rounds" subtitle="Number of rounds (1–10) — best score wins" accent={accent}>
+            <Section title={<><PremiumIcon name="Rounds" size={16} color={accent} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Rounds</span></>} subtitle="Number of rounds (1–10) — best score wins" accent={accent}>
               <PillSel options={ROUND_OPTIONS} value={config.rounds} onChange={v => update('rounds', v)} accent={accent} />
             </Section>
 
             {/* Language */}
-            <Section title="💻 Language" subtitle="Programming language for all coding challenges" accent={accent}>
+            <Section title={<><PremiumIcon name="Language" size={16} color={accent} style={{marginRight: 6, display: 'inline-block', verticalAlign: 'middle'}}/> <span style={{verticalAlign: 'middle'}}>Language</span></>} subtitle="Programming language for all coding challenges" accent={accent}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
-                {LANGUAGES.map(l => (
-                  <div key={l.value} onClick={() => update('language', l.value)}
-                    style={{ ...selStyle(config.language === l.value, l.color), padding: '12px 4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 22, marginBottom: 4 }}>{l.icon}</div>
-                    <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 10,
-                      color: config.language === l.value ? l.color : 'rgba(255,255,255,0.5)' }}>{l.value}</div>
-                  </div>
-                ))}
+                {LANGUAGES.map(l => {
+                    const isSel = config.language === l.value;
+                    return (
+                      <div key={l.value} onClick={() => update('language', l.value)}
+                        style={{ ...selStyle(isSel, l.color), padding: '12px 4px', textAlign: 'center' }}>
+                        <div style={{ fontSize: 24, marginBottom: 6, filter: isSel ? `drop-shadow(0 0 10px ${l.color}80)` : 'none', opacity: isSel ? 1 : 0.4, transition: 'all 0.3s' }}>
+                          <PremiumIcon name={l.iconName} size={32} />
+                        </div>
+                        <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15,
+                          color: isSel ? l.color : 'rgba(255,255,255,0.4)', transition: 'all 0.3s' }}>
+                          {l.value}
+                        </div>
+                      </div>
+                    );
+                })}
               </div>
             </Section>
           </div>
@@ -328,7 +334,7 @@ const CustomModeRoomCreationPage = () => {
                 background: `${diffInfo.color}10`, border: `1px solid ${diffInfo.color}30`,
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span style={{ fontSize: 16 }}>{diffInfo.icon}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}><PremiumIcon name={diffInfo.iconName} size={20} color={diffInfo.color} /></span>
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: diffInfo.color, letterSpacing: 1 }}>
                   {diffInfo.label}
                 </span>
@@ -352,7 +358,7 @@ const CustomModeRoomCreationPage = () => {
                 background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)',
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span style={{ fontSize: 13 }}>🏆</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}><Crown size={16} color="#10b981" /></span>
                 <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
                   <strong style={{ color: '#10b981' }}>First to pass all test cases</strong> and submit wins the round!
                 </span>

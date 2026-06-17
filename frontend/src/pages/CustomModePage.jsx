@@ -4,6 +4,7 @@ import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 import { PrismThemeToggle } from '../components/landing/PrismThemeToggle';
 import { Swords3DIcon, Target3DIcon } from '../components/landing/ModeIcons';
+import { PremiumIcon } from '../components/landing/PremiumIcon';
 
 // THEMES structure similar to the rest of the application
 const THEMES = {
@@ -118,9 +119,9 @@ const ScanLines = ({ theme }) => {
 };
 
 /* Stat chip */
-const StatChip = ({ icon, value, label, theme }) => (
+const StatChip = ({ iconName, value, label, theme }) => (
   <div style={{ textAlign: 'center', padding: '12px 20px' }}>
-    <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
+    <div style={{ fontSize: 24, marginBottom: 4, display: 'flex', justifyContent: 'center' }}><PremiumIcon name={iconName} size={28} color={theme.accent} /></div>
     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color: theme.accent, lineHeight: 1 }}>{value}</div>
     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
   </div>
@@ -395,15 +396,15 @@ const CustomModePage = () => {
             borderRadius: 16, overflow: 'hidden',
             boxShadow: `0 0 40px ${currentTheme.accent}08`,
           }}>
-            <StatChip icon="👥" value="4" label="Max Players" theme={currentTheme} />
+            <StatChip iconName="2P" value="4" label="Max Players" theme={currentTheme} />
             <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="🔄" value="10" label="Max Rounds" theme={currentTheme} />
+            <StatChip iconName="Rounds" value="10" label="Max Rounds" theme={currentTheme} />
             <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="⏱️" value="3–8" label="Minutes" theme={currentTheme} />
+            <StatChip iconName="Time" value="3–8" label="Minutes" theme={currentTheme} />
             <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="💻" value="5" label="Languages" theme={currentTheme} />
+            <StatChip iconName="Language" value="5" label="Languages" theme={currentTheme} />
             <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="🎭" value="5" label="Spectators" theme={currentTheme} />
+            <StatChip iconName="Spectators" value="5" label="Spectators" theme={currentTheme} />
           </div>
         </div>
 
@@ -422,13 +423,13 @@ const CustomModePage = () => {
           borderRadius: 14, maxWidth: 680, margin: '0 auto',
         }}>
           {[
-            { icon: '🧑‍💻', text: 'Pure Human Skill' },
-            { icon: '⚡', text: 'First Correct Submit Wins' },
-            { icon: '🎭', text: 'Spectate Mode' },
-            { icon: '🏆', text: '10 Round Support' },
-          ].map(({ icon, text }) => (
+            { iconName: 'Laptop', text: 'Pure Human Skill' },
+            { iconName: 'Zap', text: 'First Correct Submit Wins' },
+            { iconName: 'Spectators', text: 'Spectate Mode' },
+            { iconName: 'Crown', text: '10 Round Support' },
+          ].map(({ iconName, text }) => (
             <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <span style={{ fontSize: 14 }}>{icon}</span>
+              <span style={{ display: 'flex', alignItems: 'center' }}><PremiumIcon name={iconName} size={16} color="white" /></span>
               <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{text}</span>
             </div>
           ))}
