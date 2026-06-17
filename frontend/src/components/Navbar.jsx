@@ -219,14 +219,14 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
         <div 
           className="flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-sm"
           style={{
-            borderColor: `${currentTheme.accent}60`,
-            background: `${currentTheme.accent}15`,
+            borderColor: `#a855f760`,
+            background: `#a855f715`,
           }}
         >
           <Zap 
             className="h-4 w-4" 
-            style={{ color: currentTheme.accent }}
-            fill={currentTheme.accent}
+            style={{ color: '#a855f7' }}
+            fill="#a855f7"
           />
           <span 
             className="font-techno text-sm font-bold"
@@ -238,7 +238,7 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
             onClick={() => navigate('/store')}
             className="flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300 hover:scale-110"
             style={{
-              background: currentTheme.accent,
+              background: '#a855f7',
               color: '#ffffff',
             }}
             aria-label="Go to Store"
