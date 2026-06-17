@@ -461,7 +461,8 @@ const ProfilePage = () => {
       const angle = (Math.PI * 2 * idx) / 5 - Math.PI / 2;
       // Get completion percentage (total levels completed / max levels (100))
       const totalComp = lang.phases.reduce((sum, p) => sum + p, 0);
-      const completionRatio = Math.max(0.12, Math.min(totalComp / 100, 1.0)); // minimum distance for visibility
+      // Base radius of 0.05 for visibility, remaining 0.95 scales with completion
+      const completionRatio = 0.05 + (Math.min(totalComp / 100, 1.0) * 0.95);
       
       const cx = center + radius * Math.cos(angle);
       const cy = center + radius * Math.sin(angle);
