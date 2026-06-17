@@ -84,8 +84,6 @@ const Dashboard = () => {
         setGThunderPoints(pointsResponse.data.gThunderPoints || 0);
       } catch (error) {
         console.error('Error fetching data:', error);
-        // Don't set profile image or points on error - keep defaults
-        // The API interceptor will handle redirecting if token is invalid
       }
     };
 
@@ -111,7 +109,6 @@ const Dashboard = () => {
     if (!hero) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // When hero leaves viewport, show global particles
         setParticlesVisible(!entry.isIntersecting);
       },
       { threshold: 0.05 }
@@ -193,7 +190,7 @@ const Dashboard = () => {
                   RULES
                 </a>
                 
-                {/* Game Mode Dropdown */}
+                {/* Game Mode Dropdown — TRI MODE & SPECIALS only */}
                 <div 
                   className="relative"
                   data-dropdown="game-mode"
@@ -230,9 +227,7 @@ const Dashboard = () => {
                           navigate('/tri-mode'); 
                         }}
                         className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
-                        style={{ 
-                          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-                        }}
+                        style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = `${currentTheme.accent}25`;
                           e.currentTarget.style.borderLeft = `3px solid ${currentTheme.accent}`;
@@ -253,9 +248,7 @@ const Dashboard = () => {
                           navigate('/specials-mode'); 
                         }}
                         className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
-                        style={{ 
-                          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-                        }}
+                        style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = `${currentTheme.accent}25`;
                           e.currentTarget.style.borderLeft = `3px solid ${currentTheme.accent}`;
@@ -268,29 +261,6 @@ const Dashboard = () => {
                         }}
                       >
                         SPECIALS
-                      </button>
-                      <button
-                        onClick={(e) => { 
-                          e.preventDefault(); 
-                          setIsGameModeOpen(false);
-                          navigate('/custom-mode'); 
-                        }}
-                        className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
-                        style={{ 
-                          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = `rgba(0,229,255,0.12)`;
-                          e.currentTarget.style.borderLeft = `3px solid #00e5ff`;
-                          e.currentTarget.style.paddingLeft = '13px';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.borderLeft = 'none';
-                          e.currentTarget.style.paddingLeft = '16px';
-                        }}
-                      >
-                        ⚔️ CUSTOM MODE
                       </button>
                     </div>
                   )}
@@ -515,9 +485,7 @@ const Dashboard = () => {
       <Welcome theme={currentTheme} />
       <Footer theme={currentTheme} />
 
-      {/* Single global particle canvas — fixed overlay that travels across
-          every below-fold section without any clipping at section borders.
-          Fades in once the hero section scrolls out of view. */}
+      {/* Single global particle canvas */}
       <div
         style={{
           position: 'fixed',

@@ -2,15 +2,38 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
+import { PrismThemeToggle } from '../components/landing/PrismThemeToggle';
 
-// Custom Mode uses a distinct CYAN/TEAL theme — visually separate from Computer Mode (purple)
-const CM_ACCENT = '#00e5ff';
-const CM_UI     = '#80ffff';
-const CM_ORANGE = '#ff6b35';
-const CM_BG     = '#010d12';
+// THEMES structure similar to the rest of the application
+const THEMES = {
+  red: {
+    accent: '#ff5252',
+    ui: '#ff6b6b',
+    asteroid: '#ff6b6b',
+    bg: '#0a0005',
+  },
+  blue: {
+    accent: '#0099ff',
+    ui: '#00ccff',
+    asteroid: '#00d4ff',
+    bg: '#000a1a',
+  },
+  green: {
+    accent: '#00ff88',
+    ui: '#00ff99',
+    asteroid: '#39ff14',
+    bg: '#000a05',
+  },
+  purple: {
+    accent: '#a855f7',
+    ui: '#d8b4fe',
+    asteroid: '#c084fc',
+    bg: '#0a0515',
+  },
+};
 
 /* Hexagon grid background */
-const HexGrid = () => {
+const HexGrid = ({ theme }) => {
   const canvasRef = useRef(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,7 +64,14 @@ const HexGrid = () => {
             i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
           }
           ctx.closePath();
-          ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+          
+          // Parse hex to rgba
+          const hex = theme.accent.replace('#', '');
+          const rColor = parseInt(hex.substring(0, 2), 16);
+          const gColor = parseInt(hex.substring(2, 4), 16);
+          const bColor = parseInt(hex.substring(4, 6), 16);
+          
+          ctx.strokeStyle = `rgba(${rColor},${gColor},${bColor},${alpha})`;
           ctx.lineWidth = 0.8;
           ctx.stroke();
         }
@@ -49,8 +79,20 @@ const HexGrid = () => {
       frame = requestAnimationFrame(draw);
     };
     draw();
-    return () => cancelAnimationFrame(frame);
-  }, []);
+    
+    const handleResize = () => {
+      w = canvas.offsetWidth;
+      h = canvas.offsetHeight;
+      canvas.width = w;
+      canvas.height = h;
+    };
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [theme]);
   return (
     <canvas ref={canvasRef} style={{
       position: 'absolute', inset: 0, width: '100%', height: '100%',
@@ -60,35 +102,44 @@ const HexGrid = () => {
 };
 
 /* Scan line effect */
-const ScanLines = () => (
-  <div style={{
-    position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
-    background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.012) 2px, rgba(0,229,255,0.012) 4px)',
-  }} />
-);
+const ScanLines = ({ theme }) => {
+  const hex = theme.accent.replace('#', '');
+  const rColor = parseInt(hex.substring(0, 2), 16);
+  const gColor = parseInt(hex.substring(2, 4), 16);
+  const bColor = parseInt(hex.substring(4, 6), 16);
+  
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
+      background: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(${rColor},${gColor},${bColor},0.012) 2px, rgba(${rColor},${gColor},${bColor},0.012) 4px)`,
+    }} />
+  );
+};
 
 /* Stat chip */
-const StatChip = ({ icon, value, label }) => (
+const StatChip = ({ icon, value, label, theme }) => (
   <div style={{ textAlign: 'center', padding: '12px 20px' }}>
     <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
-    <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color: CM_ACCENT, lineHeight: 1 }}>{value}</div>
+    <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color: theme.accent, lineHeight: 1 }}>{value}</div>
     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
   </div>
 );
 
 /* Feature list item */
-const Feat = ({ text }) => (
+const Feat = ({ text, theme }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-    <div style={{ width: 5, height: 5, borderRadius: '50%', background: CM_ACCENT, boxShadow: `0 0 6px ${CM_ACCENT}`, flexShrink: 0 }} />
+    <div style={{ width: 5, height: 5, borderRadius: '50%', background: theme.accent, boxShadow: `0 0 6px ${theme.accent}`, flexShrink: 0 }} />
     <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{text}</span>
   </div>
 );
 
 /* Mode Card */
-const ModeCard = ({ type, onClick }) => {
+const ModeCard = ({ type, onClick, theme }) => {
   const [hovered, setHovered] = useState(false);
   const isCreate = type === 'create';
-  const cardAccent = isCreate ? CM_ACCENT : CM_ORANGE;
+  // Use accent for CREATE, asteroid (secondary) for JOIN
+  const cardAccent = isCreate ? theme.accent : theme.asteroid;
+  const uiColor = isCreate ? theme.ui : theme.asteroid;
 
   return (
     <div
@@ -102,7 +153,7 @@ const ModeCard = ({ type, onClick }) => {
         border: `1.5px solid ${hovered ? cardAccent : cardAccent + '25'}`,
         background: hovered
           ? `linear-gradient(135deg, ${cardAccent}12, ${cardAccent}04)`
-          : 'rgba(0,229,255,0.02)',
+          : `rgba(255,255,255,0.01)`,
         boxShadow: hovered
           ? `0 0 60px ${cardAccent}20, 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 ${cardAccent}15`
           : '0 8px 32px rgba(0,0,0,0.5)',
@@ -202,7 +253,7 @@ const ModeCard = ({ type, onClick }) => {
             'Enter Room ID & Password',
             'Join live human battles',
             'Compete against real players',
-          ]).map((f, i) => <Feat key={i} text={f} />)}
+          ]).map((f, i) => <Feat key={i} text={f} theme={{ accent: cardAccent }} />)}
         </div>
 
         {/* CTA */}
@@ -210,10 +261,8 @@ const ModeCard = ({ type, onClick }) => {
           marginTop: 'auto', width: '100%', padding: '15px 0',
           borderRadius: 12, border: 'none',
           background: hovered
-            ? isCreate ? `linear-gradient(135deg, ${CM_ACCENT}, ${CM_UI})`
-                       : `linear-gradient(135deg, ${CM_ORANGE}, #ff9b6b)`
-            : isCreate ? `linear-gradient(135deg, ${CM_ACCENT}70, ${CM_ACCENT}30)`
-                       : `linear-gradient(135deg, ${CM_ORANGE}70, ${CM_ORANGE}30)`,
+            ? `linear-gradient(135deg, ${cardAccent}, ${uiColor})`
+            : `linear-gradient(135deg, ${cardAccent}70, ${cardAccent}30)`,
           color: 'white', cursor: 'pointer',
           fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
           fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
@@ -232,7 +281,6 @@ const CustomModePage = () => {
   const navigate = useNavigate();
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
   const [glitch, setGlitch] = useState(false);
-  const [tick, setTick] = useState(0);
 
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
@@ -244,47 +292,42 @@ const CustomModePage = () => {
     return () => clearInterval(iv);
   }, []);
 
-  // Tick for animated elements
-  useEffect(() => {
-    const iv = setInterval(() => setTick(t => t + 1), 1000);
-    return () => clearInterval(iv);
-  }, []);
-
-  const themes = {
-    red: { accent: '#ff5252', ui: '#ff6b6b' },
-    blue: { accent: '#0099ff', ui: '#00ccff' },
-    green: { accent: '#00ff88', ui: '#00ff99' },
-    purple: { accent: '#a855f7', ui: '#d8b4fe' },
-  };
+  const currentTheme = THEMES[themeKey];
 
   return (
-    <div style={{ minHeight: '100vh', background: CM_BG, color: 'white', position: 'relative', overflow: 'hidden' }}>
-      <CustomCursor theme={{ accent: CM_ACCENT, ui: CM_UI }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: CM_ACCENT, ui: CM_UI }} />
+    <div style={{ minHeight: '100vh', background: currentTheme.bg, color: 'white', position: 'relative', overflow: 'hidden', transition: 'background-color 0.5s ease' }}>
+      <CustomCursor theme={currentTheme} />
+      
+      {/* Absolute container for the Theme Toggle so it can be integrated smoothly */}
+      <div style={{ position: 'absolute', top: '24px', right: '180px', zIndex: 100 }}>
+        <PrismThemeToggle currentThemeKey={themeKey} onThemeChange={setThemeKey} themes={THEMES} />
+      </div>
+
+      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={THEMES} currentTheme={currentTheme} />
 
       {/* Backgrounds */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <HexGrid />
+        <HexGrid theme={currentTheme} />
       </div>
-      <ScanLines />
+      <ScanLines theme={currentTheme} />
 
       {/* Ambient glows */}
       <div style={{
         position: 'fixed', top: '-5%', left: '15%',
         width: 600, height: 600,
-        background: `radial-gradient(circle, ${CM_ACCENT}12 0%, transparent 65%)`,
+        background: `radial-gradient(circle, ${currentTheme.accent}12 0%, transparent 65%)`,
         pointerEvents: 'none', zIndex: 0, animation: 'floatSlow 10s ease-in-out infinite',
       }} />
       <div style={{
         position: 'fixed', top: '30%', right: '5%',
         width: 400, height: 400,
-        background: `radial-gradient(circle, ${CM_ORANGE}10 0%, transparent 65%)`,
+        background: `radial-gradient(circle, ${currentTheme.asteroid}10 0%, transparent 65%)`,
         pointerEvents: 'none', zIndex: 0, animation: 'floatSlow 13s ease-in-out infinite reverse',
       }} />
       <div style={{
         position: 'fixed', bottom: '10%', left: '5%',
         width: 300, height: 300,
-        background: `radial-gradient(circle, ${CM_ACCENT}08 0%, transparent 65%)`,
+        background: `radial-gradient(circle, ${currentTheme.accent}08 0%, transparent 65%)`,
         pointerEvents: 'none', zIndex: 0, animation: 'floatSlow 16s ease-in-out infinite',
       }} />
 
@@ -297,13 +340,13 @@ const CustomModePage = () => {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
-            background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 10, color: CM_ACCENT,
+            background: `${currentTheme.accent}10`, border: `1px solid ${currentTheme.accent}30`,
+            fontFamily: 'monospace', fontSize: 10, color: currentTheme.accent,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 22,
           }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: CM_ACCENT, animation: 'pulseGlow 2s infinite', boxShadow: `0 0 8px ${CM_ACCENT}` }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: currentTheme.accent, animation: 'pulseGlow 2s infinite', boxShadow: `0 0 8px ${currentTheme.accent}` }} />
             HUMAN VS HUMAN — NO BOTS ALLOWED
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: CM_ACCENT, animation: 'pulseGlow 2s infinite 1s', boxShadow: `0 0 8px ${CM_ACCENT}` }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: currentTheme.accent, animation: 'pulseGlow 2s infinite 1s', boxShadow: `0 0 8px ${currentTheme.accent}` }} />
           </div>
 
           {/* Main title */}
@@ -312,12 +355,12 @@ const CustomModePage = () => {
             fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
             fontSize: 'clamp(52px, 9vw, 90px)',
             textTransform: 'uppercase', letterSpacing: 6,
-            background: `linear-gradient(135deg, white 20%, ${CM_ACCENT} 50%, ${CM_UI} 80%)`,
+            background: `linear-gradient(135deg, white 20%, ${currentTheme.accent} 50%, ${currentTheme.ui} 80%)`,
             backgroundClip: 'text', WebkitBackgroundClip: 'text',
             color: 'transparent', WebkitTextFillColor: 'transparent',
             filter: glitch
-              ? `drop-shadow(3px 0 0 ${CM_ACCENT}) drop-shadow(-3px 0 0 ${CM_ORANGE})`
-              : `drop-shadow(0 0 40px ${CM_ACCENT}30)`,
+              ? `drop-shadow(3px 0 0 ${currentTheme.accent}) drop-shadow(-3px 0 0 ${currentTheme.asteroid})`
+              : `drop-shadow(0 0 40px ${currentTheme.accent}30)`,
             transition: 'filter 0.1s',
           }}>
             CUSTOM MODE
@@ -327,11 +370,11 @@ const CustomModePage = () => {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 14,
           }}>
-            <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, transparent, ${CM_ACCENT}50)` }} />
-            <span style={{ fontFamily: 'monospace', fontSize: 11, color: `${CM_ACCENT}80`, letterSpacing: 4, textTransform: 'uppercase' }}>
+            <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, transparent, ${currentTheme.accent}50)` }} />
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: `${currentTheme.accent}80`, letterSpacing: 4, textTransform: 'uppercase' }}>
               HUMAN · VS · HUMAN
             </span>
-            <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, ${CM_ACCENT}50, transparent)` }} />
+            <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, ${currentTheme.accent}50, transparent)` }} />
           </div>
 
           <p style={{
@@ -345,35 +388,35 @@ const CustomModePage = () => {
           {/* Stats bar */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 0,
-            background: 'rgba(0,229,255,0.03)',
-            border: `1px solid ${CM_ACCENT}20`,
+            background: 'rgba(255,255,255,0.03)',
+            border: `1px solid ${currentTheme.accent}20`,
             borderRadius: 16, overflow: 'hidden',
-            boxShadow: `0 0 40px ${CM_ACCENT}08`,
+            boxShadow: `0 0 40px ${currentTheme.accent}08`,
           }}>
-            <StatChip icon="👥" value="4" label="Max Players" />
-            <div style={{ width: 1, background: `${CM_ACCENT}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="🔄" value="10" label="Max Rounds" />
-            <div style={{ width: 1, background: `${CM_ACCENT}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="⏱️" value="3–8" label="Minutes" />
-            <div style={{ width: 1, background: `${CM_ACCENT}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="💻" value="5" label="Languages" />
-            <div style={{ width: 1, background: `${CM_ACCENT}15`, alignSelf: 'stretch' }} />
-            <StatChip icon="🎭" value="5" label="Spectators" />
+            <StatChip icon="👥" value="4" label="Max Players" theme={currentTheme} />
+            <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
+            <StatChip icon="🔄" value="10" label="Max Rounds" theme={currentTheme} />
+            <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
+            <StatChip icon="⏱️" value="3–8" label="Minutes" theme={currentTheme} />
+            <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
+            <StatChip icon="💻" value="5" label="Languages" theme={currentTheme} />
+            <div style={{ width: 1, background: `${currentTheme.accent}15`, alignSelf: 'stretch' }} />
+            <StatChip icon="🎭" value="5" label="Spectators" theme={currentTheme} />
           </div>
         </div>
 
         {/* Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, maxWidth: 880, margin: '0 auto 48px' }}>
-          <ModeCard type="create" onClick={() => navigate('/custom-mode/create-room')} />
-          <ModeCard type="join" onClick={() => navigate('/custom-mode/join-room')} />
+          <ModeCard type="create" theme={currentTheme} onClick={() => navigate('/custom-mode/create-room')} />
+          <ModeCard type="join" theme={currentTheme} onClick={() => navigate('/custom-mode/join-room')} />
         </div>
 
         {/* VS Divider info strip */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 32,
           padding: '18px 32px',
-          background: 'rgba(0,229,255,0.03)',
-          border: `1px solid ${CM_ACCENT}12`,
+          background: 'rgba(255,255,255,0.03)',
+          border: `1px solid ${currentTheme.accent}12`,
           borderRadius: 14, maxWidth: 680, margin: '0 auto',
         }}>
           {[
@@ -392,7 +435,7 @@ const CustomModePage = () => {
         {/* Bottom hint */}
         <div style={{
           textAlign: 'center', marginTop: 32,
-          fontFamily: 'monospace', fontSize: 10, color: `${CM_ACCENT}30`,
+          fontFamily: 'monospace', fontSize: 10, color: `${currentTheme.accent}30`,
           letterSpacing: 3, textTransform: 'uppercase',
         }}>
           CREATE A ROOM TO HOST · JOIN A ROOM WITH ID + PASSWORD
