@@ -53,7 +53,7 @@ const handleJoin = () => {
   return (
     <div style={{ minHeight: '100vh', background: ('#010d12'), color: 'white', position: 'relative', overflow: 'hidden' }}>
       <CustomCursor theme={{ accent: ac, ui: ui }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: ac, ui: ui }} />
+      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={THEMES} currentTheme={{ accent: ac, ui: ui }} />
 
       {/* Ambient glow */}
       <div style={{

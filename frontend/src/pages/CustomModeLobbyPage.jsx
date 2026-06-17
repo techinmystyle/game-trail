@@ -326,7 +326,7 @@ const CustomModeLobbyPage = () => {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: ('#010d12'), color: 'white', overflow: 'hidden' }}>
       <CustomCursor theme={{ accent: ac, ui: ui }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: ac, ui: ui }} />
+      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={THEMES} currentTheme={{ accent: ac, ui: ui }} />
 
       {/* Ambient glow */}
       <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
