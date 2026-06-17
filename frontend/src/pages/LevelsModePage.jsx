@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar";
 import { CustomCursor } from "../components/landing/CustomCursor";
 import { HtmlIcon, CssIcon, JsIcon, PythonIcon, JavaIcon } from "../components/landing/TechIcons";
+import { PremiumIcon } from "../components/landing/PremiumIcon";
 import { ChevronLeft, ChevronRight, Zap } from "lucide-react";
 import PixelBlast from "../components/landing/PixelBlast";
 
@@ -68,7 +69,7 @@ const COURSES = [
     difficulty: 2,
     Icon: PythonIcon,
     langColor: "#3776ab",
-    glyph: "🐍",
+    glyph: "PY",
     description: "Clean, powerful, readable. Tackle data structures, algorithms, and OOP.",
     features: ["Syntax, Types & Data Structures", "OOP, Decorators & Generators", "File I/O, Modules & Algorithms"],
   },
@@ -82,7 +83,7 @@ const COURSES = [
     difficulty: 3,
     Icon: JavaIcon,
     langColor: "#e76f00",
-    glyph: "☕",
+    glyph: "J",
     description: "Enterprise-grade power. Master OOP, collections, multithreading & JVM.",
     features: ["OOP Principles & Inheritance", "Collections, Generics & Exceptions", "Multithreading & Java Streams"],
   },
@@ -90,9 +91,9 @@ const COURSES = [
 
 
 /* ─── Stat badge ─────────────────────────────────────────────────── */
-const StatBadge = ({ icon, value, label, color }) => (
+const StatBadge = ({ iconName, value, label, color }) => (
   <div style={{ textAlign: 'center', padding: '16px 28px' }}>
-    <div style={{ fontSize: 22, marginBottom: 5 }}>{icon}</div>
+    <div style={{ fontSize: 24, marginBottom: 4, display: 'flex', justifyContent: 'center' }}><PremiumIcon name={iconName} size={28} color={color} /></div>
     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color, lineHeight: 1 }}>{value}</div>
     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 3 }}>{label}</div>
   </div>
@@ -389,13 +390,13 @@ const LevelsModePage = () => {
               borderRadius: 18, overflow: 'hidden', backdropFilter: 'blur(12px)',
               boxShadow: `0 0 40px ${ac}08`, marginBottom: 52,
             }}>
-              <StatBadge icon="📚" value="500+" label="Total Levels"  color={ac} />
+              <StatBadge iconName="Library" value="500+" label="Total Levels"  color={ac} />
               <div style={{ width: 1, background: `${ac}15`, alignSelf: 'stretch' }} />
-              <StatBadge icon="💻" value="5"    label="Languages"     color={theme.asteroid} />
+              <StatBadge iconName="Language" value="5"    label="Languages"     color={theme.asteroid} />
               <div style={{ width: 1, background: `${ac}15`, alignSelf: 'stretch' }} />
-              <StatBadge icon="⚡" value="∞"    label="Challenges"    color="#10b981" />
+              <StatBadge iconName="Zap" value="∞"    label="Challenges"    color="#10b981" />
               <div style={{ width: 1, background: `${ac}15`, alignSelf: 'stretch' }} />
-              <StatBadge icon="🏆" value="XP"   label="Rewards"       color="#f59e0b" />
+              <StatBadge iconName="Crown" value="XP"   label="Rewards"       color="#f59e0b" />
             </div>
 
             {/* ──── ENTER BUTTON ──── */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Users, RefreshCcw, Timer, Laptop, VenetianMask, Star, Shield, Flame, Swords, Bot, Moon, Brain, Zap, Skull } from 'lucide-react';
+import { User, Users, RefreshCcw, Timer, Laptop, VenetianMask, Star, Shield, Flame, Swords, Bot, Moon, Brain, Zap, Skull, Library, Crown } from 'lucide-react';
 import { HtmlIcon, CssIcon, JsIcon, PythonIcon, JavaIcon } from './TechIcons';
 import { Swords3DIcon } from './ModeIcons';
 
@@ -40,6 +40,9 @@ export const PremiumIcon = ({ name, size = 20, color = '#ffffff', style = {} }) 
     case 'Brain': return <Brain size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'Zap': return <Zap size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'Skull': return <Skull size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    
+    case 'Library': return <Library size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Crown': return <Crown size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     
     default: return null;
   }
