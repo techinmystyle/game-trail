@@ -342,11 +342,6 @@ const LevelsModePage = () => {
     <div style={{ minHeight: '100vh', background: currentTheme.bg, color: 'white', position: 'relative', overflow: 'hidden', transition: 'background-color 0.5s ease' }}>
       <CustomCursor theme={currentTheme} />
       
-      {/* Absolute container for the Theme Toggle */}
-      <div style={{ position: 'absolute', top: '24px', right: '180px', zIndex: 100 }}>
-        <PrismThemeToggle currentThemeKey={themeKey} onThemeChange={setThemeKey} themes={THEMES} />
-      </div>
-
       <Navbar 
         currentPage="levels mode"
         themeKey={themeKey}
