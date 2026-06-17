@@ -88,14 +88,25 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
     navigate('/auth');
   };
 
+  const isDashboard = currentPage === 'dashboard';
+
   return (
     <header
-      className="sticky top-0 z-50 flex flex-wrap items-center justify-between gap-6 px-6 py-4 sm:px-12 sm:py-5"
-      style={{
-        background: "linear-gradient(135deg, rgba(4,0,18,0.99) 0%, rgba(7,0,26,0.98) 100%)",
-        borderBottom: `1px solid ${currentTheme.accent}30`,
-        boxShadow: `0 4px 24px rgba(0,0,0,0.6), 0 0 32px ${currentTheme.accent}12`,
-      }}
+      className={
+        isDashboard
+          ? "flex flex-wrap items-center justify-between gap-6"
+          : "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-6 px-6 py-4 sm:px-12 sm:py-5"
+      }
+      style={
+        isDashboard
+          ? {}
+          : {
+              background: "linear-gradient(135deg, rgba(4,0,18,0.99) 0%, rgba(7,0,26,0.98) 100%)",
+              borderBottom: `1px solid ${currentTheme.accent}30`,
+              boxShadow: `0 4px 24px rgba(0,0,0,0.6), 0 0 32px ${currentTheme.accent}12`,
+            }
+      }
+      data-testid="top-navbar"
     >
       {/* Left side - Brand + Navigation */}
       <div className="flex items-center gap-7 sm:gap-10">
