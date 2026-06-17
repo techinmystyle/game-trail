@@ -553,7 +553,7 @@ function HeaderSection({ onNav, onBack }) {
           gap: "10px",
           background: backHovered ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)",
           backdropFilter: "blur(12px)",
-          border: "1px solid rgba(255,255,255,0.2)",
+          border: "1px solid rgba(255,255,255,0.6)",
           borderRadius: "50px",
           padding: "12px 24px 12px 18px",
           cursor: "pointer",

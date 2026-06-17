@@ -78,7 +78,7 @@ const CustomModeJoinPage = () => {
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', marginBottom: 28,
             borderRadius: 8, border: `1px solid ${CM_ACCENT}30`, background: `${CM_ACCENT}08`,
             color: CM_ACCENT, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-            fontWeight: 700, fontSize: 14, transition: 'all 0.2s',
+            fontWeight: 700, fontSize: 16, fontWeight: 700, transition: 'all 0.2s',
           }}
           onMouseEnter={e => e.currentTarget.style.background = `${CM_ACCENT}18`}
           onMouseLeave={e => e.currentTarget.style.background = `${CM_ACCENT}08`}
@@ -113,7 +113,7 @@ const CustomModeJoinPage = () => {
               <h1 style={{ margin: '0 0 8px', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 32, textTransform: 'uppercase', letterSpacing: 3, color: 'white' }}>
                 JOIN BATTLE
               </h1>
-              <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
+              <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
                 Enter your credentials to join a human vs human arena
               </p>
             </div>
@@ -122,7 +122,7 @@ const CustomModeJoinPage = () => {
 
               {/* Room ID */}
               <div>
-                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, color: CM_ACCENT, display: 'block', marginBottom: 8 }}>
+                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: CM_ACCENT, display: 'block', marginBottom: 8 }}>
                   ROOM ID <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -137,7 +137,7 @@ const CustomModeJoinPage = () => {
                     style={{
                       width: '100%', padding: '13px 14px 13px 42px', borderRadius: 10, outline: 'none',
                       background: 'rgba(255,255,255,0.04)', border: `1.5px solid ${roomId ? CM_ACCENT + '60' : 'rgba(255,255,255,0.08)'}`,
-                      color: 'white', fontFamily: 'monospace', fontSize: 14,
+                      color: 'white', fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
                       transition: 'all 0.2s', caretColor: CM_ACCENT, letterSpacing: 1,
                     }}
                     onFocus={e => { e.currentTarget.style.borderColor = CM_ACCENT; e.currentTarget.style.boxShadow = `0 0 12px ${CM_ACCENT}15`; }}
@@ -148,8 +148,8 @@ const CustomModeJoinPage = () => {
 
               {/* Password */}
               <div>
-                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: 8 }}>
-                  PASSWORD <span style={{ color: 'rgba(255,255,255,0.55)', textTransform: 'lowercase', fontSize: 13 }}>(required)</span>
+                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: 8 }}>
+                  PASSWORD <span style={{ color: 'rgba(255,255,255,0.55)', textTransform: 'lowercase', fontSize: 15, fontWeight: 700 }}>(required)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.6)' }} />
@@ -163,7 +163,7 @@ const CustomModeJoinPage = () => {
                     style={{
                       width: '100%', padding: '13px 14px 13px 42px', borderRadius: 10, outline: 'none',
                       background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.08)',
-                      color: 'white', fontFamily: 'monospace', fontSize: 14,
+                      color: 'white', fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
                       transition: 'all 0.2s', caretColor: CM_ACCENT, letterSpacing: 1,
                     }}
                     onFocus={e => { e.currentTarget.style.borderColor = CM_ACCENT; e.currentTarget.style.boxShadow = `0 0 12px ${CM_ACCENT}15`; }}
@@ -176,7 +176,7 @@ const CustomModeJoinPage = () => {
               <div style={{
                 padding: '10px 14px', borderRadius: 8,
                 background: `${CM_ACCENT}06`, border: `1px solid ${CM_ACCENT}18`,
-                fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6,
+                fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6,
               }}>
                 🎯 Get your Room ID and Password from the host's battle lobby screen. Room IDs start with <strong style={{ color: CM_ACCENT }}>CUST-</strong>
               </div>
@@ -187,7 +187,7 @@ const CustomModeJoinPage = () => {
                 background: canJoin && !joining
                   ? `linear-gradient(135deg, ${CM_ORANGE}, #ff9b6b)`
                   : 'rgba(255,255,255,0.06)',
-                color: canJoin ? 'white' : 'rgba(255,255,255,0.2)',
+                color: canJoin ? 'white' : 'rgba(255,255,255,0.6)',
                 cursor: canJoin ? 'pointer' : 'not-allowed',
                 fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, textTransform: 'uppercase',
                 fontSize: 16, letterSpacing: 3,

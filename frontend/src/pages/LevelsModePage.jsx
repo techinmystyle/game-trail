@@ -95,7 +95,7 @@ const StatBadge = ({ iconName, value, label, color }) => (
   <div style={{ textAlign: 'center', padding: '16px 28px' }}>
     <div style={{ fontSize: 24, marginBottom: 4, display: 'flex', justifyContent: 'center' }}><PremiumIcon name={iconName} size={28} color={color} /></div>
     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color, lineHeight: 1 }}>{value}</div>
-    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 3 }}>{label}</div>
+    <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 3 }}>{label}</div>
   </div>
 );
 
@@ -147,7 +147,7 @@ const CourseCard = ({ course, theme, onClick, enterAnim, idx }) => {
       <div style={{
         position: 'absolute', top: 18, right: 18, padding: '3px 12px', borderRadius: 20,
         background: `${badgeColor}18`, border: `1px solid ${badgeColor}45`,
-        fontFamily: 'monospace', fontSize: 13, fontWeight: 900, letterSpacing: 2,
+        fontFamily: 'monospace', fontSize: 15, fontWeight: 700, fontWeight: 900, letterSpacing: 2,
         color: badgeColor, textTransform: 'uppercase',
       }}>{badge}</div>
 
@@ -191,17 +191,17 @@ const CourseCard = ({ course, theme, onClick, enterAnim, idx }) => {
           textTransform: 'uppercase', letterSpacing: 3, marginBottom: 4,
           textShadow: hovered ? `0 0 24px ${langColor}60` : 'none', transition: 'text-shadow 0.3s',
         }}>{title}</div>
-        <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.38)', marginBottom: 4, letterSpacing: 1 }}>{subtitle}</div>
+        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.38)', marginBottom: 4, letterSpacing: 1 }}>{subtitle}</div>
         <div style={{ marginBottom: 14 }}>
           <span style={{
             display: 'inline-block', padding: '2px 10px', borderRadius: 20,
             background: `${hovered ? langColor : theme.accent}18`,
             border: `1px solid ${hovered ? langColor : theme.accent}35`,
-            fontFamily: 'monospace', fontSize: 13, letterSpacing: 2,
+            fontFamily: 'monospace', fontSize: 15, fontWeight: 700, letterSpacing: 2,
             color: hovered ? langColor : theme.ui, transition: 'all 0.3s',
           }}>{version}</span>
         </div>
-        <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.48)', lineHeight: 1.75, marginBottom: 18, flex: 1 }}>
+        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.48)', lineHeight: 1.75, marginBottom: 18, flex: 1 }}>
           {description}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
@@ -213,7 +213,7 @@ const CourseCard = ({ course, theme, onClick, enterAnim, idx }) => {
                 boxShadow: `0 0 8px ${hovered ? langColor : theme.accent}`,
                 transition: 'all 0.3s',
               }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.52)', lineHeight: 1.5 }}>{feat}</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.52)', lineHeight: 1.5 }}>{feat}</span>
             </div>
           ))}
         </div>
@@ -224,7 +224,7 @@ const CourseCard = ({ course, theme, onClick, enterAnim, idx }) => {
           border: `1px solid ${hovered ? langColor : theme.accent}14`, transition: 'all 0.3s',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>Difficulty</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>Difficulty</span>
             <div style={{ display: 'flex', gap: 4, marginLeft: 6 }}>
               {[1,2,3].map(d => (
                 <div key={d} style={{
@@ -236,7 +236,7 @@ const CourseCard = ({ course, theme, onClick, enterAnim, idx }) => {
               ))}
             </div>
           </div>
-          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: hovered ? langColor : theme.ui, letterSpacing: 1, transition: 'color 0.3s' }}>
+          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: hovered ? langColor : theme.ui, letterSpacing: 1, transition: 'color 0.3s' }}>
             100 LEVELS
           </span>
         </div>
@@ -321,7 +321,7 @@ const LevelsModePage = () => {
             style={{
               display: 'flex', alignItems: 'center', gap: 7, padding: '8px 18px', borderRadius: 8,
               border: `1.5px solid ${ac}35`, background: `${ac}10`, color: ac, cursor: 'pointer',
-              fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, letterSpacing: 2, textTransform: 'uppercase',
+              fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
               transition: 'all 0.2s',
             }}
             onMouseEnter={e => { e.currentTarget.style.background = `${ac}20`; e.currentTarget.style.transform = 'translateX(-4px)'; }}
@@ -342,8 +342,8 @@ const LevelsModePage = () => {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
               padding: '6px 20px', borderRadius: 20,
-              background: `${ac}12`, border: `1px solid ${ac}30`,
-              fontFamily: 'monospace', fontSize: 13, color: ac,
+              background: `${ac}12`, border: `1px solid 70`,
+              fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: ac,
               textTransform: 'uppercase', letterSpacing: 4, marginBottom: 28,
             }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: ac, animation: 'pulse 2s infinite', boxShadow: `0 0 8px ${ac}` }} />
@@ -370,13 +370,13 @@ const LevelsModePage = () => {
 
             {/* Divider */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, transparent, ${ac}50)` }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 13, color: `${ac}70`, letterSpacing: 4, textTransform: 'uppercase' }}>MASTER · PROGRESS · CONQUER</span>
-              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, ${ac}50, transparent)` }} />
+              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, transparent, 90)` }} />
+              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}70`, letterSpacing: 4, textTransform: 'uppercase' }}>MASTER · PROGRESS · CONQUER</span>
+              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, 90, transparent)` }} />
             </div>
 
             <p style={{
-              fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)',
+              fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
               margin: '0 auto 48px', maxWidth: 500, lineHeight: 1.9,
             }}>
               Choose your language. Conquer 100 progressive levels.<br />
@@ -436,7 +436,7 @@ const LevelsModePage = () => {
               <ChevronRight size={20} style={{ color: ac }} />
             </button>
 
-            <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 13, color: `${ac}40`, letterSpacing: 3 }}>
+            <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `80`, letterSpacing: 3 }}>
               CLICK TO SELECT YOUR LANGUAGE
             </div>
           </div>
@@ -454,11 +454,11 @@ const LevelsModePage = () => {
                 background: `linear-gradient(135deg, white 30%, ${ac} 65%, ${ui})`,
                 backgroundClip: 'text', WebkitBackgroundClip: 'text',
                 color: 'transparent', WebkitTextFillColor: 'transparent',
-                filter: `drop-shadow(0 0 30px ${ac}30)`,
+                filter: `drop-shadow(0 0 30px 70)`,
               }}>
                 CHOOSE YOUR LANGUAGE
               </h2>
-              <p style={{ fontFamily: 'monospace', fontSize: 13, color: `${ac}60`, letterSpacing: 3, margin: 0 }}>
+              <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `99`, letterSpacing: 3, margin: 0 }}>
                 5 LANGUAGES · 100 LEVELS EACH · START ANYTIME
               </p>
             </div>
@@ -467,7 +467,7 @@ const LevelsModePage = () => {
             <div style={{
               display: 'flex', gap: 22, alignItems: 'stretch',
               overflowX: 'auto', paddingBottom: 8,
-              scrollbarWidth: 'thin', scrollbarColor: `${ac}40 transparent`,
+              scrollbarWidth: 'thin', scrollbarColor: `80 transparent`,
             }}>
               {COURSES.map((course, idx) => (
                 <div key={course.id} style={{ flex: '1 1 0', minWidth: 248, maxWidth: 310 }}>
@@ -498,11 +498,11 @@ const LevelsModePage = () => {
                 ].map(({ iconName, text, color }) => (
                   <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                     <span style={{ fontSize: 16, display: 'flex' }}><PremiumIcon name={iconName} size={18} color={color} /></span>
-                    <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: ui, letterSpacing: 1, textTransform: 'uppercase' }}>{text}</span>
+                    <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, fontWeight: 700, color: ui, letterSpacing: 1, textTransform: 'uppercase' }}>{text}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 13, color: `${ac}30`, letterSpacing: 3 }}>
+              <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `70`, letterSpacing: 3 }}>
                 SELECT A LANGUAGE TO BEGIN YOUR CAMPAIGN · ALL 100 LEVELS UNLOCKED
               </div>
             </div>
@@ -525,7 +525,7 @@ const LevelsModePage = () => {
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width:5px; height:5px; }
         ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:${ac}40; border-radius:3px; }
+        ::-webkit-scrollbar-thumb { background:80; border-radius:3px; }
       `}</style>
     </div>
   );

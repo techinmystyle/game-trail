@@ -296,7 +296,7 @@ const CustomModeLobbyPage = () => {
           {roomData.isJoining ? 'JOINING BATTLE ARENA...' : 'CREATING BATTLE ARENA...'}
         </p>
         {connectingAttempt > 0 && (
-          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 8 }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginTop: 8 }}>
             Retrying... attempt {connectingAttempt + 1} of 5
           </p>
         )}
@@ -310,11 +310,11 @@ const CustomModeLobbyPage = () => {
       <div style={{ textAlign: 'center', maxWidth: 400, padding: 32, ...cardStyle }}>
         <AlertCircle size={48} style={{ color: '#ef4444', marginBottom: 16 }} />
         <h2 style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 22, color: '#ef4444', marginBottom: 12 }}>CONNECTION FAILED</h2>
-        <p style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 20 }}>{error}</p>
+        <p style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: 20 }}>{error}</p>
         <button onClick={() => navigate('/custom-mode')} style={{
           width: '100%', padding: '12px 0', borderRadius: 10, border: 'none',
           background: CM_ACCENT, color: '#001a20', fontFamily: 'Rajdhani, sans-serif',
-          fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer', fontSize: 14,
+          fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer', fontSize: 16, fontWeight: 700,
         }}>Back to Custom Mode</button>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
@@ -342,7 +342,7 @@ const CustomModeLobbyPage = () => {
             display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
             borderRadius: 7, border: `1px solid ${CM_ACCENT}30`, background: `${CM_ACCENT}08`,
             color: CM_ACCENT, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-            fontWeight: 700, fontSize: 14,
+            fontWeight: 700, fontSize: 16, fontWeight: 700,
           }}>
             <ChevronLeft size={14} /> BACK
           </button>
@@ -359,8 +359,8 @@ const CustomModeLobbyPage = () => {
             }}>
               <Icon size={12} style={{ color: CM_ACCENT }} />
               <div>
-                <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>{label}</div>
-                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 14, color: 'white' }}>{value}</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>{label}</div>
+                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: 'white' }}>{value}</div>
               </div>
               <button onClick={() => handleCopy(value)} style={{
                 width: 24, height: 24, borderRadius: 5, border: 'none',
@@ -379,7 +379,7 @@ const CustomModeLobbyPage = () => {
           <div style={{
             padding: '4px 12px', borderRadius: 20,
             background: `${CM_ACCENT}12`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 14, color: CM_ACCENT, letterSpacing: 2,
+            fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: CM_ACCENT, letterSpacing: 2,
           }}>
             ⚔️ HUMAN VS HUMAN
           </div>
@@ -393,8 +393,8 @@ const CustomModeLobbyPage = () => {
           }}>
             <Clock size={12} style={{ color: expirySeconds < 60 ? '#ef4444' : `${CM_ACCENT}80` }} />
             <div>
-              <div style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROOM EXPIRES</div>
-              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 13, color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.7)' }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROOM EXPIRES</div>
+              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15, fontWeight: 700, color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.7)' }}>
                 {formatExpiry(expirySeconds)}
               </div>
             </div>
@@ -404,11 +404,11 @@ const CustomModeLobbyPage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {profileImage
               ? <img src={profileImage} alt="You" style={{ width: 32, height: 32, borderRadius: '50%', border: `2px solid ${CM_ACCENT}`, objectFit: 'cover' }} />
-              : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${CM_ACCENT}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 14, color: CM_ACCENT }}>{username[0]}</div>
+              : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${CM_ACCENT}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: CM_ACCENT }}>{username[0]}</div>
             }
             <div>
-              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, color: 'white' }}>{username}</div>
-              <div style={{ fontFamily: 'monospace', fontSize: 13, color: isHost ? CM_ACCENT : 'rgba(255,255,255,0.6)' }}>
+              <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, color: 'white' }}>{username}</div>
+              <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: isHost ? CM_ACCENT : 'rgba(255,255,255,0.6)' }}>
                 {isHost ? '👑 HOST' : 'PLAYER'}
               </div>
             </div>
@@ -426,7 +426,7 @@ const CustomModeLobbyPage = () => {
             <div style={{ padding: '12px 16px', borderBottom: `1px solid ${CM_ACCENT}10`,
               display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <MessageSquare size={14} style={{ color: CM_ACCENT }} />
-              <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>LOBBY CHAT</span>
+              <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>LOBBY CHAT</span>
               <div style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981', animation: 'pulse 2s infinite' }} />
             </div>
 
@@ -439,13 +439,13 @@ const CustomModeLobbyPage = () => {
                       padding: '6px 12px', borderRadius: 8,
                       background: msg.isWarning ? 'rgba(239,68,68,0.1)' : `${CM_ACCENT}08`,
                       border: `1px solid ${msg.isWarning ? 'rgba(239,68,68,0.2)' : `${CM_ACCENT}15`}`,
-                      fontFamily: 'monospace', fontSize: 13,
+                      fontFamily: 'monospace', fontSize: 15, fontWeight: 700,
                       color: msg.isWarning ? '#ef4444' : `${CM_ACCENT}80`,
                       textAlign: 'center', maxWidth: '90%',
                     }}>{msg.text}</div>
                   ) : (
                     <>
-                      <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)',
+                      <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)',
                         marginBottom: 3, paddingLeft: msg.isMine ? 0 : 4, paddingRight: msg.isMine ? 4 : 0 }}>
                         {msg.isMine ? 'You' : msg.from} · {msg.time}
                       </div>
@@ -453,7 +453,7 @@ const CustomModeLobbyPage = () => {
                         padding: '8px 12px', borderRadius: 10,
                         background: msg.isMine ? `${CM_ACCENT}18` : 'rgba(255,255,255,0.05)',
                         border: `1px solid ${msg.isMine ? CM_ACCENT + '30' : 'rgba(255,255,255,0.06)'}`,
-                        fontFamily: 'monospace', fontSize: 14, color: 'white', maxWidth: '85%', lineHeight: 1.5,
+                        fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'white', maxWidth: '85%', lineHeight: 1.5,
                       }}>{msg.text}</div>
                     </>
                   )}
@@ -473,7 +473,7 @@ const CustomModeLobbyPage = () => {
                   style={{
                     flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${CM_ACCENT}15`,
                     background: `${CM_ACCENT}04`, color: 'white',
-                    fontFamily: 'monospace', fontSize: 14, outline: 'none', caretColor: CM_ACCENT,
+                    fontFamily: 'monospace', fontSize: 16, fontWeight: 700, outline: 'none', caretColor: CM_ACCENT,
                   }}
                 />
                 <button onClick={sendChat} style={{
@@ -493,7 +493,7 @@ const CustomModeLobbyPage = () => {
 
           {/* Title */}
           <div style={{ textAlign: 'center', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 4, color: CM_ACCENT, textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, letterSpacing: 4, color: CM_ACCENT, textTransform: 'uppercase', marginBottom: 4 }}>
               HUMAN VS HUMAN BATTLE LOBBY
             </div>
             <h1 style={{
@@ -520,7 +520,7 @@ const CustomModeLobbyPage = () => {
                 display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
                 borderRadius: 20, background: `${CM_ACCENT}06`,
                 border: `1px solid ${CM_ACCENT}15`,
-                fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 14, color: 'rgba(255,255,255,0.6)',
+                fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)',
               }}>
                 <Icon size={12} style={{ color: CM_ACCENT }} /> {label}
               </div>
@@ -532,14 +532,14 @@ const CustomModeLobbyPage = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
               <User size={16} style={{ color: CM_ACCENT }} />
               <div>
-                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 14, textTransform: 'uppercase' }}>PLAYERS</div>
-                <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
+                <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, textTransform: 'uppercase' }}>PLAYERS</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
                   {playersReady} / {totalPlayers} Ready
                 </div>
               </div>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Wifi size={12} style={{ color: '#10b981' }} />
-                <span style={{ fontFamily: 'monospace', fontSize: 14, color: '#10b981' }}>LIVE</span>
+                <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: '#10b981' }}>LIVE</span>
               </div>
             </div>
 
@@ -562,17 +562,17 @@ const CustomModeLobbyPage = () => {
                           </div>
                       }
                       {player.isHost && (
-                        <div style={{ position: 'absolute', top: -4, right: -4, fontSize: 14 }}>👑</div>
+                        <div style={{ position: 'absolute', top: -4, right: -4, fontSize: 16, fontWeight: 700 }}>👑</div>
                       )}
                       {player.ready && (
                         <div style={{ position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: '50%', background: '#10b981', border: '2px solid #010d12', boxShadow: '0 0 6px #10b981' }} />
                       )}
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: isMe ? CM_ACCENT : 'white' }}>
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: isMe ? CM_ACCENT : 'white' }}>
                         {player.username} {isMe && '(YOU)'}
                       </div>
-                      <div style={{ fontFamily: 'monospace', fontSize: 14, color: player.ready ? '#10b981' : 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                      <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: player.ready ? '#10b981' : 'rgba(255,255,255,0.6)', marginTop: 2 }}>
                         {player.ready ? '✅ READY' : '⏳ Waiting...'}
                       </div>
                     </div>
@@ -591,10 +591,10 @@ const CustomModeLobbyPage = () => {
                     fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: `${CM_ACCENT}30` }}>
                     {activePlayers.length + i + 1}
                   </div>
-                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 14, color: 'rgba(255,255,255,0.2)' }}>
+                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
                     Waiting for player...
                   </div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.1)' }}>SLOT OPEN</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.1)' }}>SLOT OPEN</div>
                 </div>
               ))}
             </div>
@@ -606,14 +606,14 @@ const CustomModeLobbyPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <Eye size={16} style={{ color: `${CM_ACCENT}80` }} />
                 <div>
-                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>SPECTATOR ZONE (HOST ONLY)</div>
-                  <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.55)' }}>Up to 5 spectator slots — optional</div>
+                  <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>SPECTATOR ZONE (HOST ONLY)</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>Up to 5 spectator slots — optional</div>
                 </div>
                 <button onClick={handleSpectateToggle} style={{
                   marginLeft: 'auto', padding: '6px 14px', borderRadius: 8, border: `1px solid ${CM_ACCENT}30`,
                   background: isSpectator ? `${CM_ACCENT}18` : 'rgba(255,255,255,0.04)',
                   color: isSpectator ? CM_ACCENT : 'rgba(255,255,255,0.8)',
-                  fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13,
+                  fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', transition: 'all 0.2s',
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}>
@@ -626,7 +626,7 @@ const CustomModeLobbyPage = () => {
                 <div style={{
                   padding: '10px 14px', borderRadius: 8,
                   background: `${CM_ACCENT}08`, border: `1px solid ${CM_ACCENT}20`,
-                  fontFamily: 'monospace', fontSize: 13, color: `${CM_ACCENT}80`,
+                  fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${CM_ACCENT}80`,
                 }}>
                   🎭 You are spectating. You will watch all players' code during the battle — read only.
                 </div>
@@ -642,7 +642,7 @@ const CustomModeLobbyPage = () => {
               display: 'flex', alignItems: 'center', gap: 10,
             }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: CM_ORANGE, animation: 'pulse 1s infinite' }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 13, color: CM_ORANGE }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: CM_ORANGE }}>
                 WAITING FOR {totalPlayers - activePlayers.length} MORE PLAYER(S) — Share: {roomId} / {roomPassword}
               </span>
             </div>
@@ -656,14 +656,14 @@ const CustomModeLobbyPage = () => {
                   onClick={() => handleReadyChange(!accepted)}
                   style={{
                     width: 22, height: 22, borderRadius: 6,
-                    border: `2px solid ${accepted ? CM_ACCENT : 'rgba(255,255,255,0.2)'}`,
+                    border: `2px solid ${accepted ? CM_ACCENT : 'rgba(255,255,255,0.6)'}`,
                     background: accepted ? CM_ACCENT : 'transparent',
                     cursor: 'pointer', transition: 'all 0.2s',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                     boxShadow: accepted ? `0 0 12px ${CM_ACCENT}50` : 'none',
                   }}
                 >
-                  {accepted && <span style={{ color: '#001a20', fontSize: 13, lineHeight: 1 }}>✓</span>}
+                  {accepted && <span style={{ color: '#001a20', fontSize: 15, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                 </div>
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15,
                   color: accepted ? CM_ACCENT : 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -680,17 +680,17 @@ const CustomModeLobbyPage = () => {
                     background: accepted && activePlayers.length >= totalPlayers
                       ? `linear-gradient(135deg, ${CM_ACCENT}, ${CM_UI})`
                       : 'rgba(255,255,255,0.05)',
-                    color: accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.2)',
+                    color: accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.6)',
                     fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, textTransform: 'uppercase',
                     fontSize: 15, cursor: accepted ? 'pointer' : 'not-allowed', letterSpacing: 2,
                     boxShadow: accepted ? `0 4px 20px ${CM_ACCENT}40` : 'none', transition: 'all 0.2s',
                     display: 'flex', alignItems: 'center', gap: 8,
                   }}>
-                  <Play size={16} fill={accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.2)'} /> START BATTLE
+                  <Play size={16} fill={accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.6)'} /> START BATTLE
                 </button>
               ) : (
                 <div style={{ padding: '10px 18px', borderRadius: 8, fontFamily: 'Rajdhani, sans-serif',
-                  fontWeight: 800, fontSize: 13, textTransform: 'uppercase',
+                  fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase',
                   color: CM_ACCENT, background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}25` }}>
                   Waiting for host...
                 </div>
@@ -707,7 +707,7 @@ const CustomModeLobbyPage = () => {
           backdropFilter: 'blur(16px)', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }}>
-          <div style={{ fontFamily: 'monospace', fontSize: 13, letterSpacing: 5,
+          <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, letterSpacing: 5,
             color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: 20 }}>
             BATTLE COMMENCING IN
           </div>

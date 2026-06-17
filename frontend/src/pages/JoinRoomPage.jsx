@@ -74,9 +74,9 @@ const JoinRoomPage = () => {
           {/* Back */}
           <button onClick={() => navigate('/computer-mode')} style={{
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', marginBottom: 28,
-            borderRadius: 8, border: `1px solid ${ac}30`, background: `${ac}10`,
+            borderRadius: 8, border: `1px solid 70`, background: `${ac}10`,
             color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
-            fontWeight: 700, fontSize: 14, transition: 'all 0.2s',
+            fontWeight: 700, fontSize: 16, fontWeight: 700, transition: 'all 0.2s',
           }}
           onMouseEnter={e => e.currentTarget.style.background = `${ac}25`}
           onMouseLeave={e => e.currentTarget.style.background = `${ac}10`}
@@ -104,7 +104,7 @@ const JoinRoomPage = () => {
               <h1 style={{ margin: '0 0 8px', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 32, textTransform: 'uppercase', letterSpacing: 3, color: 'white' }}>
                 JOIN ROOM
               </h1>
-              <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
+              <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
                 Enter your battle credentials to join the arena
               </p>
             </div>
@@ -112,7 +112,7 @@ const JoinRoomPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {/* Room ID */}
               <div>
-                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, color: ac, display: 'block', marginBottom: 8 }}>
+                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: ac, display: 'block', marginBottom: 8 }}>
                   ROOM ID <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -126,7 +126,7 @@ const JoinRoomPage = () => {
                     style={{
                       width: '100%', padding: '13px 14px 13px 42px', borderRadius: 10, outline: 'none',
                       background: 'rgba(255,255,255,0.04)', border: `1.5px solid ${roomId ? ac + '50' : 'rgba(255,255,255,0.08)'}`,
-                      color: 'white', fontFamily: 'monospace', fontSize: 14,
+                      color: 'white', fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
                       transition: 'all 0.2s', caretColor: ac, letterSpacing: 1,
                     }}
                     onFocus={e => { e.currentTarget.style.borderColor = ac; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
@@ -137,8 +137,8 @@ const JoinRoomPage = () => {
 
               {/* Password */}
               <div>
-                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: 8 }}>
-                  PASSWORD <span style={{ color: 'rgba(255,255,255,0.55)', textTransform: 'lowercase', fontSize: 13 }}>(if required)</span>
+                <label style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: 8 }}>
+                  PASSWORD <span style={{ color: 'rgba(255,255,255,0.55)', textTransform: 'lowercase', fontSize: 15, fontWeight: 700 }}>(if required)</span>
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.6)' }} />
@@ -151,7 +151,7 @@ const JoinRoomPage = () => {
                     style={{
                       width: '100%', padding: '13px 14px 13px 42px', borderRadius: 10, outline: 'none',
                       background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.08)',
-                      color: 'white', fontFamily: 'monospace', fontSize: 14,
+                      color: 'white', fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
                       transition: 'all 0.2s', caretColor: ac, letterSpacing: 1,
                     }}
                     onFocus={e => { e.currentTarget.style.borderColor = ac; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
@@ -164,7 +164,7 @@ const JoinRoomPage = () => {
               <div style={{
                 padding: '10px 14px', borderRadius: 8,
                 background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.15)',
-                fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6,
+                fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6,
               }}>
                 💡 Get your Room ID and Password from the host's battle lobby screen.
               </div>
@@ -173,7 +173,7 @@ const JoinRoomPage = () => {
               <button onClick={handleJoin} disabled={!canJoin || joining} style={{
                 width: '100%', padding: '16px 0', borderRadius: 12, border: 'none', marginTop: 8,
                 background: canJoin && !joining ? `linear-gradient(135deg, #f97316, #fb923c)` : 'rgba(255,255,255,0.06)',
-                color: canJoin ? 'white' : 'rgba(255,255,255,0.2)', cursor: canJoin ? 'pointer' : 'not-allowed',
+                color: canJoin ? 'white' : 'rgba(255,255,255,0.6)', cursor: canJoin ? 'pointer' : 'not-allowed',
                 fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, textTransform: 'uppercase',
                 fontSize: 16, letterSpacing: 3,
                 boxShadow: canJoin && !joining ? '0 8px 30px rgba(249,115,22,0.45)' : 'none',

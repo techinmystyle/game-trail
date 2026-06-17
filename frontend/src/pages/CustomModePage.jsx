@@ -123,7 +123,7 @@ const StatChip = ({ iconName, value, label, theme }) => (
   <div style={{ textAlign: 'center', padding: '12px 20px' }}>
     <div style={{ fontSize: 24, marginBottom: 4, display: 'flex', justifyContent: 'center' }}><PremiumIcon name={iconName} size={28} color={theme.accent} /></div>
     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 26, color: theme.accent, lineHeight: 1 }}>{value}</div>
-    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
+    <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>{label}</div>
   </div>
 );
 
@@ -131,7 +131,7 @@ const StatChip = ({ iconName, value, label, theme }) => (
 const Feat = ({ text, theme }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
     <div style={{ width: 5, height: 5, borderRadius: '50%', background: theme.accent, boxShadow: `0 0 6px ${theme.accent}`, flexShrink: 0 }} />
-    <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5 }}>{text}</span>
+    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5 }}>{text}</span>
   </div>
 );
 
@@ -179,7 +179,7 @@ const ModeCard = ({ type, onClick, theme }) => {
         position: 'absolute', top: 18, right: 18,
         padding: '3px 10px', borderRadius: 20,
         background: `${cardAccent}18`, border: `1px solid ${cardAccent}35`,
-        fontFamily: 'monospace', fontSize: 13, color: cardAccent,
+        fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: cardAccent,
         letterSpacing: 3, textTransform: 'uppercase', fontWeight: 700,
         display: 'flex', alignItems: 'center', gap: 6,
       }}>
@@ -243,7 +243,7 @@ const ModeCard = ({ type, onClick, theme }) => {
           {isCreate ? 'CREATE ROOM' : 'JOIN ROOM'}
         </div>
         <div style={{
-          fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.7)',
+          fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
           lineHeight: 1.8, marginBottom: 20,
         }}>
           {isCreate
@@ -344,7 +344,7 @@ const CustomModePage = () => {
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
             background: `${currentTheme.accent}10`, border: `1px solid ${currentTheme.accent}30`,
-            fontFamily: 'monospace', fontSize: 13, color: currentTheme.accent,
+            fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: currentTheme.accent,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 22,
           }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: currentTheme.accent, animation: 'pulseGlow 2s infinite', boxShadow: `0 0 8px ${currentTheme.accent}` }} />
@@ -374,14 +374,14 @@ const CustomModePage = () => {
             display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 14,
           }}>
             <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, transparent, ${currentTheme.accent}50)` }} />
-            <span style={{ fontFamily: 'monospace', fontSize: 13, color: `${currentTheme.accent}80`, letterSpacing: 4, textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${currentTheme.accent}80`, letterSpacing: 4, textTransform: 'uppercase' }}>
               HUMAN · VS · HUMAN
             </span>
             <div style={{ height: 1, width: 60, background: `linear-gradient(90deg, ${currentTheme.accent}50, transparent)` }} />
           </div>
 
           <p style={{
-            fontFamily: 'monospace', fontSize: 13,
+            fontFamily: 'monospace', fontSize: 15, fontWeight: 700,
             color: 'rgba(255,255,255,0.7)', margin: '0 auto 36px', maxWidth: 520, lineHeight: 1.8,
           }}>
             Real coders. Real battles. No AI, no bots — just pure human intellect racing against the clock.
@@ -430,7 +430,7 @@ const CustomModePage = () => {
           ].map(({ iconName, text }) => (
             <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <span style={{ display: 'flex', alignItems: 'center' }}><PremiumIcon name={iconName} size={16} color="white" /></span>
-              <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{text}</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{text}</span>
             </div>
           ))}
         </div>
@@ -438,7 +438,7 @@ const CustomModePage = () => {
         {/* Bottom hint */}
         <div style={{
           textAlign: 'center', marginTop: 32,
-          fontFamily: 'monospace', fontSize: 13, color: `${currentTheme.accent}30`,
+          fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${currentTheme.accent}30`,
           letterSpacing: 3, textTransform: 'uppercase',
         }}>
           CREATE A ROOM TO HOST · JOIN A ROOM WITH ID + PASSWORD

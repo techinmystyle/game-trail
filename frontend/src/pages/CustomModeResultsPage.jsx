@@ -149,7 +149,7 @@ const CustomModeResultsPage = () => {
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
             background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 13, color: CM_ACCENT,
+            fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: CM_ACCENT,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 24,
           }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: CM_ACCENT, animation: 'pulse 2s infinite' }} />
@@ -171,7 +171,7 @@ const CustomModeResultsPage = () => {
             {winnerData.title}
           </h1>
 
-          <p style={{ fontFamily: 'monospace', fontSize: 13, color: 'rgba(255,255,255,0.8)', maxWidth: 450, margin: '0 auto' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.8)', maxWidth: 450, margin: '0 auto' }}>
             {winnerData.subtitle}
           </p>
 
@@ -191,7 +191,7 @@ const CustomModeResultsPage = () => {
               <div key={sublabel} style={{ textAlign: 'center' }}>
                 <Icon size={18} style={{ color: CM_ACCENT, marginBottom: 6 }} />
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: 'white' }}>{label}</div>
-                <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>{sublabel}</div>
+                <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>{sublabel}</div>
               </div>
             ))}
           </div>
@@ -243,9 +243,9 @@ const CustomModeResultsPage = () => {
                         {player.username} {isMe && '(YOU)'}
                       </span>
                       {isWinner && <span style={{ fontSize: 18 }}>👑</span>}
-                      {isDraw && rank === 0 && <span style={{ fontSize: 14 }}>🤝</span>}
+                      {isDraw && rank === 0 && <span style={{ fontSize: 16, fontWeight: 700 }}>🤝</span>}
                     </div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                    <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
                       {player.finished ? '✅ Submitted successfully' : '⏳ Did not submit'}
                     </div>
                   </div>
@@ -255,7 +255,7 @@ const CustomModeResultsPage = () => {
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 36, color: playerColor, lineHeight: 1 }}>
                       {playerScore}
                     </div>
-                    <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROUNDS WON</div>
+                    <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROUNDS WON</div>
                   </div>
                 </div>
               );
