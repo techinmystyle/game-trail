@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Zap, LogOut, Plus } from "lucide-react";
+import { Zap, LogOut, Plus, ChevronDown } from "lucide-react";
 import { PrismThemeToggle } from "./landing/PrismThemeToggle";
 import { profileAPI, pointsAPI } from "../utils/api";
 
@@ -23,6 +23,7 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
   const currentTheme = themes[themeKey] || DEFAULT_THEMES[themeKey];
 
   const navigate = useNavigate();
+  const [isGameModeOpen, setIsGameModeOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [xpPoints, setXpPoints] = useState(0);
   const [gThunderPoints, setGThunderPoints] = useState(0);
@@ -158,6 +159,100 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
             style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
           >
             RULES
+          </button>
+          
+          {/* Game Mode Dropdown — TRI MODE & SPECIALS only */}
+          <div className="relative" data-dropdown="game-mode">
+            <button
+              onClick={() => setIsGameModeOpen(!isGameModeOpen)}
+              className={`nav-btn relative tracking-wider transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 font-techno text-[15px] font-semibold flex items-center gap-1 ${
+                (currentPage === 'tri-mode' || currentPage === 'specials-mode')
+                  ? 'text-white nav-btn-active' 
+                  : 'text-white/90 hover:text-white nav-btn-inactive'
+              }`}
+              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
+            >
+              GAME MODE
+              <ChevronDown 
+                className="h-4 w-4 transition-transform duration-300" 
+                style={{ transform: isGameModeOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isGameModeOpen && (
+              <div 
+                className="absolute top-full left-0 mt-2 py-2 rounded-lg backdrop-blur-md min-w-[160px]"
+                style={{
+                  background: 'rgba(10, 5, 25, 0.98)',
+                  border: `1px solid ${currentTheme.accent}60`,
+                  boxShadow: `0 8px 32px rgba(0,0,0,0.9), 0 0 24px ${currentTheme.accent}30`,
+                  zIndex: 9999
+                }}
+              >
+                <button
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    setIsGameModeOpen(false);
+                    navigate('/tri-mode'); 
+                  }}
+                  className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
+                  style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `${currentTheme.accent}25`;
+                    e.currentTarget.style.borderLeft = `3px solid ${currentTheme.accent}`;
+                    e.currentTarget.style.paddingLeft = '13px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderLeft = 'none';
+                    e.currentTarget.style.paddingLeft = '16px';
+                  }}
+                >
+                  TRI MODE
+                </button>
+                <button
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    setIsGameModeOpen(false);
+                    navigate('/specials-mode'); 
+                  }}
+                  className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
+                  style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `${currentTheme.accent}25`;
+                    e.currentTarget.style.borderLeft = `3px solid ${currentTheme.accent}`;
+                    e.currentTarget.style.paddingLeft = '13px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderLeft = 'none';
+                    e.currentTarget.style.paddingLeft = '16px';
+                  }}
+                >
+                  SPECIALS
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <button
+            onClick={() => { if(window.location.pathname === '/dashboard') window.location.hash = 'leaderboard'; else navigate('/dashboard#leaderboard'); }}
+            className={`nav-btn relative tracking-wider transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 font-techno text-[15px] font-semibold text-white/90 hover:text-white nav-btn-inactive`}
+            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
+          >
+            LEADERBOARD
+          </button>
+          <button
+            onClick={() => navigate("/tutorials")}
+            className={`nav-btn relative tracking-wider transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 font-techno text-[15px] font-semibold ${
+              currentPage === 'tutorials' 
+                ? 'text-white nav-btn-active' 
+                : 'text-white/90 hover:text-white nav-btn-inactive'
+            }`}
+            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
+          >
+            TUTORIALS
           </button>
         </nav>
       </div>
