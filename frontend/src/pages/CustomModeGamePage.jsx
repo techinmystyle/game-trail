@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Play, Trophy, Zap, BookOpen, Lock, Eye } from 'lucide-react';
+import { X, Play, Trophy, Zap, BookOpen, Lock, Eye, ChevronDown, ChevronUp, Terminal } from 'lucide-react';
 import { computerModeAPI, profileAPI } from '../utils/api';
 import { getSocket } from '../utils/socket';
 
-const CM_ACCENT = '#00e5ff';
-const CM_UI     = '#80ffff';
-const CM_BG     = '#010d12';
+/* ── Theme map ─────────────────────────────────────────────────── */
+const THEMES = {
+  red:    { accent: '#ff5252', ui: '#ff6b6b', bg: '#050105' },
+  blue:   { accent: '#0099ff', ui: '#00ccff', bg: '#00050f' },
+  green:  { accent: '#00ff88', ui: '#00ff99', bg: '#000a05' },
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#060110' },
+};
 
+const PAGE_BG = '#010d12'; // fallback dark bg
 const ext = l => ({ HTML: 'html', CSS: 'css', JavaScript: 'js', Python: 'py', Java: 'java' }[l] || 'txt');
 
-// ── Animated Binary Panel — shown to opponents ──
-const BinaryPanel = ({ username, progress = 0, isTyping = false, color = CM_ACCENT }) => {
+// ── Animated Binary Panel ──
+const BinaryPanel = ({ username, progress = 0, isTyping = false, color }) => {
   const ROWS = 18, COLS = 42;
   const [matrix, setMatrix] = useState(() =>
     Array.from({ length: ROWS }, () =>
@@ -48,7 +53,7 @@ const BinaryPanel = ({ username, progress = 0, isTyping = false, color = CM_ACCE
             {['#ff5f56','#ffbd2e','#27c93f'].map(c => <div key={c} style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />)}
           </div>
           <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>
-            {username}.{ext('encrypted')} [ENCRYPTED]
+            {username}.enc [ENCRYPTED]
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -58,7 +63,7 @@ const BinaryPanel = ({ username, progress = 0, isTyping = false, color = CM_ACCE
               background: `${color}18`, border: `1px solid ${color}30`,
               borderRadius: 4, padding: '2px 8px',
             }}>
-              <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, animation: 'pulse 0.5s infinite' }} />
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, animation: 'binaryPulse 0.5s infinite' }} />
               <span style={{ fontFamily: 'monospace', fontSize: 8, color, fontWeight: 700 }}>TYPING...</span>
             </div>
           )}
@@ -86,7 +91,7 @@ const BinaryPanel = ({ username, progress = 0, isTyping = false, color = CM_ACCE
           ))}
         </div>
 
-        {/* Progress overlay */}
+        {/* Progress overlay bar */}
         <div style={{
           position: 'absolute', bottom: 12, left: 12, right: 12,
           height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden',
@@ -159,7 +164,7 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
                 background: `${ac}10`, border: `1px solid ${ac}20`,
                 fontFamily: 'monospace', fontSize: 9, color: `${ac}90`,
               }}>
-                Test {i + 1}: {tc.description}
+                Test {i + 1}{tc.description ? `: ${tc.description}` : ''}
               </div>
             ))}
           </div>
@@ -169,65 +174,263 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
   </div>
 );
 
+// ── Output Panel ──
+const OutputPanel = ({ testResults, challenge, outputData, logs, ac }) => {
+  const [expanded, setExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState('tests');
+
+  const testCount = challenge?.testCases?.length || 0;
+  const passCount = testResults.filter(Boolean).length;
+
+  return (
+    <div style={{
+      flexShrink: 0,
+      background: '#07090e',
+      border: `1px solid ${ac}15`,
+      borderRadius: 8,
+      overflow: 'hidden',
+      transition: 'all 0.3s',
+    }}>
+      {/* Panel header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 0,
+        borderBottom: expanded ? '1px solid rgba(255,255,255,0.06)' : 'none',
+        background: '#0a0d14',
+      }}>
+        {/* Tabs */}
+        {[
+          { id: 'tests', label: `TEST CASES (${passCount}/${testCount})` },
+          { id: 'output', label: 'OUTPUT' },
+          { id: 'logs', label: `LOGS (${logs.length})` },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => { setActiveTab(tab.id); setExpanded(true); }}
+            style={{
+              padding: '7px 14px', border: 'none', cursor: 'pointer',
+              background: activeTab === tab.id && expanded ? `${ac}12` : 'transparent',
+              borderRight: '1px solid rgba(255,255,255,0.05)',
+              borderBottom: activeTab === tab.id && expanded ? `2px solid ${ac}` : '2px solid transparent',
+              fontFamily: 'monospace', fontSize: 9, fontWeight: 700, letterSpacing: 1,
+              color: activeTab === tab.id && expanded ? ac : 'rgba(255,255,255,0.3)',
+              transition: 'all 0.2s',
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => setExpanded(v => !v)}
+          style={{
+            padding: '7px 12px', border: 'none', background: 'transparent',
+            color: 'rgba(255,255,255,0.3)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 4,
+            fontFamily: 'monospace', fontSize: 9,
+          }}
+        >
+          {expanded ? <><ChevronDown size={12} /> HIDE</> : <><ChevronUp size={12} /> SHOW</>}
+        </button>
+      </div>
+
+      {/* Panel content */}
+      {expanded && (
+        <div style={{ maxHeight: 180, overflowY: 'auto' }}>
+          {/* ── TEST CASES TAB ── */}
+          {activeTab === 'tests' && (
+            <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {testCount === 0 ? (
+                <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '16px 0' }}>
+                  // Run your code to see test results
+                </div>
+              ) : (
+                challenge.testCases.map((tc, i) => {
+                  const passed = testResults[i];
+                  const od = outputData?.[i];
+                  return (
+                    <div key={i} style={{
+                      borderRadius: 8,
+                      border: `1px solid ${passed === true ? '#10b98130' : passed === false ? '#ef444430' : 'rgba(255,255,255,0.08)'}`,
+                      background: passed === true ? 'rgba(16,185,129,0.04)' : passed === false ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.02)',
+                      overflow: 'hidden',
+                    }}>
+                      {/* Test header */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px',
+                        borderBottom: '1px solid rgba(255,255,255,0.04)',
+                      }}>
+                        <div style={{
+                          width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+                          background: passed === true ? '#10b98120' : passed === false ? '#ef444420' : 'rgba(255,255,255,0.06)',
+                          border: `1.5px solid ${passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.2)'}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontFamily: 'monospace', fontSize: 9, fontWeight: 900,
+                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.3)',
+                        }}>
+                          {passed === true ? '✓' : passed === false ? '✗' : i + 1}
+                        </div>
+                        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 11,
+                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)' }}>
+                          Test Case {i + 1}
+                          {tc.description ? ` — ${tc.description}` : ''}
+                        </span>
+                        <span style={{
+                          marginLeft: 'auto', fontFamily: 'monospace', fontSize: 8, fontWeight: 700,
+                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.25)',
+                        }}>
+                          {passed === true ? 'PASSED' : passed === false ? 'FAILED' : 'PENDING'}
+                        </span>
+                      </div>
+                      {/* Test details */}
+                      <div style={{ padding: '6px 12px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        {tc.input !== undefined && (
+                          <div>
+                            <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.25)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>INPUT</div>
+                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
+                              {JSON.stringify(tc.input)}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.25)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>EXPECTED</div>
+                          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: '#10b981', background: 'rgba(16,185,129,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
+                            {tc.expectedOutput !== undefined ? JSON.stringify(tc.expectedOutput) : tc.expected !== undefined ? JSON.stringify(tc.expected) : '—'}
+                          </div>
+                        </div>
+                        {od?.actualOutput !== undefined && (
+                          <div>
+                            <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.25)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>YOUR OUTPUT</div>
+                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: passed ? '#10b981' : '#ef4444', background: passed ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
+                              {JSON.stringify(od.actualOutput)}
+                            </div>
+                          </div>
+                        )}
+                        {od?.error && (
+                          <div style={{ gridColumn: '1/-1' }}>
+                            <div style={{ fontFamily: 'monospace', fontSize: 8, color: '#ef4444', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>ERROR</div>
+                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: '#ef4444', background: 'rgba(239,68,68,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
+                              {od.error}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* ── OUTPUT TAB ── */}
+          {activeTab === 'output' && (
+            <div style={{ padding: '10px 12px' }}>
+              {outputData && outputData.length > 0 ? (
+                outputData.map((od, i) => (
+                  od?.stdout ? (
+                    <div key={i} style={{ marginBottom: 8 }}>
+                      <div style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>
+                        ► Test {i+1} stdout:
+                      </div>
+                      <pre style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '8px', borderRadius: 6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                        {od.stdout}
+                      </pre>
+                    </div>
+                  ) : null
+                ))
+              ) : (
+                <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '16px 0' }}>
+                  // Run your code to see output
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── LOGS TAB ── */}
+          {activeTab === 'logs' && (
+            <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {logs.length === 0 ? (
+                <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '16px 0' }}>
+                  // System logs appear here...
+                </div>
+              ) : (
+                logs.map((log, i) => (
+                  <div key={i} style={{
+                    fontFamily: 'monospace', fontSize: 10, lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'baseline',
+                    color: log.type === 'error' ? '#ef4444' : log.type === 'success' ? '#10b981' : log.type === 'warning' ? '#f59e0b' : 'rgba(255,255,255,0.5)',
+                  }}>
+                    <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 8, flexShrink: 0 }}>{log.ts}</span>
+                    <span>{log.msg}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Player colors for multi-player
 const PLAYER_COLORS = ['#00e5ff', '#ff6b35', '#a855f7', '#10b981'];
 
 export default function CustomModeGamePage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const rd = location.state || {};
+  const navigate   = useNavigate();
+  const location   = useLocation();
+  const rd         = location.state || {};
 
-  const totalRounds  = Number(rd.rounds) || 3;
-  const roomTime     = Number(rd.roomTime || rd.timeLimit) || 5;
-  const language     = rd.language || 'JavaScript';
-  const difficulty   = rd.difficulty || 'Moderate';
-  const playerMode   = Number(rd.playerMode) || 2;
-  const isSpectator  = rd.isSpectator || false;
+  const totalRounds = Number(rd.rounds) || 3;
+  const roomTime    = Number(rd.roomTime || rd.timeLimit) || 5;
+  const language    = rd.language || 'JavaScript';
+  const difficulty  = rd.difficulty || 'Moderate';
+  const playerMode  = Number(rd.playerMode) || 2;
+  const isSpectator = rd.isSpectator || false;
 
+  // ── Dynamic theme from localStorage ──
   const [themeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
-  const pageBg = CM_BG;
-  const ac = CM_ACCENT;
+  const theme = THEMES[themeKey] || THEMES.purple;
+  const ac    = theme.accent;
 
-  const [roomId]     = useState(() => rd.roomId || 'CUSTOM');
-  const [myUserId, setMyUserId] = useState(() => rd.userId || null);
-  const [myUsername] = useState(() => localStorage.getItem('username') || 'YOU');
-  const [myProfileImg] = useState(() => localStorage.getItem('profileImage') || null);
+  const [roomId]      = useState(() => rd.roomId || 'CUSTOM');
+  const [myUserId, setMyUserId]   = useState(() => rd.userId || null);
+  const [myUsername]  = useState(() => localStorage.getItem('username') || 'YOU');
 
   const [challenge, setChallenge] = useState(() => rd.gameData?.challenge || null);
-  const [loading, setLoading] = useState(() => !rd.gameData?.challenge);
+  const [loading, setLoading]     = useState(() => !rd.gameData?.challenge);
   const [currentRound, setCurrentRound] = useState(() => rd.gameData?.currentRound || 1);
-  const [scores, setScores] = useState({});       // { userId: score }
-  const [players, setPlayers] = useState(() => rd.gameData?.players || rd.players || []);
-  const [opponentTyping, setOpponentTyping] = useState({});  // { userId: bool }
-  const [opponentProgress, setOpponentProgress] = useState({}); // { userId: 0-100 }
+  const [scores, setScores]             = useState({});
+  const [players, setPlayers]           = useState(() => rd.gameData?.players || rd.players || []);
+  const [opponentTyping, setOpponentTyping]     = useState({});
+  const [opponentProgress, setOpponentProgress] = useState({});
 
-  // Editor state
-  const [userCode, setUserCode] = useState('');
+  // Editor
+  const [userCode, setUserCode]       = useState('');
   const [testResults, setTestResults] = useState([]);
-  const [allPassed, setAllPassed] = useState(false);
-  const [compiling, setCompiling] = useState(false);
-  const [logs, setLogs] = useState([]);
-  const [progress, setProgress] = useState(0);
+  const [outputData, setOutputData]   = useState([]); // per-test output detail
+  const [allPassed, setAllPassed]     = useState(false);
+  const [compiling, setCompiling]     = useState(false);
+  const [logs, setLogs]               = useState([]);
+  const [progress, setProgress]       = useState(0);
 
   // Timer
-  const totalMs = roomTime * 60 * 1000;
-  const initMs  = rd.gameData?.timer ? rd.gameData.timer * 1000 : totalMs;
+  const totalMs    = roomTime * 60 * 1000;
+  const initMs     = rd.gameData?.timer ? rd.gameData.timer * 1000 : totalMs;
   const [playerMs, setPlayerMs] = useState(initMs);
   const msCurRef   = useRef(initMs);
   const startRef   = useRef(null);
   const timerIdRef = useRef(null);
 
   // Reading phase
-  const [readingPhase, setReadingPhase] = useState(false);
+  const [readingPhase, setReadingPhase]         = useState(false);
   const [readingCountdown, setReadingCountdown] = useState(15);
   const readingDoneRef = useRef(false);
 
   // Modals
-  const [exitModal, setExitModal] = useState(false);
+  const [exitModal, setExitModal]   = useState(false);
   const [roundModal, setRoundModal] = useState(false);
   const [roundWinner, setRoundWinner] = useState(null);
   const [nextRoundIn, setNextRoundIn] = useState(5);
-  const roundEndedRef = useRef(false);
+  const roundEndedRef  = useRef(false);
   const typingTimerRef = useRef(null);
 
   const addLog = useCallback((msg, type = 'info') => {
@@ -276,14 +479,14 @@ export default function CustomModeGamePage() {
     }, 1000);
   }, [startTimer]);
 
-  // Profile fetch
+  // Profile fetch for userId
   useEffect(() => {
     if (!myUserId) {
       profileAPI.getProfile().then(r => setMyUserId(r.data.user._id)).catch(() => {});
     }
   }, [myUserId]);
 
-  // Multiplayer init
+  // Multiplayer init from route state
   const mpInitDone = useRef(false);
   useEffect(() => {
     if (mpInitDone.current) return;
@@ -293,14 +496,17 @@ export default function CustomModeGamePage() {
     setChallenge(gd.challenge);
     setCurrentRound(gd.currentRound || 1);
     setPlayers(gd.players || []);
-    setTestResults((gd.challenge?.testCases || []).map(() => false));
+    // ── FIX: initialize testResults array with false for each test case ──
+    const tcLen = gd.challenge?.testCases?.length || 0;
+    setTestResults(Array(tcLen).fill(null));
+    setOutputData(Array(tcLen).fill(null));
     if (gd.timer) { msCurRef.current = gd.timer * 1000; setPlayerMs(gd.timer * 1000); }
     setLoading(false);
     setTimeout(() => startReadingPhase(), 500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Socket listeners
+  // Socket listeners — re-register when myUserId is known
   useEffect(() => {
     const sock = getSocket();
     if (!sock) return;
@@ -309,7 +515,9 @@ export default function CustomModeGamePage() {
       setChallenge(d.challenge);
       setCurrentRound(d.currentRound);
       setPlayers(d.players || []);
-      setTestResults((d.challenge?.testCases || []).map(() => false));
+      const tcLen = d.challenge?.testCases?.length || 0;
+      setTestResults(Array(tcLen).fill(null));
+      setOutputData(Array(tcLen).fill(null));
       setLoading(false);
       startReadingPhase();
     };
@@ -320,11 +528,13 @@ export default function CustomModeGamePage() {
         startRef.current = Date.now();
         setPlayerMs(d.timer * 1000);
       }
-      if (d.players) setPlayers(d.players);
-      // Update opponent progress from tick
       if (d.players) {
+        setPlayers(d.players);
+        // ── FIX: update opponent progress map ──
         const prog = {};
-        d.players.forEach(p => { if (p.userId !== myUserId) prog[p.userId] = p.progress || 0; });
+        d.players.forEach(p => {
+          if (p.userId !== myUserId) prog[p.userId] = p.progress ?? 0;
+        });
         setOpponentProgress(prog);
       }
     };
@@ -341,6 +551,13 @@ export default function CustomModeGamePage() {
       }
     };
 
+    const onProgressUpdate = (d) => {
+      // Real-time progress from opponent
+      if (d.userId !== myUserId) {
+        setOpponentProgress(prev => ({ ...prev, [d.userId]: d.progress ?? 0 }));
+      }
+    };
+
     const onRoundEnded = (d) => {
       stopTimer();
       roundEndedRef.current = true;
@@ -354,7 +571,9 @@ export default function CustomModeGamePage() {
       roundEndedRef.current = false;
       setChallenge(d.challenge);
       setCurrentRound(d.round);
-      setTestResults((d.challenge?.testCases || []).map(() => false));
+      const tcLen = d.challenge?.testCases?.length || 0;
+      setTestResults(Array(tcLen).fill(null));
+      setOutputData(Array(tcLen).fill(null));
       setProgress(0); setUserCode(''); setAllPassed(false); setRoundModal(false);
       msCurRef.current = totalMs; setPlayerMs(totalMs);
       readingDoneRef.current = false;
@@ -376,6 +595,7 @@ export default function CustomModeGamePage() {
     sock.on('custom-game-state-tick', onGameTick);
     sock.on('custom-player-completed', onPlayerCompleted);
     sock.on('custom-player-typing-update', onTypingUpdate);
+    sock.on('custom-player-progress-update', onProgressUpdate);
     sock.on('custom-round-ended', onRoundEnded);
     sock.on('custom-next-round', onNextRound);
     sock.on('custom-game-over', onGameOver);
@@ -385,6 +605,7 @@ export default function CustomModeGamePage() {
       sock.off('custom-game-state-tick', onGameTick);
       sock.off('custom-player-completed', onPlayerCompleted);
       sock.off('custom-player-typing-update', onTypingUpdate);
+      sock.off('custom-player-progress-update', onProgressUpdate);
       sock.off('custom-round-ended', onRoundEnded);
       sock.off('custom-next-round', onNextRound);
       sock.off('custom-game-over', onGameOver);
@@ -392,14 +613,14 @@ export default function CustomModeGamePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUserId]);
 
-  // Emit join-game
+  // Emit join-game once userId is ready
   useEffect(() => {
     const sock = getSocket();
     if (!sock || !myUserId) return;
     sock.emit('custom-join-game', { roomId, userId: myUserId });
   }, [roomId, myUserId]);
 
-  // Handle typing events — emit to server so others see binary rain
+  // Handle typing events
   const handleCodeChange = (val) => {
     setUserCode(val);
     const sock = getSocket();
@@ -418,20 +639,44 @@ export default function CustomModeGamePage() {
     addLog('⚙️ Compiling & validating...', 'info');
     try {
       const res = await computerModeAPI.validateCode({ userCode, challenge, language, timeMinutes: roomTime, difficulty });
-      const results = (res.data.validation?.testResults || []).map(r => r.passed);
-      setTestResults(results);
-      const cnt = results.filter(Boolean).length;
-      const tot = results.length || (challenge?.testCases?.length || 0);
-      const pct = tot > 0 ? (cnt / tot) * 100 : 0;
+      const validation = res.data.validation || {};
+      const rawResults = validation.testResults || [];
+      const results    = rawResults.map(r => r.passed);
+
+      // ── FIX: preserve null for missing tests, store per-test output ──
+      const tcLen  = challenge?.testCases?.length || 0;
+      const filled = Array(tcLen).fill(null).map((_, i) => results[i] !== undefined ? results[i] : null);
+      setTestResults(filled);
+      // Store detailed output per test
+      const details = Array(tcLen).fill(null).map((_, i) => rawResults[i] ? {
+        actualOutput: rawResults[i].actualOutput,
+        stdout: rawResults[i].stdout || '',
+        error: rawResults[i].error || null,
+      } : null);
+      setOutputData(details);
+
+      const cnt  = results.filter(Boolean).length;
+      const tot  = tcLen > 0 ? tcLen : results.length;
+      const pct  = tot > 0 ? (cnt / tot) * 100 : 0;
       setProgress(pct);
+
+      // Emit progress to server so opponents' binary panels update
       const sock = getSocket();
       if (sock && myUserId) {
         sock.emit('custom-player-progress', { roomId, userId: myUserId, progress: pct, testsPassed: cnt });
       }
-      if (cnt === tot && tot > 0) { setAllPassed(true); addLog(`✅ ALL ${tot}/${tot} TESTS PASSED! Click SUBMIT to WIN!`, 'success'); }
-      else { setAllPassed(false); addLog(`⚠️ ${cnt}/${tot} tests passed. Fix remaining cases.`, 'warning'); }
-      (res.data.validation?.errors || []).forEach(e => addLog(`  ${e.message}`, 'error'));
-    } catch { addLog('❌ Validation error — check your connection.', 'error'); }
+
+      if (cnt === tot && tot > 0) {
+        setAllPassed(true);
+        addLog(`✅ ALL ${tot}/${tot} TESTS PASSED! Click SUBMIT to WIN!`, 'success');
+      } else {
+        setAllPassed(false);
+        addLog(`⚠️ ${cnt}/${tot} tests passed. Fix remaining cases.`, 'warning');
+      }
+      (validation.errors || []).forEach(e => addLog(`  ${e.message}`, 'error'));
+    } catch (err) {
+      addLog('❌ Validation error — check your connection.', 'error');
+    }
     setCompiling(false);
   };
 
@@ -454,35 +699,54 @@ export default function CustomModeGamePage() {
       if (e.key === 'Escape') { e.preventDefault(); setExitModal(v => !v); }
     };
     window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compiling, allPassed, readingPhase, isSpectator]);
 
+  // ── FIX: also init testResults when challenge loads with no socket data ──
+  useEffect(() => {
+    if (challenge && testResults.length === 0 && challenge.testCases?.length > 0) {
+      setTestResults(Array(challenge.testCases.length).fill(null));
+      setOutputData(Array(challenge.testCases.length).fill(null));
+    }
+  }, [challenge]);
+
   if (loading || !challenge) return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: pageBg, gap: 16 }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: PAGE_BG, gap: 16 }}>
       <div style={{ width: 52, height: 52, border: `4px solid ${ac}25`, borderTopColor: ac, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <p style={{ fontFamily: 'Rajdhani,sans-serif', fontSize: 18, fontWeight: 800, color: ac, letterSpacing: 3, margin: 0, textTransform: 'uppercase' }}>LOADING BATTLE CHALLENGE...</p>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
-  const timerPct  = (playerMs / totalMs) * 100;
-  const timerCrit = playerMs < 30000;
+  const timerPct   = (playerMs / totalMs) * 100;
+  const timerCrit  = playerMs < 30000;
   const timerColor = timerCrit ? '#ef4444' : ac;
 
-  // Identify my player and opponents
-  const myPlayer = players.find(p => p.userId === myUserId);
-  const opponents = players.filter(p => p.userId !== myUserId && !p.isSpectator);
-  const spectatorsList = players.filter(p => p.isSpectator);
+  // Identify players
+  const myPlayer    = players.find(p => p.userId === myUserId);
+  const opponents   = players.filter(p => p.userId !== myUserId && !p.isSpectator);
 
-  // Grid layout: question | my editor | opponent panels
-  const opponentCount = opponents.length;
+  // ── FIX: If players not loaded yet, generate placeholder opponents from playerMode ──
+  const placeholderOpponents = opponents.length === 0 && !isSpectator
+    ? Array.from({ length: playerMode - 1 }, (_, i) => ({
+        userId: `placeholder-${i}`,
+        username: `Player ${i + 2}`,
+        progress: 0,
+        finished: false,
+      }))
+    : opponents;
+
+  const effectiveOpponents = opponents.length > 0 ? opponents : placeholderOpponents;
+  const opponentCount      = effectiveOpponents.length;
+
   const gridCols = isSpectator
     ? `repeat(${Math.min(playerMode, 4)}, 1fr)`
-    : opponentCount === 1 ? '42% 30% 28%'
-    : opponentCount === 2 ? '35% 22% 22% 21%'
-    : '28% 18% 18% 18% 18%'; // 4-player
+    : opponentCount === 1 ? '42% 58%'
+    : opponentCount === 2 ? '34% 33% 33%'
+    : '28% 24% 24% 24%';
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: pageBg, color: 'white', overflow: 'hidden' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: PAGE_BG, color: 'white', overflow: 'hidden' }}>
 
       {/* Reading Phase Overlay */}
       {readingPhase && <ReadingPhaseOverlay challenge={challenge} countdown={readingCountdown} ac={ac} />}
@@ -536,6 +800,17 @@ export default function CustomModeGamePage() {
           ))}
         </div>
 
+        {/* Timer in top bar */}
+        <div style={{
+          padding: '0 14px', borderLeft: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%',
+        }}>
+          <div style={{ fontFamily: 'monospace', fontSize: 7, color: timerCrit ? '#ef4444' : 'rgba(255,255,255,0.3)', letterSpacing: 1, marginBottom: 1 }}>TIME</div>
+          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 14, fontWeight: 900, color: timerColor, letterSpacing: 1, animation: timerCrit ? 'timerPulse 0.8s infinite' : 'none' }}>
+            {fmtMs(playerMs)}
+          </div>
+        </div>
+
         {/* Exit */}
         <button onClick={() => setExitModal(true)} style={{
           height: 44, width: 44, border: 'none', borderLeft: '1px solid rgba(239,68,68,0.2)',
@@ -550,22 +825,22 @@ export default function CustomModeGamePage() {
       </div>
 
       {/* ══ TIMER BAR ══ */}
-      <div style={{ height: 4, flexShrink: 0, background: 'rgba(255,255,255,0.05)', position: 'relative' }}>
+      <div style={{ height: 3, flexShrink: 0, background: 'rgba(255,255,255,0.05)', position: 'relative' }}>
         <div style={{
           position: 'absolute', left: 0, top: 0, height: '100%',
           width: `${timerPct}%`,
           background: timerCrit
             ? 'linear-gradient(90deg, #ef4444, #ff6b6b)'
-            : `linear-gradient(90deg, ${ac}, ${CM_UI})`,
+            : `linear-gradient(90deg, ${ac}, ${theme.ui})`,
           boxShadow: `0 0 8px ${timerCrit ? '#ef4444' : ac}`,
           transition: 'width 0.1s linear, background 0.5s',
         }} />
       </div>
 
       {/* ══ MAIN BODY ══ */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: gridCols, minHeight: 0, overflow: 'hidden', gap: 8, padding: 8 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: gridCols, minHeight: 0, overflow: 'hidden', gap: 6, padding: 6 }}>
 
-        {/* ═══ SPECTATOR MODE: show all editors ═══ */}
+        {/* ═══ SPECTATOR MODE ═══ */}
         {isSpectator ? (
           players.filter(p => !p.isSpectator).map((p, idx) => (
             <div key={p.userId} style={{
@@ -573,44 +848,50 @@ export default function CustomModeGamePage() {
               background: '#0b0e17', border: `1px solid ${PLAYER_COLORS[idx % PLAYER_COLORS.length]}25`,
               borderRadius: 10, overflow: 'hidden',
             }}>
-              {/* Player header */}
               <div style={{ padding: '8px 14px', background: '#07090e', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: PLAYER_COLORS[idx % PLAYER_COLORS.length] }} />
                 <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 12, color: PLAYER_COLORS[idx % PLAYER_COLORS.length] }}>{p.username}</span>
                 <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.35)' }}>· {p.progress || 0}% done</span>
                 {p.finished && <span style={{ marginLeft: 'auto', fontFamily: 'monospace', fontSize: 8, color: '#10b981' }}>✅ SUBMITTED</span>}
               </div>
-              {/* Spectator sees the real code — real-time via socket would need code sync, show placeholder for now */}
-              <div style={{ flex: 1, padding: '12px', fontFamily: "'JetBrains Mono',monospace", fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, overflowY: 'auto' }}>
-                <div style={{ color: `${PLAYER_COLORS[idx % PLAYER_COLORS.length]}50`, fontFamily: 'monospace', fontSize: 10 }}>
-                  // Spectator view — {p.username}'s editor
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  {p.finished
-                    ? <span style={{ color: '#10b981' }}>✅ Player submitted successfully</span>
-                    : <span style={{ color: `${PLAYER_COLORS[idx % PLAYER_COLORS.length]}70` }}>⏳ Player is coding...</span>
-                  }
-                </div>
+              <div style={{ flex: 1 }}>
+                <BinaryPanel
+                  username={p.username}
+                  progress={p.progress || 0}
+                  isTyping={opponentTyping[p.userId] || false}
+                  color={PLAYER_COLORS[idx % PLAYER_COLORS.length]}
+                />
               </div>
             </div>
           ))
         ) : (
           <>
             {/* ═══ COLUMN 1: CHALLENGE + MY EDITOR + CONTROLS ═══ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0, overflow: 'hidden' }}>
 
               {/* Challenge card */}
               <div style={{
-                flexShrink: 0, height: 140,
+                flexShrink: 0,
                 background: '#0b0e17', border: `1px solid ${ac}20`,
-                borderRadius: 10, padding: '12px 16px', overflow: 'hidden',
+                borderRadius: 10, padding: '10px 14px', overflow: 'hidden',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <div style={{ width: 3, height: 14, borderRadius: 2, background: ac }} />
-                  <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 11, color: ac, textTransform: 'uppercase', letterSpacing: 2 }}>CHALLENGE</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <div style={{ width: 3, height: 12, borderRadius: 2, background: ac }} />
+                  <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 10, color: ac, textTransform: 'uppercase', letterSpacing: 2 }}>CHALLENGE</span>
+                  {/* My progress indicator */}
+                  {progress > 0 && (
+                    <span style={{
+                      marginLeft: 'auto', fontFamily: 'monospace', fontSize: 8,
+                      color: allPassed ? '#10b981' : ac,
+                      background: allPassed ? 'rgba(16,185,129,0.12)' : `${ac}15`,
+                      padding: '2px 8px', borderRadius: 10, border: `1px solid ${allPassed ? '#10b98140' : ac + '30'}`,
+                    }}>
+                      MY: {progress.toFixed(0)}%
+                    </span>
+                  )}
                 </div>
-                <div style={{ overflowY: 'auto', maxHeight: 90, borderLeft: `3px solid ${ac}`, paddingLeft: 12 }}>
-                  <p style={{ fontFamily: 'monospace', fontSize: 11, color: '#e2e8f0', margin: 0, lineHeight: 1.6 }}>{challenge.objective}</p>
+                <div style={{ borderLeft: `3px solid ${ac}`, paddingLeft: 10, maxHeight: 60, overflowY: 'auto' }}>
+                  <p style={{ fontFamily: 'monospace', fontSize: 10, color: '#e2e8f0', margin: 0, lineHeight: 1.6 }}>{challenge.objective}</p>
                 </div>
               </div>
 
@@ -619,13 +900,13 @@ export default function CustomModeGamePage() {
                 flex: 1, display: 'flex', flexDirection: 'column',
                 background: '#0b0e17', border: `1px solid ${readingPhase ? 'rgba(255,255,255,0.08)' : ac + '22'}`,
                 borderRadius: 10, minHeight: 0, overflow: 'hidden',
-                opacity: readingPhase ? 0.5 : 1, transition: 'opacity 0.3s',
+                opacity: readingPhase ? 0.5 : 1, transition: 'opacity 0.3s, border-color 0.3s',
               }}>
                 {/* Editor header */}
-                <div style={{ background: '#07090e', padding: '8px 14px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ background: '#07090e', padding: '7px 14px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      {['#ff5f56','#ffbd2e','#27c93f'].map(c => <div key={c} style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />)}
+                      {['#ff5f56','#ffbd2e','#27c93f'].map(c => <div key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c }} />)}
                     </div>
                     <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>solution.{ext(language)} — {myUsername}</span>
                   </div>
@@ -634,7 +915,7 @@ export default function CustomModeGamePage() {
                       <Lock size={8} /> LOCKED
                     </span>}
                     <span style={{ fontFamily: 'monospace', fontSize: 8, background: `${ac}20`, color: ac, padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>{language}</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 8, color: '#64748b' }}>Ctrl+Enter: Run</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 8, color: '#64748b' }}>Ctrl+Enter: Run · Ctrl+Shift+Enter: Submit</span>
                   </div>
                 </div>
 
@@ -648,25 +929,23 @@ export default function CustomModeGamePage() {
                   style={{
                     flex: 1, minHeight: 0, background: '#07090e', color: '#f8fafc',
                     fontFamily: "'JetBrains Mono','Fira Code',monospace", fontSize: 13,
-                    lineHeight: 1.8, padding: '16px', border: 'none', resize: 'none', outline: 'none',
+                    lineHeight: 1.8, padding: '14px', border: 'none', resize: 'none', outline: 'none',
                     caretColor: ac, cursor: readingPhase ? 'not-allowed' : 'text',
                     tabSize: 2,
                   }}
                 />
 
-                {/* Progress bar */}
-                {progress > 0 && (
-                  <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }}>
-                    <div style={{ height: '100%', width: `${progress}%`, background: allPassed ? '#10b981' : ac, transition: 'width 0.5s', boxShadow: `0 0 6px ${allPassed ? '#10b981' : ac}` }} />
-                  </div>
-                )}
+                {/* Progress bar under editor */}
+                <div style={{ height: 3, background: 'rgba(255,255,255,0.04)', flexShrink: 0 }}>
+                  <div style={{ height: '100%', width: `${progress}%`, background: allPassed ? '#10b981' : ac, transition: 'width 0.5s', boxShadow: `0 0 6px ${allPassed ? '#10b981' : ac}` }} />
+                </div>
               </div>
 
               {/* Controls row */}
-              <div style={{ flexShrink: 0, display: 'flex', gap: 8, alignItems: 'center' }}>
-                {/* Test results */}
+              <div style={{ flexShrink: 0, display: 'flex', gap: 6, alignItems: 'center' }}>
+                {/* Test result pills */}
                 <div style={{ display: 'flex', gap: 4, flex: 1 }}>
-                  {challenge.testCases?.map((_, i) => (
+                  {(challenge.testCases || []).map((_, i) => (
                     <div key={i} style={{
                       height: 28, flex: 1, borderRadius: 6,
                       background: testResults[i] === true ? 'rgba(16,185,129,0.2)' : testResults[i] === false ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.04)',
@@ -674,6 +953,7 @@ export default function CustomModeGamePage() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontFamily: 'monospace', fontSize: 9,
                       color: testResults[i] === true ? '#10b981' : testResults[i] === false ? '#ef4444' : 'rgba(255,255,255,0.3)',
+                      transition: 'all 0.3s',
                     }}>
                       {testResults[i] === true ? '✓' : testResults[i] === false ? '✗' : `T${i + 1}`}
                     </div>
@@ -682,53 +962,48 @@ export default function CustomModeGamePage() {
 
                 {/* Compile */}
                 <button onClick={handleCompile} disabled={compiling || readingPhase} style={{
-                  padding: '0 18px', height: 36, borderRadius: 8,
+                  padding: '0 16px', height: 28, borderRadius: 6,
                   border: `1px solid ${ac}30`,
                   background: compiling ? 'rgba(255,255,255,0.08)' : `${ac}18`,
                   color: compiling ? 'rgba(255,255,255,0.3)' : ac,
-                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 13, letterSpacing: 2,
+                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 12, letterSpacing: 2,
                   cursor: compiling ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
-                  display: 'flex', alignItems: 'center', gap: 6,
+                  display: 'flex', alignItems: 'center', gap: 5,
                 }}>
-                  {compiling ? <><div style={{ width: 12, height: 12, border: `2px solid ${ac}40`, borderTopColor: ac, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> RUN</> : <><Play size={12} fill={ac} /> RUN</>}
+                  {compiling ? <><div style={{ width: 10, height: 10, border: `2px solid ${ac}40`, borderTopColor: ac, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> RUN</> : <><Play size={10} fill={ac} /> RUN</>}
                 </button>
 
                 {/* Submit */}
                 <button onClick={handleSubmit} disabled={!allPassed} style={{
-                  padding: '0 18px', height: 36, borderRadius: 8, border: 'none',
-                  background: allPassed ? `linear-gradient(135deg, ${ac}, ${CM_UI})` : 'rgba(255,255,255,0.06)',
+                  padding: '0 16px', height: 28, borderRadius: 6, border: 'none',
+                  background: allPassed ? `linear-gradient(135deg, ${ac}, ${theme.ui})` : 'rgba(255,255,255,0.06)',
                   color: allPassed ? '#001a20' : 'rgba(255,255,255,0.2)',
-                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 13, letterSpacing: 2,
+                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 12, letterSpacing: 2,
                   cursor: allPassed ? 'pointer' : 'not-allowed', transition: 'all 0.2s',
                   boxShadow: allPassed ? `0 4px 16px ${ac}40` : 'none',
-                  display: 'flex', alignItems: 'center', gap: 6,
+                  display: 'flex', alignItems: 'center', gap: 5,
                   animation: allPassed ? 'glowPulse 2s infinite' : 'none',
                 }}>
-                  <Trophy size={13} fill={allPassed ? '#001a20' : 'rgba(255,255,255,0.2)'} /> SUBMIT
+                  <Trophy size={11} fill={allPassed ? '#001a20' : 'rgba(255,255,255,0.2)'} /> SUBMIT
                 </button>
               </div>
 
-              {/* Log output */}
-              <div style={{
-                flexShrink: 0, height: 80,
-                background: '#07090e', border: `1px solid ${ac}15`,
-                borderRadius: 8, padding: '8px 12px', overflowY: 'auto',
-              }}>
-                {logs.slice(-5).map((log, i) => (
-                  <div key={i} style={{
-                    fontFamily: 'monospace', fontSize: 10, lineHeight: 1.6,
-                    color: log.type === 'error' ? '#ef4444' : log.type === 'success' ? '#10b981' : log.type === 'warning' ? '#f59e0b' : 'rgba(255,255,255,0.5)',
-                  }}>{log.msg}</div>
-                ))}
-                {logs.length === 0 && <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>// Output will appear here after running...</div>}
-              </div>
+              {/* ── OUTPUT PANEL (Test Cases + Expected/Actual output + Logs) ── */}
+              <OutputPanel
+                testResults={testResults}
+                challenge={challenge}
+                outputData={outputData}
+                logs={logs}
+                ac={ac}
+              />
             </div>
 
             {/* ═══ OPPONENT PANELS ═══ */}
-            {opponents.map((opp, idx) => {
-              const oppColor = PLAYER_COLORS[(idx + 1) % PLAYER_COLORS.length];
-              const isTyping = opponentTyping[opp.userId] || false;
-              const oppProgress = opponentProgress[opp.userId] || opp.progress || 0;
+            {effectiveOpponents.map((opp, idx) => {
+              const oppColor   = PLAYER_COLORS[(idx + 1) % PLAYER_COLORS.length];
+              const isTyping   = opponentTyping[opp.userId] || false;
+              const oppProgress = opponentProgress[opp.userId] ?? opp.progress ?? 0;
+              const isPlaceholder = opp.userId?.startsWith('placeholder-');
 
               return (
                 <div key={opp.userId} style={{
@@ -743,14 +1018,20 @@ export default function CustomModeGamePage() {
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
                     display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
                   }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: oppColor, boxShadow: `0 0 6px ${oppColor}` }} />
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: oppColor, boxShadow: `0 0 6px ${oppColor}`, animation: isPlaceholder ? 'binaryPulse 2s infinite' : 'none' }} />
                     <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 12, color: oppColor }}>{opp.username}</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }}>
-                      {oppProgress.toFixed(0)}% done
-                    </span>
+                    {isPlaceholder ? (
+                      <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.2)', marginLeft: 'auto' }}>
+                        ⏳ WAITING TO CONNECT...
+                      </span>
+                    ) : (
+                      <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }}>
+                        {oppProgress.toFixed(0)}% done
+                      </span>
+                    )}
                   </div>
 
-                  {/* Binary Matrix */}
+                  {/* Binary Matrix — always shown */}
                   <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                     <BinaryPanel
                       username={opp.username}
@@ -760,11 +1041,19 @@ export default function CustomModeGamePage() {
                     />
                   </div>
 
-                  {/* Opponent progress bar */}
-                  <div style={{ padding: '8px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)' }}>PROGRESS</span>
-                      {opp.finished && <span style={{ fontFamily: 'monospace', fontSize: 9, color: '#10b981' }}>✅ SUBMITTED</span>}
+                  {/* Opponent progress footer */}
+                  <div style={{ padding: '8px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0, background: '#080a12' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>PROGRESS</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {opp.finished
+                          ? <span style={{ fontFamily: 'monospace', fontSize: 8, color: '#10b981' }}>✅ SUBMITTED</span>
+                          : isTyping
+                            ? <span style={{ fontFamily: 'monospace', fontSize: 8, color: oppColor }}>⌨️ TYPING...</span>
+                            : null
+                        }
+                        <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 12, color: oppColor }}>{oppProgress.toFixed(0)}%</span>
+                      </div>
                     </div>
                     <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${oppProgress}%`, background: oppColor, borderRadius: 2, transition: 'width 0.5s', boxShadow: `0 0 6px ${oppColor}` }} />
@@ -777,25 +1066,10 @@ export default function CustomModeGamePage() {
         )}
       </div>
 
-      {/* Timer display */}
-      <div style={{
-        position: 'fixed', top: 58, right: 16,
-        padding: '6px 16px', borderRadius: 10,
-        background: timerCrit ? 'rgba(239,68,68,0.15)' : 'rgba(0,0,0,0.7)',
-        border: `1px solid ${timerCrit ? '#ef444440' : ac + '20'}`,
-        zIndex: 100,
-        animation: timerCrit ? 'timerPulse 0.8s infinite' : 'none',
-      }}>
-        <div style={{ fontFamily: 'monospace', fontSize: 8, color: timerCrit ? '#ef4444' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 2 }}>TIME LEFT</div>
-        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 20, fontWeight: 900, color: timerColor, letterSpacing: 1, textShadow: timerCrit ? '0 0 20px #ef4444' : `0 0 12px ${ac}60` }}>
-          {fmtMs(playerMs)}
-        </div>
-      </div>
-
       {/* Exit modal */}
       {exitModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-          <div style={{ background: '#0f1523', border: `1.5px solid #ef444440`, borderRadius: 20, padding: '36px', maxWidth: 420, width: '100%', textAlign: 'center' }}>
+          <div style={{ background: '#0f1523', border: '1.5px solid #ef444440', borderRadius: 20, padding: '36px', maxWidth: 420, width: '100%', textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
             <h2 style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 26, color: '#ef4444', letterSpacing: 3, margin: '0 0 12px' }}>ABANDON BATTLE?</h2>
             <p style={{ fontFamily: 'monospace', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 28, lineHeight: 1.6 }}>You will forfeit this battle. Your opponent will be declared the winner.</p>
@@ -844,13 +1118,13 @@ export default function CustomModeGamePage() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-        @keyframes glowPulse { 0%,100%{box-shadow:0 4px 16px ${CM_ACCENT}40} 50%{box-shadow:0 4px 24px ${CM_ACCENT}70} }
+        @keyframes binaryPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes glowPulse { 0%,100%{box-shadow:0 4px 16px ${ac}40} 50%{box-shadow:0 4px 24px ${ac}70} }
         @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        ::-webkit-scrollbar-thumb { background: ${CM_ACCENT}40; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: ${ac}40; border-radius: 3px; }
       `}</style>
     </div>
   );

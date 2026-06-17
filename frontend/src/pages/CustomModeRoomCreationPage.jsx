@@ -4,9 +4,13 @@ import { ChevronLeft, ChevronRight, Rocket, CheckCircle2, AlertTriangle, Zap } f
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 
-const CM_ACCENT = '#00e5ff';
-const CM_UI     = '#80ffff';
-const CM_BG     = '#010d12';
+/* ── Theme map (synced with rest of app) ─────────────────────────── */
+const THEMES = {
+  red:    { accent: '#ff5252', ui: '#ff6b6b', bg: '#0a0005', asteroid: '#ff6b6b' },
+  blue:   { accent: '#0099ff', ui: '#00ccff', bg: '#000a1a', asteroid: '#00d4ff' },
+  green:  { accent: '#00ff88', ui: '#00ff99', bg: '#000a05', asteroid: '#39ff14' },
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0a0515', asteroid: '#c084fc' },
+};
 
 const PLAYER_MODES = [
   { value: 2, icon: '⚔️', label: '2P',  sub: '2 Humans battle' },
@@ -31,15 +35,16 @@ function getDifficultyFromTime(t) {
   return { value: 'Advanced', tests: 5, color: '#ef4444', icon: '🔥', label: 'ADVANCED MODE' };
 }
 
-const Section = ({ title, subtitle, children }) => (
+const Section = ({ title, subtitle, children, accent }) => (
   <div style={{
-    background: 'rgba(0,229,255,0.03)',
-    border: '1px solid rgba(0,229,255,0.1)',
+    background: `${accent}04`,
+    border: `1px solid ${accent}18`,
     borderRadius: 16, padding: '18px 20px',
+    transition: 'all 0.3s',
   }}>
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-        <div style={{ width: 3, height: 14, borderRadius: 2, background: CM_ACCENT }} />
+        <div style={{ width: 3, height: 14, borderRadius: 2, background: accent }} />
         <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, color: 'white' }}>{title}</div>
       </div>
       <div style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.3)', paddingLeft: 11 }}>{subtitle}</div>
@@ -48,19 +53,19 @@ const Section = ({ title, subtitle, children }) => (
   </div>
 );
 
-const PillSel = ({ options, value, onChange }) => (
+const PillSel = ({ options, value, onChange, accent }) => (
   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
     {options.map(opt => {
       const isSelected = opt === value;
       return (
         <div key={opt} onClick={() => onChange(opt)} style={{
           padding: '8px 18px', borderRadius: 100,
-          border: `1.5px solid ${isSelected ? CM_ACCENT : 'rgba(255,255,255,0.08)'}`,
-          background: isSelected ? `${CM_ACCENT}18` : 'rgba(255,255,255,0.02)',
-          color: isSelected ? CM_ACCENT : 'rgba(255,255,255,0.5)',
+          border: `1.5px solid ${isSelected ? accent : 'rgba(255,255,255,0.08)'}`,
+          background: isSelected ? `${accent}18` : 'rgba(255,255,255,0.02)',
+          color: isSelected ? accent : 'rgba(255,255,255,0.5)',
           fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16,
           cursor: 'pointer', transition: 'all 0.2s',
-          boxShadow: isSelected ? `0 0 16px ${CM_ACCENT}25` : 'none',
+          boxShadow: isSelected ? `0 0 16px ${accent}25` : 'none',
         }}>
           {opt}
         </div>
@@ -72,14 +77,14 @@ const PillSel = ({ options, value, onChange }) => (
 const CustomModeRoomCreationPage = () => {
   const navigate = useNavigate();
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
+
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
-  const themes = {
-    red: { accent: '#ff5252', ui: '#ff6b6b' },
-    blue: { accent: '#0099ff', ui: '#00ccff' },
-    green: { accent: '#00ff88', ui: '#00ff99' },
-    purple: { accent: '#a855f7', ui: '#d8b4fe' },
-  };
+  /* Derive live theme colors from themeKey */
+  const theme = THEMES[themeKey] || THEMES.purple;
+  const accent = theme.accent;
+  const ui     = theme.ui;
+  const bg     = theme.bg;
 
   const [config, setConfig] = useState({
     playerMode: 2,
@@ -93,12 +98,15 @@ const CustomModeRoomCreationPage = () => {
   const update = (key, val) => setConfig(p => ({ ...p, [key]: val }));
   const diffInfo = getDifficultyFromTime(config.timeLimit);
 
-  const selStyle = (isSelected, color = CM_ACCENT) => ({
-    border: `1.5px solid ${isSelected ? color : 'rgba(255,255,255,0.07)'}`,
-    background: isSelected ? `${color}12` : 'rgba(255,255,255,0.02)',
-    boxShadow: isSelected ? `0 0 20px ${color}20` : 'none',
-    cursor: 'pointer', borderRadius: 12, transition: 'all 0.2s',
-  });
+  const selStyle = (isSelected, color) => {
+    const c = color || accent;
+    return {
+      border: `1.5px solid ${isSelected ? c : 'rgba(255,255,255,0.07)'}`,
+      background: isSelected ? `${c}12` : 'rgba(255,255,255,0.02)',
+      boxShadow: isSelected ? `0 0 20px ${c}20` : 'none',
+      cursor: 'pointer', borderRadius: 12, transition: 'all 0.2s',
+    };
+  };
 
   const handleEnterArena = () => {
     setIsCreating(true);
@@ -124,22 +132,41 @@ const CustomModeRoomCreationPage = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: CM_BG, color: 'white' }}>
-      <CustomCursor theme={{ accent: CM_ACCENT, ui: CM_UI }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: CM_ACCENT, ui: CM_UI }} />
+    <div style={{ minHeight: '100vh', background: bg, color: 'white', transition: 'background 0.4s ease' }}>
+      <CustomCursor theme={theme} />
+      <Navbar
+        currentPage="custom-mode"
+        themeKey={themeKey}
+        setThemeKey={setThemeKey}
+        themes={THEMES}
+        currentTheme={theme}
+      />
 
-      {/* Ambient glow */}
+      {/* Ambient glow — uses dynamic accent */}
       <div style={{
         position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
         width: 900, height: 500,
-        background: `radial-gradient(ellipse, ${CM_ACCENT}10 0%, transparent 65%)`,
-        pointerEvents: 'none', zIndex: 0,
+        background: `radial-gradient(ellipse, ${accent}12 0%, transparent 65%)`,
+        pointerEvents: 'none', zIndex: 0, transition: 'background 0.4s ease',
       }} />
-      {/* Hex grid subtle */}
+      {/* Grid lines */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.04,
-        backgroundImage: `linear-gradient(rgba(0,229,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.5) 1px, transparent 1px)`,
-        backgroundSize: '50px 50px',
+        backgroundImage: `linear-gradient(${accent}80 1px, transparent 1px), linear-gradient(90deg, ${accent}80 1px, transparent 1px)`,
+        backgroundSize: '50px 50px', transition: 'background-image 0.4s ease',
+      }} />
+      {/* Corner glows */}
+      <div style={{
+        position: 'fixed', top: '20%', right: '-5%',
+        width: 400, height: 400,
+        background: `radial-gradient(circle, ${theme.asteroid}08 0%, transparent 65%)`,
+        pointerEvents: 'none', zIndex: 0, animation: 'floatSlow 14s ease-in-out infinite',
+      }} />
+      <div style={{
+        position: 'fixed', bottom: '10%', left: '-5%',
+        width: 350, height: 350,
+        background: `radial-gradient(circle, ${accent}06 0%, transparent 65%)`,
+        pointerEvents: 'none', zIndex: 0, animation: 'floatSlow 18s ease-in-out infinite reverse',
       }} />
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '28px 20px 80px' }}>
@@ -148,26 +175,27 @@ const CustomModeRoomCreationPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
           <button onClick={() => navigate('/custom-mode')} style={{
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
-            borderRadius: 8, border: `1.5px solid ${CM_ACCENT}40`, background: `${CM_ACCENT}10`,
-            color: CM_ACCENT, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+            borderRadius: 8, border: `1.5px solid ${accent}40`, background: `${accent}10`,
+            color: accent, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
             fontWeight: 700, fontSize: 13, transition: 'all 0.2s',
           }}
-          onMouseEnter={e => e.currentTarget.style.background = `${CM_ACCENT}20`}
-          onMouseLeave={e => e.currentTarget.style.background = `${CM_ACCENT}10`}
+          onMouseEnter={e => e.currentTarget.style.background = `${accent}20`}
+          onMouseLeave={e => e.currentTarget.style.background = `${accent}10`}
           >
             <ChevronLeft size={16} /> BACK
           </button>
 
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 10, letterSpacing: 4, color: CM_ACCENT, textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 10, letterSpacing: 4, color: accent, textTransform: 'uppercase', marginBottom: 4, transition: 'color 0.3s' }}>
               CONFIGURE YOUR HUMAN BATTLE
             </div>
             <h1 style={{
               margin: 0, fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 38,
               textTransform: 'uppercase', letterSpacing: 4,
-              background: `linear-gradient(135deg, white 30%, ${CM_ACCENT})`,
+              background: `linear-gradient(135deg, white 30%, ${accent})`,
               backgroundClip: 'text', WebkitBackgroundClip: 'text',
               color: 'transparent', WebkitTextFillColor: 'transparent',
+              transition: 'all 0.4s ease',
             }}>
               ROOM SETTINGS
             </h1>
@@ -181,33 +209,33 @@ const CustomModeRoomCreationPage = () => {
           {/* LEFT — config */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* Player Mode — NO 1P */}
-            <Section title="👥 Player Mode" subtitle="Choose the number of human players — no solo, no bots!">
+            {/* Player Mode */}
+            <Section title="👥 Player Mode" subtitle="Choose the number of human players — no solo, no bots!" accent={accent}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
                 {PLAYER_MODES.map(m => (
                   <div key={m.value} onClick={() => update('playerMode', m.value)}
                     style={{ ...selStyle(config.playerMode === m.value), padding: '16px 8px', textAlign: 'center' }}>
                     <div style={{ fontSize: 26, marginBottom: 6 }}>{m.icon}</div>
                     <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18,
-                      color: config.playerMode === m.value ? CM_ACCENT : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
+                      color: config.playerMode === m.value ? accent : 'rgba(255,255,255,0.7)' }}>{m.label}</div>
                     <div style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>{m.sub}</div>
-                    {config.playerMode === m.value && <CheckCircle2 size={14} style={{ color: CM_ACCENT, marginTop: 5 }} />}
+                    {config.playerMode === m.value && <CheckCircle2 size={14} style={{ color: accent, marginTop: 5 }} />}
                   </div>
                 ))}
               </div>
               {/* No-solo notice */}
               <div style={{
                 marginTop: 12, padding: '8px 14px', borderRadius: 8,
-                background: `${CM_ACCENT}08`, border: `1px solid ${CM_ACCENT}20`,
-                fontFamily: 'monospace', fontSize: 10, color: `${CM_ACCENT}80`,
+                background: `${accent}08`, border: `1px solid ${accent}20`,
+                fontFamily: 'monospace', fontSize: 10, color: `${accent}80`,
               }}>
                 ⚠️ Custom Mode is Human vs Human only — No AI bots involved!
               </div>
             </Section>
 
             {/* Time Limit */}
-            <Section title="⏱️ Time Limit" subtitle="Minutes per round — auto-detects difficulty">
-              <PillSel options={TIME_OPTIONS} value={config.timeLimit} onChange={v => update('timeLimit', v)} />
+            <Section title="⏱️ Time Limit" subtitle="Minutes per round — auto-detects difficulty" accent={accent}>
+              <PillSel options={TIME_OPTIONS} value={config.timeLimit} onChange={v => update('timeLimit', v)} accent={accent} />
               {/* Difficulty badge */}
               <div style={{
                 marginTop: 12, padding: '12px 16px', borderRadius: 10,
@@ -237,12 +265,12 @@ const CustomModeRoomCreationPage = () => {
             </Section>
 
             {/* Rounds */}
-            <Section title="🔄 Rounds" subtitle="Number of rounds (1–10) — best score wins">
-              <PillSel options={ROUND_OPTIONS} value={config.rounds} onChange={v => update('rounds', v)} />
+            <Section title="🔄 Rounds" subtitle="Number of rounds (1–10) — best score wins" accent={accent}>
+              <PillSel options={ROUND_OPTIONS} value={config.rounds} onChange={v => update('rounds', v)} accent={accent} />
             </Section>
 
             {/* Language */}
-            <Section title="💻 Language" subtitle="Programming language for all coding challenges">
+            <Section title="💻 Language" subtitle="Programming language for all coding challenges" accent={accent}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
                 {LANGUAGES.map(l => (
                   <div key={l.value} onClick={() => update('language', l.value)}
@@ -259,16 +287,17 @@ const CustomModeRoomCreationPage = () => {
           {/* RIGHT — Summary + CTA */}
           <div>
             <div style={{
-              background: `linear-gradient(135deg, ${CM_ACCENT}10, ${CM_ACCENT}04)`,
-              border: `1.5px solid ${CM_ACCENT}30`,
+              background: `linear-gradient(135deg, ${accent}10, ${accent}04)`,
+              border: `1.5px solid ${accent}30`,
               borderRadius: 18, padding: '22px',
               position: 'sticky', top: 24,
+              transition: 'all 0.4s ease',
             }}>
               {/* Header */}
               <div style={{
                 fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15,
-                color: CM_ACCENT, marginBottom: 18, letterSpacing: 2, textTransform: 'uppercase',
-                display: 'flex', alignItems: 'center', gap: 8,
+                color: accent, marginBottom: 18, letterSpacing: 2, textTransform: 'uppercase',
+                display: 'flex', alignItems: 'center', gap: 8, transition: 'color 0.3s',
               }}>
                 <Zap size={16} /> BATTLE SUMMARY
               </div>
@@ -308,12 +337,12 @@ const CustomModeRoomCreationPage = () => {
               {/* Multiplayer info */}
               <div style={{
                 padding: '10px 14px', borderRadius: 8, marginBottom: 16,
-                background: `${CM_ACCENT}08`, border: `1px solid ${CM_ACCENT}22`,
+                background: `${accent}08`, border: `1px solid ${accent}22`,
                 display: 'flex', alignItems: 'flex-start', gap: 8,
               }}>
-                <AlertTriangle size={13} style={{ color: CM_ACCENT, flexShrink: 0, marginTop: 1 }} />
+                <AlertTriangle size={13} style={{ color: accent, flexShrink: 0, marginTop: 1 }} />
                 <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
-                  Share <strong style={{ color: CM_ACCENT }}>Room ID + Password</strong> with your {config.playerMode - 1} opponent{config.playerMode > 2 ? 's' : ''} after creating the room.
+                  Share <strong style={{ color: accent }}>Room ID + Password</strong> with your {config.playerMode - 1} opponent{config.playerMode > 2 ? 's' : ''} after creating the room.
                 </span>
               </div>
 
@@ -329,22 +358,27 @@ const CustomModeRoomCreationPage = () => {
                 </span>
               </div>
 
-              {/* Enter Arena */}
-              <button onClick={handleEnterArena} disabled={isCreating} id="custom-enter-arena-btn" style={{
-                width: '100%', padding: '16px 0', borderRadius: 12, border: 'none',
-                background: isCreating ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${CM_ACCENT}, ${CM_UI})`,
-                color: isCreating ? 'rgba(255,255,255,0.4)' : '#001a20',
-                cursor: isCreating ? 'not-allowed' : 'pointer',
-                fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
-                fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                boxShadow: isCreating ? 'none' : `0 8px 32px ${CM_ACCENT}40`,
-                transition: 'all 0.3s',
-              }}>
+              {/* Enter Arena button */}
+              <button
+                onClick={handleEnterArena}
+                disabled={isCreating}
+                id="custom-enter-arena-btn"
+                style={{
+                  width: '100%', padding: '16px 0', borderRadius: 12, border: 'none',
+                  background: isCreating ? 'rgba(255,255,255,0.08)' : `linear-gradient(135deg, ${accent}, ${ui})`,
+                  color: isCreating ? 'rgba(255,255,255,0.4)' : '#ffffff',
+                  cursor: isCreating ? 'not-allowed' : 'pointer',
+                  fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
+                  fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  boxShadow: isCreating ? 'none' : `0 8px 32px ${accent}40`,
+                  transition: 'all 0.3s',
+                }}
+              >
                 {isCreating ? (
                   <>
-                    <div style={{ width: 16, height: 16, border: '3px solid rgba(0,0,0,0.3)',
-                      borderTopColor: '#001a20', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    <div style={{ width: 16, height: 16, border: '3px solid rgba(255,255,255,0.2)',
+                      borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
                     CREATING ARENA...
                   </>
                 ) : (
@@ -365,6 +399,7 @@ const CustomModeRoomCreationPage = () => {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes floatSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-24px); } }
         * { box-sizing: border-box; }
       `}</style>
     </div>
