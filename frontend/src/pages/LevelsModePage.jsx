@@ -490,14 +490,14 @@ const LevelsModePage = () => {
                 backdropFilter: 'blur(14px)', flexWrap: 'wrap', justifyContent: 'center',
               }}>
                 {[
-                  { icon: '⚡', text: 'Instant Validation' },
-                  { icon: '📊', text: 'XP Tracking' },
-                  { icon: '🎯', text: 'Adaptive Difficulty' },
-                  { icon: '🔥', text: 'Daily Streaks' },
-                  { icon: '🏅', text: 'Rank & Rewards' },
-                ].map(({ icon, text }) => (
+                  { iconName: 'Zap', text: 'Instant Validation', color: '#10b981' },
+                  { iconName: 'BarChart2', text: 'XP Tracking', color: '#3b82f6' },
+                  { iconName: 'Target', text: 'Adaptive Difficulty', color: '#f43f5e' },
+                  { iconName: 'Flame', text: 'Daily Streaks', color: '#f59e0b' },
+                  { iconName: 'Crown', text: 'Rank & Rewards', color: '#fbbf24' },
+                ].map(({ iconName, text, color }) => (
                   <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <span style={{ fontSize: 15 }}>{icon}</span>
+                    <span style={{ fontSize: 16, display: 'flex' }}><PremiumIcon name={iconName} size={18} color={color} /></span>
                     <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 13, color: ui, letterSpacing: 1, textTransform: 'uppercase' }}>{text}</span>
                   </div>
                 ))}
