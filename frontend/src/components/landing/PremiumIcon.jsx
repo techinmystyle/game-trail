@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Users, RefreshCcw, Timer, Laptop, VenetianMask, Star, Shield, Flame, Swords, Bot, Moon, Brain, Zap, Skull, Library, Crown, Target, Activity, BarChart2 } from 'lucide-react';
+import { User, Users, RefreshCcw, Timer, Laptop, VenetianMask, Star, Shield, Flame, Swords, Bot, Moon, Brain, Zap, Skull, Library, Crown, Target, Activity, BarChart2, Bug, Medal, Diamond, Hexagon, Trophy } from 'lucide-react';
 import { HtmlIcon, CssIcon, JsIcon, PythonIcon, JavaIcon } from './TechIcons';
 import { Swords3DIcon } from './ModeIcons';
 
@@ -46,6 +46,11 @@ export const PremiumIcon = ({ name, size = 20, color = '#ffffff', style = {} }) 
     case 'Target': return <Target size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'Activity': return <Activity size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'BarChart2': return <BarChart2 size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Bug': return <Bug size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Medal': return <Medal size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Diamond': return <Diamond size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Hexagon': return <Hexagon size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
+    case 'Trophy': return <Trophy size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     
     default: return null;
   }

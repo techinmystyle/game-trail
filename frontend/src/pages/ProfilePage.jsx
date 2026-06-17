@@ -6,6 +6,7 @@ import { DailyRewards } from "../components/DailyRewards";
 import { Footer } from "../components/landing/Footer";
 import { CustomCursor } from "../components/landing/CustomCursor";
 import { profileAPI, levelsAPI } from "../utils/api";
+import { PremiumIcon } from "../components/landing/PremiumIcon";
 
 const PROFILE_IMAGES = [
   "/assets/profile-images/human-00.png",
@@ -120,15 +121,15 @@ const BOT_CONFIGS = [
 ];
 
 const RANK_TIERS = [
-  { name: "SYNTAX SPAMMER", min: 0, max: 500, color: "#8c8c8c", icon: "🐛" },
-  { name: "LOGIC RUNNER", min: 500, max: 1000, color: "#cd7f32", icon: "🥉" },
-  { name: "CODE BREAKER", min: 1000, max: 1500, color: "#a3a3a3", icon: "🥈" },
-  { name: "COMPILER CONQUEROR", min: 1500, max: 2000, color: "#eab308", icon: "🌟" },
-  { name: "ALGORITHM SENTINEL", min: 2000, max: 2500, color: "#38bdf8", icon: "💎" },
-  { name: "NEURAL SHADOW", min: 2500, max: 3000, color: "#00ffd4", icon: "💠" },
-  { name: "CYBER GLADIATOR", min: 3000, max: 3500, color: "#a855f7", icon: "👑" },
-  { name: "AI SLAYER", min: 3500, max: 4000, color: "#ec4899", icon: "⚡" },
-  { name: "SYSTEM OVERLORD", min: 4000, max: Infinity, color: "#f97316", icon: "🏆" },
+  { name: "SYNTAX SPAMMER", min: 0, max: 500, color: "#8c8c8c", iconName: "Bug" },
+  { name: "LOGIC RUNNER", min: 500, max: 1000, color: "#cd7f32", iconName: "Medal" },
+  { name: "CODE BREAKER", min: 1000, max: 1500, color: "#a3a3a3", iconName: "Medal" },
+  { name: "COMPILER CONQUEROR", min: 1500, max: 2000, color: "#eab308", iconName: "Star" },
+  { name: "ALGORITHM SENTINEL", min: 2000, max: 2500, color: "#38bdf8", iconName: "Diamond" },
+  { name: "NEURAL SHADOW", min: 2500, max: 3000, color: "#00ffd4", iconName: "Hexagon" },
+  { name: "CYBER GLADIATOR", min: 3000, max: 3500, color: "#a855f7", iconName: "Crown" },
+  { name: "AI SLAYER", min: 3500, max: 4000, color: "#ec4899", iconName: "Zap" },
+  { name: "SYSTEM OVERLORD", min: 4000, max: Infinity, color: "#f97316", iconName: "Trophy" },
 ];
 
 const THEMES = {
@@ -648,7 +649,7 @@ const ProfilePage = () => {
                     <p className="text-xs text-white/40 font-mono mt-0.5">{isViewingOther ? searchResult.rankPoints : rankPoints} RP</p>
                   </div>
                   <div className="w-12 h-12 rounded-lg flex items-center justify-center text-3xl shadow-inner" style={{ background: `${currentRank.color}25` }}>
-                    {currentRank.icon}
+                    <PremiumIcon name={currentRank.iconName} size={28} color={currentRank.color} />
                   </div>
                 </div>
 
@@ -1205,6 +1206,7 @@ const ProfilePage = () => {
                     <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
                       {RANK_TIERS.map((tier) => {
                         const isCurrent = rankPoints >= tier.min && rankPoints < tier.max;
+                        const isAchieved = rankPoints >= tier.min;
                         return (
                           <div 
                             key={tier.name}
@@ -1215,7 +1217,13 @@ const ProfilePage = () => {
                             }}
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-lg">{tier.icon}</span>
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5"
+                                style={{ 
+                                  borderColor: isAchieved ? tier.color : undefined,
+                                  background: isAchieved ? `${tier.color}15` : undefined
+                                }}>
+                                <PremiumIcon name={tier.iconName} size={24} color={isAchieved ? tier.color : "rgba(255,255,255,0.4)"} />
+                              </div>
                               <span className="text-xs font-bold" style={{ color: tier.color }}>{tier.name}</span>
                               {isCurrent && (
                                 <span className="px-2 py-0.5 rounded text-3xs font-bold uppercase tracking-widest" style={{ background: currentTheme.accent, color: 'white' }}>
