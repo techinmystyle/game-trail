@@ -29,6 +29,7 @@ export const PremiumIcon = ({ name, size = 20, color = '#ffffff', style = {} }) 
     case 'Language': return <Laptop size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'Spectators': return <VenetianMask size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     
+    case 'Star': return <Star size={size} color={color} strokeWidth={2.5} style={glowStyle} />;
     case 'Beginner': return <Star size={size} color={color} strokeWidth={2.5} fill={`${color}40`} style={glowStyle} />;
     case 'Moderate': return <Shield size={size} color={color} strokeWidth={2.5} fill={`${color}40`} style={glowStyle} />;
     case 'Advanced': return <Flame size={size} color={color} strokeWidth={2.5} fill={`${color}40`} style={glowStyle} />;
