@@ -215,7 +215,8 @@ export default function ComputerModeGamePage() {
   const playerBotsRaw = rd.playerBots || [];
 
   const [themeKey]   = useState(() => localStorage.getItem('themeKey') || 'purple');
-  const { accent: ac, ui, bg: pageBg } = THEMES[themeKey];
+  const safeTheme = THEMES[themeKey] || THEMES.purple;
+  const { accent: ac, ui, bg: pageBg } = safeTheme;
 
   const [roomId]       = useState(() => rd.roomId || 'SOLO');
   const [userId, setUserId]     = useState(() => rd.userId || null);

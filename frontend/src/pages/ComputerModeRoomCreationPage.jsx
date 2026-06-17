@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, ChevronLeft, Cpu, Crown, RefreshCw, AlertTriangle, CheckCircle2, Gamepad2, Settings } from 'lucide-react';
+import { Play, ChevronLeft, Cpu, Crown, RefreshCw, AlertTriangle, CheckCircle2, Gamepad2, Settings, Zap, Rocket, ChevronRight } from 'lucide-react';
 import { PremiumIcon } from '../components/landing/PremiumIcon';
 import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
@@ -133,9 +133,10 @@ const ComputerModeRoomCreationPage = () => {
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
-  const ac = THEMES[themeKey].accent;
-  const ui = THEMES[themeKey].ui;
-  const pageBg = THEMES[themeKey].bg;
+  const safeTheme = THEMES[themeKey] || THEMES.purple;
+  const ac = safeTheme.accent;
+  const ui = safeTheme.ui;
+  const pageBg = safeTheme.bg;
   const themes = {
     red: { accent: '#ff5252', ui: '#ff6b6b' },
     blue: { accent: '#0099ff', ui: '#00ccff' },
@@ -228,7 +229,7 @@ const ComputerModeRoomCreationPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
           <button onClick={() => navigate('/computer-mode')} style={{
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
-            borderRadius: 8, border: `1.5px solid 80`, background: `${ac}10`,
+            borderRadius: 8, border: `1.5px solid ${ac}80`, background: `${ac}10`,
             color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
             fontWeight: 700, fontSize: 15, fontWeight: 700, transition: 'all 0.2s',
           }}

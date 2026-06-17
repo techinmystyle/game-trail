@@ -8,109 +8,112 @@ import { CustomCursor } from "../components/landing/CustomCursor";
 import { profileAPI, levelsAPI } from "../utils/api";
 import { PremiumIcon } from "../components/landing/PremiumIcon";
 
-const PROFILE_IMAGES = [
-  "/assets/profile-images/human-00.png",
-  "/assets/profile-images/human-01.png",
-  "/assets/profile-images/human-02.png",
-  "/assets/profile-images/human-03.png",
-  "/assets/profile-images/human-04.png",
-  "/assets/profile-images/human-05.png",
-  "/assets/profile-images/human-06.png",
-  "/assets/profile-images/human-07.png",
-  "/assets/profile-images/human-08.png",
-  "/assets/profile-images/human-09.png",
-  "/assets/profile-images/human-10.png",
-  "/assets/profile-images/human-11.png",
-  "/assets/profile-images/human-12.png",
-  "/assets/profile-images/human-13.png",
-  "/assets/profile-images/human-14.png",
-  "/assets/profile-images/human-15.png",
-  "/assets/profile-images/human-16.png",
-  "/assets/profile-images/human-17.png",
-  "/assets/profile-images/human-18.png",
-  "/assets/profile-images/human-19.png",
-  "/assets/profile-images/human-20.png",
-  "/assets/profile-images/human-21.png",
-  "/assets/profile-images/human-22.png",
-  "/assets/profile-images/human-23.png",
-  "/assets/profile-images/human-24.png",
-  "/assets/profile-images/human-25.png",
-  "/assets/profile-images/human-26.png",
-  "/assets/profile-images/human-27.png",
-  "/assets/profile-images/human-28.png",
-  "/assets/profile-images/human-29.png",
-  "/assets/profile-images/human-30.png",
-  "/assets/profile-images/human-31.png",
-  "/assets/profile-images/human-32.png",
-  "/assets/profile-images/human-33.png",
-  "/assets/profile-images/human-34.png",
-  "/assets/profile-images/human-35.png",
-  "/assets/profile-images/human-36.png",
-  "/assets/profile-images/human-37.png",
-  "/assets/profile-images/human-38.png",
-  "/assets/profile-images/human-39.png",
-  "/assets/profile-images/human-40.png",
-  "/assets/profile-images/human-41.png",
-  "/assets/profile-images/human-42.png",
-  "/assets/profile-images/human-43.png",
-  "/assets/profile-images/human-44.png",
-  "/assets/profile-images/human-45.png",
-  "/assets/profile-images/human-46.png",
-  "/assets/profile-images/human-47.png",
-  "/assets/profile-images/human-48.png",
-  "/assets/profile-images/human-49.png",
-  "/assets/profile-images/human-50.png",
-  "/assets/profile-images/human-51.png",
-  "/assets/profile-images/human-52.png",
-  "/assets/profile-images/human-53.png",
-  "/assets/profile-images/human-54.png",
-  "/assets/profile-images/human-55.png",
-  "/assets/profile-images/human-56.png",
-  "/assets/profile-images/human-57.png",
-  "/assets/profile-images/human-58.png",
-  "/assets/profile-images/human-59.png",
-  "/assets/profile-images/human-60.png",
-  "/assets/profile-images/human-61.png",
-  "/assets/profile-images/human-62.png",
-  "/assets/profile-images/human-63.png",
-  "/assets/profile-images/human-64.png",
-  "/assets/profile-images/human-65.png",
-  "/assets/profile-images/human-66.png",
-  "/assets/profile-images/human-67.png",
-  "/assets/profile-images/human-68.png",
-  "/assets/profile-images/human-69.png",
-  "/assets/profile-images/human-70.png",
-  "/assets/profile-images/human-71.png",
-  "/assets/profile-images/human-72.png",
-  "/assets/profile-images/human-73.png",
-  "/assets/profile-images/human-74.png",
-  "/assets/profile-images/human-75.png",
-  "/assets/profile-images/human-76.png",
-  "/assets/profile-images/human-77.png",
-  "/assets/profile-images/human-78.png",
-  "/assets/profile-images/human-79.png",
-  "/assets/profile-images/human-80.png",
-  "/assets/profile-images/human-81.png",
-  "/assets/profile-images/human-82.png",
-  "/assets/profile-images/human-83.png",
-  "/assets/profile-images/human-84.png",
-  "/assets/profile-images/human-85.png",
-  "/assets/profile-images/human-86.png",
-  "/assets/profile-images/human-87.png",
-  "/assets/profile-images/human-88.png",
-  "/assets/profile-images/human-89.png",
-  "/assets/profile-images/human-90.png",
-  "/assets/profile-images/human-91.png",
-  "/assets/profile-images/human-92.png",
-  "/assets/profile-images/human-93.png",
-  "/assets/profile-images/human-94.png",
-  "/assets/profile-images/human-95.png",
-  "/assets/profile-images/human-96.png",
-  "/assets/profile-images/human-97.png",
-  "/assets/profile-images/human-98.png",
-  "/assets/profile-images/human-99.png",
-  "/assets/profile-images/human-100.png",
+const MALE_IMAGES = [
+  "/assets/profile-images/male_human_01.png",
+  "/assets/profile-images/male_human_02.png",
+  "/assets/profile-images/male_human_03.png",
+  "/assets/profile-images/male_human_04.png",
+  "/assets/profile-images/male_human_05.png",
+  "/assets/profile-images/male_human_06.png",
+  "/assets/profile-images/male_human_07.png",
+  "/assets/profile-images/male_human_08.png",
+  "/assets/profile-images/male_human_09.png",
+  "/assets/profile-images/male_human_10.png",
+  "/assets/profile-images/male_human_11.png",
+  "/assets/profile-images/male_human_12.png",
+  "/assets/profile-images/male_human_13.png",
+  "/assets/profile-images/male_human_14.png",
+  "/assets/profile-images/male_human_15.png",
+  "/assets/profile-images/male_human_16.png",
+  "/assets/profile-images/male_human_17.png",
+  "/assets/profile-images/male_human_18.png",
+  "/assets/profile-images/male_human_19.png",
+  "/assets/profile-images/male_human_20.png",
+  "/assets/profile-images/male_human_21.png",
+  "/assets/profile-images/male_human_22.png",
+  "/assets/profile-images/male_human_23.png",
+  "/assets/profile-images/male_human_24.png",
+  "/assets/profile-images/male_human_25.png",
+  "/assets/profile-images/male_human_26.png",
+  "/assets/profile-images/male_human_27.png",
+  "/assets/profile-images/male_human_28.png",
+  "/assets/profile-images/male_human_29.png",
+  "/assets/profile-images/male_human_30.png",
+  "/assets/profile-images/male_human_31.png",
+  "/assets/profile-images/male_human_32.png",
+  "/assets/profile-images/male_human_33.png",
+  "/assets/profile-images/male_human_34.png",
+  "/assets/profile-images/male_human_35.png",
+  "/assets/profile-images/male_human_36.png",
+  "/assets/profile-images/male_human_37.png",
+  "/assets/profile-images/male_human_38.png",
+  "/assets/profile-images/male_human_39.png",
+  "/assets/profile-images/male_human_40.png",
+  "/assets/profile-images/male_human_41.png",
+  "/assets/profile-images/male_human_42.png",
+  "/assets/profile-images/male_human_43.png",
+  "/assets/profile-images/male_human_44.png",
+  "/assets/profile-images/male_human_45.png",
+  "/assets/profile-images/male_human_46.png",
+  "/assets/profile-images/male_human_47.png",
+  "/assets/profile-images/male_human_48.png",
+  "/assets/profile-images/male_human_49.png",
+  "/assets/profile-images/male_human_50.png",
 ];
+
+const FEMALE_IMAGES = [
+  "/assets/profile-images/female_human_01.png",
+  "/assets/profile-images/female_human_02.png",
+  "/assets/profile-images/female_human_03.png",
+  "/assets/profile-images/female_human_04.png",
+  "/assets/profile-images/female_human_05.png",
+  "/assets/profile-images/female_human_06.png",
+  "/assets/profile-images/female_human_07.png",
+  "/assets/profile-images/female_human_08.png",
+  "/assets/profile-images/female_human_09.png",
+  "/assets/profile-images/female_human_10.png",
+  "/assets/profile-images/female_human_11.png",
+  "/assets/profile-images/female_human_12.png",
+  "/assets/profile-images/female_human_13.png",
+  "/assets/profile-images/female_human_14.png",
+  "/assets/profile-images/female_human_15.png",
+  "/assets/profile-images/female_human_16.png",
+  "/assets/profile-images/female_human_17.png",
+  "/assets/profile-images/female_human_18.png",
+  "/assets/profile-images/female_human_19.png",
+  "/assets/profile-images/female_human_20.png",
+  "/assets/profile-images/female_human_21.png",
+  "/assets/profile-images/female_human_22.png",
+  "/assets/profile-images/female_human_23.png",
+  "/assets/profile-images/female_human_24.png",
+  "/assets/profile-images/female_human_25.png",
+  "/assets/profile-images/female_human_26.png",
+  "/assets/profile-images/female_human_27.png",
+  "/assets/profile-images/female_human_28.png",
+  "/assets/profile-images/female_human_29.png",
+  "/assets/profile-images/female_human_30.png",
+  "/assets/profile-images/female_human_31.png",
+  "/assets/profile-images/female_human_32.png",
+  "/assets/profile-images/female_human_33.png",
+  "/assets/profile-images/female_human_34.png",
+  "/assets/profile-images/female_human_35.png",
+  "/assets/profile-images/female_human_36.png",
+  "/assets/profile-images/female_human_37.png",
+  "/assets/profile-images/female_human_38.png",
+  "/assets/profile-images/female_human_39.png",
+  "/assets/profile-images/female_human_40.png",
+  "/assets/profile-images/female_human_41.png",
+  "/assets/profile-images/female_human_42.png",
+  "/assets/profile-images/female_human_43.png",
+  "/assets/profile-images/female_human_44.png",
+  "/assets/profile-images/female_human_45.png",
+  "/assets/profile-images/female_human_46.png",
+  "/assets/profile-images/female_human_47.png",
+  "/assets/profile-images/female_human_48.png",
+  "/assets/profile-images/female_human_49.png",
+  "/assets/profile-images/female_human_50.png",
+];
+const PROFILE_IMAGES = [...MALE_IMAGES, ...FEMALE_IMAGES];
 
 const BOT_CONFIGS = [
   { name: "Beginner Bot", image: "/assets/BEGINNER-BOT-BG.png", difficulty: "EASY", color: "#10b981", desc: "Steady compiler" },
@@ -763,14 +766,14 @@ const ProfilePage = () => {
                         boxShadow: `0 0 10px ${currentTheme.accent}50`
                       }}
                     >
-                      SCAN NODE
+                      SEARCH
                     </button>
                     {isViewingOther && (
                       <button
                         onClick={handleBackToMyProfile}
                         className="px-5 py-2 rounded-full font-techno font-bold text-white text-xs uppercase bg-white/10 hover:bg-white/20 transition-all hover:scale-105"
                       >
-                        DISCONNECT SCAN
+                        CLEAR
                       </button>
                     )}
                   </div>
@@ -840,8 +843,10 @@ const ProfilePage = () => {
                             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-2xs font-mono font-bold tracking-widest uppercase border bg-black/40"
                             style={{ color: currentTheme.ui, borderColor: `${currentTheme.ui}40` }}
                           >
-                            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                            {getRPGTitle(activeLevel)}
+                            <User className="w-3.5 h-3.5" />
+                            {isViewingOther 
+                              ? `@${searchResult?.username || 'unknown'}` 
+                              : `@${username} • ${Math.max(0, maxNameChanges - nameChangeCount)} CHANGES LEFT`}
                           </span>
                         </div>
                       </div>
@@ -884,7 +889,7 @@ const ProfilePage = () => {
                         {isEditing ? (
                           <div className="space-y-3.5 text-left">
                             <div>
-                              <label className="text-white/50 text-2xs uppercase">USER CREDENTIALS NAME</label>
+                              <label className="text-white/50 text-2xs uppercase">FULL NAME</label>
                               <input
                                 type="text"
                                 value={tempFullName}
@@ -897,7 +902,7 @@ const ProfilePage = () => {
                             </div>
                             
                             <div>
-                              <label className="text-white/50 text-2xs uppercase">NETWORK ACCESS ALIAS</label>
+                              <label className="text-white/50 text-2xs uppercase">USERNAME</label>
                               <div className="flex items-center gap-1.5 mt-1">
                                 <span className="text-white/40">@</span>
                                 <input
@@ -914,7 +919,7 @@ const ProfilePage = () => {
 
                             {isSetupMode && (
                               <div>
-                                <label className="text-white/50 text-2xs uppercase">CHARACTER TYPE (GENDER)</label>
+                                <label className="text-white/50 text-2xs uppercase">GENDER</label>
                                 <div className="flex gap-2.5 mt-1">
                                   <button
                                     type="button"
@@ -926,7 +931,7 @@ const ProfilePage = () => {
                                       color: tempGender === 'male' ? currentTheme.accent : 'rgba(255,255,255,0.8)'
                                     }}
                                   >
-                                    MALE CODER
+                                    MALE
                                   </button>
                                   <button
                                     type="button"
@@ -938,14 +943,14 @@ const ProfilePage = () => {
                                       color: tempGender === 'female' ? currentTheme.accent : 'rgba(255,255,255,0.8)'
                                     }}
                                   >
-                                    FEMALE CODER
+                                    FEMALE
                                   </button>
                                 </div>
                               </div>
                             )}
 
                             <div>
-                              <label className="text-white/50 text-2xs uppercase">USER SYNOPSIS (BIO)</label>
+                              <label className="text-white/50 text-2xs uppercase">BIO</label>
                               <textarea
                                 value={tempBio}
                                 onChange={(e) => setTempBio(e.target.value)}
@@ -959,23 +964,23 @@ const ProfilePage = () => {
                         ) : (
                           <div className="space-y-4">
                             <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                              <span className="text-white/50 text-xs">USER MATRIX ID</span>
+                              <span className="text-white/50 text-xs">FULL NAME</span>
                               <span className="text-white font-bold">{isViewingOther ? searchResult.fullName : fullName}</span>
                             </div>
                             <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                              <span className="text-white/50 text-xs">NODE SIGNATURE</span>
+                              <span className="text-white/50 text-xs">USERNAME</span>
                               <span className="text-white/80">@{isViewingOther ? searchResult.username : username}</span>
                             </div>
                             {uid && (
                               <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                                <span className="text-white/50 text-xs">SIGNATURE KEY (UID)</span>
+                                <span className="text-white/50 text-xs">USER ID</span>
                                 <span className="text-white font-mono font-bold tracking-widest text-xs" style={{ color: currentTheme.ui }}>
                                   #{isViewingOther ? searchResult.uid : uid}
                                 </span>
                               </div>
                             )}
                             <div className="space-y-1.5 py-1">
-                              <span className="text-white/50 text-xs block">LOG DESCRIPTION</span>
+                              <span className="text-white/50 text-xs block">BIO</span>
                               <p className="text-white/70 text-xs leading-relaxed italic bg-black/20 p-3 rounded-lg border border-white/5">
                                 {isViewingOther ? searchResult.bio : bio}
                               </p>
@@ -997,7 +1002,7 @@ const ProfilePage = () => {
                               }}
                             >
                               <Check className="w-4 h-4" />
-                              SAVE CONFIG
+                              SAVE PROFILE
                             </button>
                             <button
                               onClick={handleCancel}
@@ -1013,7 +1018,7 @@ const ProfilePage = () => {
                               className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg font-techno font-bold text-white uppercase text-xs transition-all hover:scale-103 bg-white/5 border border-white/10 hover:bg-white/10"
                             >
                               <Edit2 className="w-4 h-4" />
-                              MODIFY TERMINAL
+                              EDIT PROFILE
                             </button>
                             <button
                               onClick={async () => {
@@ -1046,10 +1051,10 @@ const ProfilePage = () => {
                     {!isViewingOther && isEditing && (
                       <div className="px-6 pb-6 pt-2 border-t border-white/5 bg-black/20">
                         <p className="font-techno text-2xs font-bold uppercase tracking-wider mb-3 text-white/60">
-                          REASSIGN PORTRAIT KEY
+                          SELECT PROFILE PICTURE
                         </p>
                         <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
-                          {PROFILE_IMAGES.map((img, idx) => (
+                          {(tempGender === "female" ? FEMALE_IMAGES : MALE_IMAGES).map((img, idx) => (
                             <button
                               key={idx}
                               onClick={() => setTempImage(img)}

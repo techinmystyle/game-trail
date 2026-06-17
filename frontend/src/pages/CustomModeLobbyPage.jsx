@@ -15,10 +15,10 @@ import {
 } from '../utils/socket';
 import { getSocket } from '../utils/socket';
 
-const CM_ACCENT = '#00e5ff';
-const CM_UI     = '#80ffff';
-const CM_ORANGE = '#ff6b35';
-const CM_BG     = '#010d12';
+
+
+
+
 
 const ROOM_EXPIRY_SECONDS = 900;
 
@@ -58,14 +58,19 @@ const CustomModeLobbyPage = () => {
   const roomData = location.state || {};
 
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
+  const safeTheme = THEMES[themeKey] || THEMES.purple;
+  const { accent: ac, ui } = safeTheme;
+
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
-  const themes = {
-    red: { accent: '#ff5252', ui: '#ff6b6b' },
-    blue: { accent: '#0099ff', ui: '#00ccff' },
-    green: { accent: '#00ff88', ui: '#00ff99' },
-    purple: { accent: '#a855f7', ui: '#d8b4fe' },
-  };
+  
+const THEMES = {
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
+};
+
 
   // State
   const [copied, setCopied] = useState(false);
@@ -289,10 +294,10 @@ const CustomModeLobbyPage = () => {
   const isHost = roomState?.players?.find(p => p.userId === userId)?.isHost ?? !roomData.isJoining;
 
   if (connecting) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: CM_BG }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: ('#010d12') }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: 64, height: 64, border: `4px solid ${CM_ACCENT}30`, borderTopColor: CM_ACCENT, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px' }} />
-        <p style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 20, fontWeight: 800, color: CM_ACCENT, letterSpacing: 2 }}>
+        <div style={{ width: 64, height: 64, border: `4px solid ${ac}30`, borderTopColor: ac, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 20px' }} />
+        <p style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 20, fontWeight: 800, color: ac, letterSpacing: 2 }}>
           {roomData.isJoining ? 'JOINING BATTLE ARENA...' : 'CREATING BATTLE ARENA...'}
         </p>
         {connectingAttempt > 0 && (
@@ -306,14 +311,14 @@ const CustomModeLobbyPage = () => {
   );
 
   if (error) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: CM_BG }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: ('#010d12') }}>
       <div style={{ textAlign: 'center', maxWidth: 400, padding: 32, ...cardStyle }}>
         <AlertCircle size={48} style={{ color: '#ef4444', marginBottom: 16 }} />
         <h2 style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 22, color: '#ef4444', marginBottom: 12 }}>CONNECTION FAILED</h2>
         <p style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: 20 }}>{error}</p>
         <button onClick={() => navigate('/custom-mode')} style={{
           width: '100%', padding: '12px 0', borderRadius: 10, border: 'none',
-          background: CM_ACCENT, color: '#001a20', fontFamily: 'Rajdhani, sans-serif',
+          background: ac, color: '#001a20', fontFamily: 'Rajdhani, sans-serif',
           fontWeight: 800, textTransform: 'uppercase', cursor: 'pointer', fontSize: 16, fontWeight: 700,
         }}>Back to Custom Mode</button>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -322,26 +327,26 @@ const CustomModeLobbyPage = () => {
   );
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: CM_BG, color: 'white', overflow: 'hidden' }}>
-      <CustomCursor theme={{ accent: CM_ACCENT, ui: CM_UI }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: CM_ACCENT, ui: CM_UI }} />
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: ('#010d12'), color: 'white', overflow: 'hidden' }}>
+      <CustomCursor theme={{ accent: ac, ui: ui }} />
+      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: ac, ui: ui }} />
 
       {/* Ambient glow */}
       <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-        width: 800, height: 400, background: `radial-gradient(ellipse, ${CM_ACCENT}08 0%, transparent 70%)`,
+        width: 800, height: 400, background: `radial-gradient(ellipse, ${ac}08 0%, transparent 70%)`,
         pointerEvents: 'none', zIndex: 0 }} />
 
       {/* Top strip */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '8px 24px', background: 'rgba(0,0,0,0.5)',
-        borderBottom: `1px solid ${CM_ACCENT}18`, flexShrink: 0, gap: 16, position: 'relative', zIndex: 10,
+        borderBottom: `1px solid ${ac}18`, flexShrink: 0, gap: 16, position: 'relative', zIndex: 10,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button onClick={() => navigate('/custom-mode')} style={{
             display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
-            borderRadius: 7, border: `1px solid ${CM_ACCENT}30`, background: `${CM_ACCENT}08`,
-            color: CM_ACCENT, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
+            borderRadius: 7, border: `1px solid ${ac}30`, background: `${ac}08`,
+            color: ac, cursor: 'pointer', fontFamily: 'Rajdhani, sans-serif',
             fontWeight: 700, fontSize: 16, fontWeight: 700,
           }}>
             <ChevronLeft size={14} /> BACK
@@ -354,10 +359,10 @@ const CustomModeLobbyPage = () => {
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              background: 'rgba(0,229,255,0.04)', border: `1px solid ${CM_ACCENT}15`,
+              background: 'rgba(0,229,255,0.04)', border: `1px solid ${ac}15`,
               borderRadius: 8, padding: '6px 12px',
             }}>
-              <Icon size={12} style={{ color: CM_ACCENT }} />
+              <Icon size={12} style={{ color: ac }} />
               <div>
                 <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>{label}</div>
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: 'white' }}>{value}</div>
@@ -378,8 +383,8 @@ const CustomModeLobbyPage = () => {
           {/* Custom Mode badge */}
           <div style={{
             padding: '4px 12px', borderRadius: 20,
-            background: `${CM_ACCENT}12`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: CM_ACCENT, letterSpacing: 2,
+            background: `${ac}12`, border: `1px solid ${ac}30`,
+            fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: ac, letterSpacing: 2,
           }}>
             ⚔️ HUMAN VS HUMAN
           </div>
@@ -388,10 +393,10 @@ const CustomModeLobbyPage = () => {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: expirySeconds < 60 ? 'rgba(239,68,68,0.1)' : 'rgba(0,229,255,0.04)',
-            border: `1px solid ${expirySeconds < 60 ? 'rgba(239,68,68,0.3)' : `${CM_ACCENT}12`}`,
+            border: `1px solid ${expirySeconds < 60 ? 'rgba(239,68,68,0.3)' : `${ac}12`}`,
             borderRadius: 8, padding: '6px 12px',
           }}>
-            <Clock size={12} style={{ color: expirySeconds < 60 ? '#ef4444' : `${CM_ACCENT}80` }} />
+            <Clock size={12} style={{ color: expirySeconds < 60 ? '#ef4444' : `${ac}80` }} />
             <div>
               <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>ROOM EXPIRES</div>
               <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 15, fontWeight: 700, color: expirySeconds < 60 ? '#ef4444' : 'rgba(255,255,255,0.7)' }}>
@@ -403,12 +408,12 @@ const CustomModeLobbyPage = () => {
           {/* Profile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {profileImage
-              ? <img src={profileImage} alt="You" style={{ width: 32, height: 32, borderRadius: '50%', border: `2px solid ${CM_ACCENT}`, objectFit: 'cover' }} />
-              : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${CM_ACCENT}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: CM_ACCENT }}>{username[0]}</div>
+              ? <img src={profileImage} alt="You" style={{ width: 32, height: 32, borderRadius: '50%', border: `2px solid ${ac}`, objectFit: 'cover' }} />
+              : <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${ac}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: ac }}>{username[0]}</div>
             }
             <div>
               <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, color: 'white' }}>{username}</div>
-              <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: isHost ? CM_ACCENT : 'rgba(255,255,255,0.6)' }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: isHost ? ac : 'rgba(255,255,255,0.6)' }}>
                 {isHost ? '👑 HOST' : 'PLAYER'}
               </div>
             </div>
@@ -423,9 +428,9 @@ const CustomModeLobbyPage = () => {
         <div style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ ...cardStyle, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: 0, overflow: 'hidden' }}>
             {/* Chat header */}
-            <div style={{ padding: '12px 16px', borderBottom: `1px solid ${CM_ACCENT}10`,
+            <div style={{ padding: '12px 16px', borderBottom: `1px solid ${ac}10`,
               display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <MessageSquare size={14} style={{ color: CM_ACCENT }} />
+              <MessageSquare size={14} style={{ color: ac }} />
               <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>LOBBY CHAT</span>
               <div style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981', animation: 'pulse 2s infinite' }} />
             </div>
@@ -437,10 +442,10 @@ const CustomModeLobbyPage = () => {
                   {msg.isSystem ? (
                     <div style={{
                       padding: '6px 12px', borderRadius: 8,
-                      background: msg.isWarning ? 'rgba(239,68,68,0.1)' : `${CM_ACCENT}08`,
-                      border: `1px solid ${msg.isWarning ? 'rgba(239,68,68,0.2)' : `${CM_ACCENT}15`}`,
+                      background: msg.isWarning ? 'rgba(239,68,68,0.1)' : `${ac}08`,
+                      border: `1px solid ${msg.isWarning ? 'rgba(239,68,68,0.2)' : `${ac}15`}`,
                       fontFamily: 'monospace', fontSize: 15, fontWeight: 700,
-                      color: msg.isWarning ? '#ef4444' : `${CM_ACCENT}80`,
+                      color: msg.isWarning ? '#ef4444' : `${ac}80`,
                       textAlign: 'center', maxWidth: '90%',
                     }}>{msg.text}</div>
                   ) : (
@@ -451,8 +456,8 @@ const CustomModeLobbyPage = () => {
                       </div>
                       <div style={{
                         padding: '8px 12px', borderRadius: 10,
-                        background: msg.isMine ? `${CM_ACCENT}18` : 'rgba(255,255,255,0.05)',
-                        border: `1px solid ${msg.isMine ? CM_ACCENT + '30' : 'rgba(255,255,255,0.06)'}`,
+                        background: msg.isMine ? `${ac}18` : 'rgba(255,255,255,0.05)',
+                        border: `1px solid ${msg.isMine ? ac + '30' : 'rgba(255,255,255,0.06)'}`,
                         fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'white', maxWidth: '85%', lineHeight: 1.5,
                       }}>{msg.text}</div>
                     </>
@@ -463,7 +468,7 @@ const CustomModeLobbyPage = () => {
             </div>
 
             {/* Input */}
-            <div style={{ padding: '10px 12px', borderTop: `1px solid ${CM_ACCENT}10`, flexShrink: 0 }}>
+            <div style={{ padding: '10px 12px', borderTop: `1px solid ${ac}10`, flexShrink: 0 }}>
               <div style={{ display: 'flex', gap: 8 }}>
                 <input
                   value={chatInput}
@@ -471,14 +476,14 @@ const CustomModeLobbyPage = () => {
                   onKeyDown={e => e.key === 'Enter' && sendChat()}
                   placeholder="Type a message..."
                   style={{
-                    flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${CM_ACCENT}15`,
-                    background: `${CM_ACCENT}04`, color: 'white',
-                    fontFamily: 'monospace', fontSize: 16, fontWeight: 700, outline: 'none', caretColor: CM_ACCENT,
+                    flex: 1, padding: '8px 12px', borderRadius: 8, border: `1px solid ${ac}15`,
+                    background: `${ac}04`, color: 'white',
+                    fontFamily: 'monospace', fontSize: 16, fontWeight: 700, outline: 'none', caretColor: ac,
                   }}
                 />
                 <button onClick={sendChat} style={{
                   width: 36, height: 36, borderRadius: 8, border: 'none',
-                  background: CM_ACCENT, color: '#001a20', cursor: 'pointer',
+                  background: ac, color: '#001a20', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <Send size={15} />
@@ -493,13 +498,13 @@ const CustomModeLobbyPage = () => {
 
           {/* Title */}
           <div style={{ textAlign: 'center', flexShrink: 0 }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, letterSpacing: 4, color: CM_ACCENT, textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, letterSpacing: 4, color: ac, textTransform: 'uppercase', marginBottom: 4 }}>
               HUMAN VS HUMAN BATTLE LOBBY
             </div>
             <h1 style={{
               margin: 0, fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 32,
               textTransform: 'uppercase', letterSpacing: 3,
-              background: `linear-gradient(135deg, white 40%, ${CM_ACCENT})`,
+              background: `linear-gradient(135deg, white 40%, ${ac})`,
               backgroundClip: 'text', WebkitBackgroundClip: 'text',
               color: 'transparent', WebkitTextFillColor: 'transparent',
             }}>
@@ -518,11 +523,11 @@ const CustomModeLobbyPage = () => {
             ].map(({ icon: Icon, label }) => (
               <div key={label} style={{
                 display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
-                borderRadius: 20, background: `${CM_ACCENT}06`,
-                border: `1px solid ${CM_ACCENT}15`,
+                borderRadius: 20, background: `${ac}06`,
+                border: `1px solid ${ac}15`,
                 fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)',
               }}>
-                <Icon size={12} style={{ color: CM_ACCENT }} /> {label}
+                <Icon size={12} style={{ color: ac }} /> {label}
               </div>
             ))}
           </div>
@@ -530,7 +535,7 @@ const CustomModeLobbyPage = () => {
           {/* Players grid */}
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <User size={16} style={{ color: CM_ACCENT }} />
+              <User size={16} style={{ color: ac }} />
               <div>
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, textTransform: 'uppercase' }}>PLAYERS</div>
                 <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
@@ -550,14 +555,14 @@ const CustomModeLobbyPage = () => {
                 return (
                   <div key={player.userId || idx} style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 12px', borderRadius: 14,
-                    background: isMe ? `${CM_ACCENT}10` : 'rgba(255,255,255,0.02)',
-                    border: `1.5px solid ${isMe ? CM_ACCENT + '40' : 'rgba(255,255,255,0.06)'}`,
+                    background: isMe ? `${ac}10` : 'rgba(255,255,255,0.02)',
+                    border: `1.5px solid ${isMe ? ac + '40' : 'rgba(255,255,255,0.06)'}`,
                     transition: 'all 0.3s', textAlign: 'center',
                   }}>
                     <div style={{ position: 'relative' }}>
                       {isMe && profileImage
-                        ? <img src={profileImage} alt="You" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${CM_ACCENT}` }} />
-                        : <div style={{ width: 48, height: 48, borderRadius: '50%', background: player.ready ? `${CM_ACCENT}25` : 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: player.ready ? CM_ACCENT : 'rgba(255,255,255,0.6)' }}>
+                        ? <img src={profileImage} alt="You" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${ac}` }} />
+                        : <div style={{ width: 48, height: 48, borderRadius: '50%', background: player.ready ? `${ac}25` : 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: player.ready ? ac : 'rgba(255,255,255,0.6)' }}>
                             {player.username?.[0]?.toUpperCase() || (idx + 1)}
                           </div>
                       }
@@ -569,7 +574,7 @@ const CustomModeLobbyPage = () => {
                       )}
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: isMe ? CM_ACCENT : 'white' }}>
+                      <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: isMe ? ac : 'white' }}>
                         {player.username} {isMe && '(YOU)'}
                       </div>
                       <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: player.ready ? '#10b981' : 'rgba(255,255,255,0.6)', marginTop: 2 }}>
@@ -584,11 +589,11 @@ const CustomModeLobbyPage = () => {
               {Array.from({ length: Math.max(0, totalPlayers - activePlayers.length) }).map((_, i) => (
                 <div key={`empty-${i}`} style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 12px', borderRadius: 14,
-                  background: 'rgba(255,255,255,0.01)', border: `1.5px dashed ${CM_ACCENT}15`, textAlign: 'center',
+                  background: 'rgba(255,255,255,0.01)', border: `1.5px dashed ${ac}15`, textAlign: 'center',
                 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${CM_ACCENT}06`,
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: `${ac}06`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: `${CM_ACCENT}30` }}>
+                    fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 18, color: `${ac}30` }}>
                     {activePlayers.length + i + 1}
                   </div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>
@@ -604,15 +609,15 @@ const CustomModeLobbyPage = () => {
           {isHost && (
             <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <Eye size={16} style={{ color: `${CM_ACCENT}80` }} />
+                <Eye size={16} style={{ color: `${ac}80` }} />
                 <div>
                   <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>SPECTATOR ZONE (HOST ONLY)</div>
                   <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>Up to 5 spectator slots — optional</div>
                 </div>
                 <button onClick={handleSpectateToggle} style={{
-                  marginLeft: 'auto', padding: '6px 14px', borderRadius: 8, border: `1px solid ${CM_ACCENT}30`,
-                  background: isSpectator ? `${CM_ACCENT}18` : 'rgba(255,255,255,0.04)',
-                  color: isSpectator ? CM_ACCENT : 'rgba(255,255,255,0.8)',
+                  marginLeft: 'auto', padding: '6px 14px', borderRadius: 8, border: `1px solid ${ac}30`,
+                  background: isSpectator ? `${ac}18` : 'rgba(255,255,255,0.04)',
+                  color: isSpectator ? ac : 'rgba(255,255,255,0.8)',
                   fontFamily: 'Rajdhani, sans-serif', fontWeight: 700, fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', transition: 'all 0.2s',
                   display: 'flex', alignItems: 'center', gap: 6,
@@ -625,8 +630,8 @@ const CustomModeLobbyPage = () => {
               {isSpectator && (
                 <div style={{
                   padding: '10px 14px', borderRadius: 8,
-                  background: `${CM_ACCENT}08`, border: `1px solid ${CM_ACCENT}20`,
-                  fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${CM_ACCENT}80`,
+                  background: `${ac}08`, border: `1px solid ${ac}20`,
+                  fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}80`,
                 }}>
                   🎭 You are spectating. You will watch all players' code during the battle — read only.
                 </div>
@@ -638,11 +643,11 @@ const CustomModeLobbyPage = () => {
           {activePlayers.length < totalPlayers && (
             <div style={{
               padding: '10px 16px', borderRadius: 8, flexShrink: 0,
-              background: `${CM_ORANGE}08`, border: `1px solid ${CM_ORANGE}25`,
+              background: `${('#ff6b35')}08`, border: `1px solid ${('#ff6b35')}25`,
               display: 'flex', alignItems: 'center', gap: 10,
             }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: CM_ORANGE, animation: 'pulse 1s infinite' }} />
-              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: CM_ORANGE }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: ('#ff6b35'), animation: 'pulse 1s infinite' }} />
+              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: ('#ff6b35') }}>
                 WAITING FOR {totalPlayers - activePlayers.length} MORE PLAYER(S) — Share: {roomId} / {roomPassword}
               </span>
             </div>
@@ -656,17 +661,17 @@ const CustomModeLobbyPage = () => {
                   onClick={() => handleReadyChange(!accepted)}
                   style={{
                     width: 22, height: 22, borderRadius: 6,
-                    border: `2px solid ${accepted ? CM_ACCENT : 'rgba(255,255,255,0.6)'}`,
-                    background: accepted ? CM_ACCENT : 'transparent',
+                    border: `2px solid ${accepted ? ac : 'rgba(255,255,255,0.6)'}`,
+                    background: accepted ? ac : 'transparent',
                     cursor: 'pointer', transition: 'all 0.2s',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    boxShadow: accepted ? `0 0 12px ${CM_ACCENT}50` : 'none',
+                    boxShadow: accepted ? `0 0 12px ${ac}50` : 'none',
                   }}
                 >
                   {accepted && <span style={{ color: '#001a20', fontSize: 15, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                 </div>
                 <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15,
-                  color: accepted ? CM_ACCENT : 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                  color: accepted ? ac : 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: 1 }}>
                   {accepted ? "✅ I'M READY TO BATTLE!" : "CLICK TO MARK READY"}
                 </span>
               </label>
@@ -678,12 +683,12 @@ const CustomModeLobbyPage = () => {
                   style={{
                     padding: '13px 32px', borderRadius: 10, border: 'none',
                     background: accepted && activePlayers.length >= totalPlayers
-                      ? `linear-gradient(135deg, ${CM_ACCENT}, ${CM_UI})`
+                      ? `linear-gradient(135deg, ${ac}, ${ui})`
                       : 'rgba(255,255,255,0.05)',
                     color: accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.6)',
                     fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, textTransform: 'uppercase',
                     fontSize: 15, cursor: accepted ? 'pointer' : 'not-allowed', letterSpacing: 2,
-                    boxShadow: accepted ? `0 4px 20px ${CM_ACCENT}40` : 'none', transition: 'all 0.2s',
+                    boxShadow: accepted ? `0 4px 20px ${ac}40` : 'none', transition: 'all 0.2s',
                     display: 'flex', alignItems: 'center', gap: 8,
                   }}>
                   <Play size={16} fill={accepted && activePlayers.length >= totalPlayers ? '#001a20' : 'rgba(255,255,255,0.6)'} /> START BATTLE
@@ -691,7 +696,7 @@ const CustomModeLobbyPage = () => {
               ) : (
                 <div style={{ padding: '10px 18px', borderRadius: 8, fontFamily: 'Rajdhani, sans-serif',
                   fontWeight: 800, fontSize: 15, fontWeight: 700, textTransform: 'uppercase',
-                  color: CM_ACCENT, background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}25` }}>
+                  color: ac, background: `${ac}10`, border: `1px solid ${ac}25` }}>
                   Waiting for host...
                 </div>
               )}
@@ -713,8 +718,8 @@ const CustomModeLobbyPage = () => {
           </div>
           <div style={{
             fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 180,
-            color: CM_ACCENT, lineHeight: 1,
-            textShadow: `0 0 80px ${CM_ACCENT}90, 0 0 160px ${CM_ACCENT}40`,
+            color: ac, lineHeight: 1,
+            textShadow: `0 0 80px ${ac}90, 0 0 160px ${ac}40`,
             animation: 'countdownPop 1s ease-out',
           }}>
             {countdown}

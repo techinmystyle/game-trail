@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Play, Trophy, Zap, BookOpen, Lock, Eye, ChevronDown, ChevronUp, Terminal } from 'lucide-react';
+import { X, Play, Trophy, Zap, BookOpen, Lock, Eye, Terminal, Trash2, CheckCircle2, AlertTriangle, ChevronRight } from 'lucide-react';
 import { computerModeAPI, profileAPI } from '../utils/api';
 import { getSocket } from '../utils/socket';
 
@@ -175,202 +175,6 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
 );
 
 // ── Output Panel ──
-const OutputPanel = ({ testResults, challenge, outputData, logs, ac }) => {
-  const [expanded, setExpanded] = useState(true);
-  const [activeTab, setActiveTab] = useState('tests');
-
-  const testCount = challenge?.testCases?.length || 0;
-  const passCount = testResults.filter(Boolean).length;
-
-  return (
-    <div style={{
-      flexShrink: 0,
-      background: '#07090e',
-      border: `1px solid ${ac}15`,
-      borderRadius: 8,
-      overflow: 'hidden',
-      transition: 'all 0.3s',
-    }}>
-      {/* Panel header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 0,
-        borderBottom: expanded ? '1px solid rgba(255,255,255,0.06)' : 'none',
-        background: '#0a0d14',
-      }}>
-        {/* Tabs */}
-        {[
-          { id: 'tests', label: `TEST CASES (${passCount}/${testCount})` },
-          { id: 'output', label: 'OUTPUT' },
-          { id: 'logs', label: `LOGS (${logs.length})` },
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => { setActiveTab(tab.id); setExpanded(true); }}
-            style={{
-              padding: '7px 14px', border: 'none', cursor: 'pointer',
-              background: activeTab === tab.id && expanded ? `${ac}12` : 'transparent',
-              borderRight: '1px solid rgba(255,255,255,0.05)',
-              borderBottom: activeTab === tab.id && expanded ? `2px solid ${ac}` : '2px solid transparent',
-              fontFamily: 'monospace', fontSize: 16, fontWeight: 700, fontWeight: 700, letterSpacing: 1,
-              color: activeTab === tab.id && expanded ? ac : 'rgba(255,255,255,0.6)',
-              transition: 'all 0.2s',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <button
-          onClick={() => setExpanded(v => !v)}
-          style={{
-            padding: '7px 12px', border: 'none', background: 'transparent',
-            color: 'rgba(255,255,255,0.6)', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 4,
-            fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
-          }}
-        >
-          {expanded ? <><ChevronDown size={12} /> HIDE</> : <><ChevronUp size={12} /> SHOW</>}
-        </button>
-      </div>
-
-      {/* Panel content */}
-      {expanded && (
-        <div style={{ maxHeight: 180, overflowY: 'auto' }}>
-          {/* ── TEST CASES TAB ── */}
-          {activeTab === 'tests' && (
-            <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {testCount === 0 ? (
-                <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '16px 0' }}>
-                  // Run your code to see test results
-                </div>
-              ) : (
-                challenge.testCases.map((tc, i) => {
-                  const passed = testResults[i];
-                  const od = outputData?.[i];
-                  return (
-                    <div key={i} style={{
-                      borderRadius: 8,
-                      border: `1px solid ${passed === true ? '#10b98130' : passed === false ? '#ef444430' : 'rgba(255,255,255,0.08)'}`,
-                      background: passed === true ? 'rgba(16,185,129,0.04)' : passed === false ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.02)',
-                      overflow: 'hidden',
-                    }}>
-                      {/* Test header */}
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px',
-                        borderBottom: '1px solid rgba(255,255,255,0.04)',
-                      }}>
-                        <div style={{
-                          width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
-                          background: passed === true ? '#10b98120' : passed === false ? '#ef444420' : 'rgba(255,255,255,0.06)',
-                          border: `1.5px solid ${passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)'}`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontFamily: 'monospace', fontSize: 16, fontWeight: 700, fontWeight: 900,
-                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)',
-                        }}>
-                          {passed === true ? '✓' : passed === false ? '✗' : i + 1}
-                        </div>
-                        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700,
-                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)' }}>
-                          Test Case {i + 1}
-                          {tc.description ? ` — ${tc.description}` : ''}
-                        </span>
-                        <span style={{
-                          marginLeft: 'auto', fontFamily: 'monospace', fontSize: 15, fontWeight: 700, fontWeight: 700,
-                          color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.55)',
-                        }}>
-                          {passed === true ? 'PASSED' : passed === false ? 'FAILED' : 'PENDING'}
-                        </span>
-                      </div>
-                      {/* Test details */}
-                      <div style={{ padding: '6px 12px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                        {tc.input !== undefined && (
-                          <div>
-                            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>INPUT</div>
-                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
-                              {JSON.stringify(tc.input)}
-                            </div>
-                          </div>
-                        )}
-                        <div>
-                          <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>EXPECTED</div>
-                          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
-                            {tc.expectedOutput !== undefined ? JSON.stringify(tc.expectedOutput) : tc.expected !== undefined ? JSON.stringify(tc.expected) : '—'}
-                          </div>
-                        </div>
-                        {od?.actualOutput !== undefined && (
-                          <div>
-                            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>YOUR OUTPUT</div>
-                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: passed ? '#10b981' : '#ef4444', background: passed ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
-                              {JSON.stringify(od.actualOutput)}
-                            </div>
-                          </div>
-                        )}
-                        {od?.error && (
-                          <div style={{ gridColumn: '1/-1' }}>
-                            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#ef4444', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 1 }}>ERROR</div>
-                            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.06)', padding: '4px 8px', borderRadius: 4, wordBreak: 'break-all' }}>
-                              {od.error}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
-
-          {/* ── OUTPUT TAB ── */}
-          {activeTab === 'output' && (
-            <div style={{ padding: '10px 12px' }}>
-              {outputData && outputData.length > 0 ? (
-                outputData.map((od, i) => (
-                  od?.stdout ? (
-                    <div key={i} style={{ marginBottom: 8 }}>
-                      <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>
-                        ► Test {i+1} stdout:
-                      </div>
-                      <pre style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '8px', borderRadius: 6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                        {od.stdout}
-                      </pre>
-                    </div>
-                  ) : null
-                ))
-              ) : (
-                <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '16px 0' }}>
-                  // Run your code to see output
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── LOGS TAB ── */}
-          {activeTab === 'logs' && (
-            <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {logs.length === 0 ? (
-                <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '16px 0' }}>
-                  // System logs appear here...
-                </div>
-              ) : (
-                logs.map((log, i) => (
-                  <div key={i} style={{
-                    fontFamily: 'monospace', fontSize: 15, fontWeight: 700, lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'baseline',
-                    color: log.type === 'error' ? '#ef4444' : log.type === 'success' ? '#10b981' : log.type === 'warning' ? '#f59e0b' : 'rgba(255,255,255,0.8)',
-                  }}>
-                    <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 15, fontWeight: 700, flexShrink: 0 }}>{log.ts}</span>
-                    <span>{log.msg}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
 // Player colors for multi-player
 const PLAYER_COLORS = ['#00e5ff', '#ff6b35', '#a855f7', '#10b981'];
 
@@ -411,6 +215,26 @@ export default function CustomModeGamePage() {
   const [compiling, setCompiling]     = useState(false);
   const [logs, setLogs]               = useState([]);
   const [progress, setProgress]       = useState(0);
+  const [previewTab, setPreviewTab]   = useState('tests');
+  const [compiledOutput, setCompiledOutput] = useState('');
+  const iframeRef = useRef(null);
+  const expectedIframeRef = useRef(null);
+
+  useEffect(() => {
+    if (iframeRef.current && compiledOutput) {
+      const doc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+      doc.open(); doc.write(compiledOutput); doc.close();
+    }
+  }, [compiledOutput]);
+
+  useEffect(() => {
+    if (expectedIframeRef.current && challenge?.expectedOutput) {
+      const doc = expectedIframeRef.current.contentDocument || expectedIframeRef.current.contentWindow.document;
+      doc.open(); doc.write(challenge.expectedOutput); doc.close();
+    }
+  }, [challenge]);
+
+
 
   // Timer
   const totalMs    = roomTime * 60 * 1000;
@@ -637,6 +461,7 @@ export default function CustomModeGamePage() {
     if (!userCode.trim() || isSpectator) { addLog('✍️ Write some code first!', 'error'); return; }
     setCompiling(true);
     addLog('⚙️ Compiling & validating...', 'info');
+    setCompiledOutput(userCode);
     try {
       const res = await computerModeAPI.validateCode({ userCode, challenge, language, timeMinutes: roomTime, difficulty });
       const validation = res.data.validation || {};
@@ -761,7 +586,7 @@ export default function CustomModeGamePage() {
         {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
           <Zap size={12} fill={ac} style={{ color: ac }} />
-          <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 15, fontWeight: 700, color: ac, letterSpacing: 2 }}>CUSTOM MODE</span>
+          <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 15, color: ac, letterSpacing: 2 }}>CUSTOM MODE</span>
         </div>
 
         {/* Round dots */}
@@ -778,7 +603,7 @@ export default function CustomModeGamePage() {
 
         {/* Title */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>{challenge.title}</span>
+          <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>{challenge.title}</span>
           <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: `${ac}20`, color: ac }}>{language}</span>
           <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)' }}>{difficulty}</span>
           {isSpectator && (
@@ -786,29 +611,6 @@ export default function CustomModeGamePage() {
               <Eye size={10} /> SPECTATING
             </span>
           )}
-        </div>
-
-        {/* Scores */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 14px', borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
-          {players.filter(p => !p.isSpectator).map((p, i) => (
-            <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: PLAYER_COLORS[i % PLAYER_COLORS.length] }} />
-              <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 15, fontWeight: 700, color: PLAYER_COLORS[i % PLAYER_COLORS.length] }}>
-                {scores[p.userId] || 0}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Timer in top bar */}
-        <div style={{
-          padding: '0 14px', borderLeft: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%',
-        }}>
-          <div style={{ fontFamily: 'monospace', fontSize: 7, color: timerCrit ? '#ef4444' : 'rgba(255,255,255,0.6)', letterSpacing: 1, marginBottom: 1 }}>TIME</div>
-          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 16, fontWeight: 700, fontWeight: 900, color: timerColor, letterSpacing: 1, animation: timerCrit ? 'timerPulse 0.8s infinite' : 'none' }}>
-            {fmtMs(playerMs)}
-          </div>
         </div>
 
         {/* Exit */}
@@ -824,21 +626,12 @@ export default function CustomModeGamePage() {
         </button>
       </div>
 
-      {/* ══ TIMER BAR ══ */}
-      <div style={{ height: 3, flexShrink: 0, background: 'rgba(255,255,255,0.05)', position: 'relative' }}>
-        <div style={{
-          position: 'absolute', left: 0, top: 0, height: '100%',
-          width: `${timerPct}%`,
-          background: timerCrit
-            ? 'linear-gradient(90deg, #ef4444, #ff6b6b)'
-            : `linear-gradient(90deg, ${ac}, ${theme.ui})`,
-          boxShadow: `0 0 8px ${timerCrit ? '#ef4444' : ac}`,
-          transition: 'width 0.1s linear, background 0.5s',
-        }} />
-      </div>
-
-      {/* ══ MAIN BODY ══ */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: gridCols, minHeight: 0, overflow: 'hidden', gap: 6, padding: 6 }}>
+      {/* ══ MAIN BODY (3-COLUMN LAYOUT) ══ */}
+      <div style={{
+        flex: 1, padding: '16px 20px',
+        display: 'grid', gridTemplateColumns: isSpectator ? `repeat(${Math.min(playerMode, 4)}, 1fr)` : 'minmax(0, 1.2fr) minmax(0, 1fr) 280px', gap: 16,
+        minHeight: 0, overflow: 'hidden',
+      }}>
 
         {/* ═══ SPECTATOR MODE ═══ */}
         {isSpectator ? (
@@ -850,7 +643,7 @@ export default function CustomModeGamePage() {
             }}>
               <div style={{ padding: '8px 14px', background: '#07090e', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: PLAYER_COLORS[idx % PLAYER_COLORS.length] }} />
-                <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, color: PLAYER_COLORS[idx % PLAYER_COLORS.length] }}>{p.username}</span>
+                <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, color: PLAYER_COLORS[idx % PLAYER_COLORS.length] }}>{p.username}</span>
                 <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.65)' }}>· {p.progress || 0}% done</span>
                 {p.finished && <span style={{ marginLeft: 'auto', fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#10b981' }}>✅ SUBMITTED</span>}
               </div>
@@ -866,202 +659,469 @@ export default function CustomModeGamePage() {
           ))
         ) : (
           <>
-            {/* ═══ COLUMN 1: CHALLENGE + MY EDITOR + CONTROLS ═══ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0, overflow: 'hidden' }}>
-
-              {/* Challenge card */}
+            {/* ═══════════ COLUMN 1: CHALLENGE & EDITOR ═══════════ */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, overflow: 'hidden' }}>
+              
+              {/* Challenge Card */}
               <div style={{
-                flexShrink: 0,
-                background: '#0b0e17', border: `1px solid ${ac}20`,
-                borderRadius: 10, padding: '10px 14px', overflow: 'hidden',
+                flexShrink: 0, background: '#0b0e17', border: `1px solid ${ac}25`,
+                borderRadius: 10, padding: '14px 18px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <div style={{ width: 3, height: 12, borderRadius: 2, background: ac }} />
-                  <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, fontWeight: 700, color: ac, textTransform: 'uppercase', letterSpacing: 2 }}>CHALLENGE</span>
-                  {/* My progress indicator */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <div style={{ width: 3, height: 14, borderRadius: 2, background: ac }} />
+                  <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 16, color: ac, textTransform: 'uppercase', letterSpacing: 2 }}>CHALLENGE</span>
                   {progress > 0 && (
                     <span style={{
                       marginLeft: 'auto', fontFamily: 'monospace', fontSize: 15, fontWeight: 700,
-                      color: allPassed ? '#10b981' : ac,
-                      background: allPassed ? 'rgba(16,185,129,0.12)' : `${ac}15`,
+                      color: allPassed ? '#10b981' : ac, background: allPassed ? 'rgba(16,185,129,0.12)' : `${ac}15`,
                       padding: '2px 8px', borderRadius: 10, border: `1px solid ${allPassed ? '#10b98140' : ac + '30'}`,
                     }}>
-                      MY: {progress.toFixed(0)}%
+                      MY PROGRESS: {progress.toFixed(0)}%
                     </span>
                   )}
                 </div>
-                <div style={{ borderLeft: `3px solid ${ac}`, paddingLeft: 10, maxHeight: 60, overflowY: 'auto' }}>
+                <div style={{ borderLeft: `3px solid ${ac}`, paddingLeft: 12, maxHeight: 80, overflowY: 'auto' }}>
                   <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#e2e8f0', margin: 0, lineHeight: 1.6 }}>{challenge.objective}</p>
                 </div>
               </div>
 
-              {/* MY CODE EDITOR */}
+              {/* Editor */}
               <div style={{
                 flex: 1, display: 'flex', flexDirection: 'column',
-                background: '#0b0e17', border: `1px solid ${readingPhase ? 'rgba(255,255,255,0.08)' : ac + '22'}`,
-                borderRadius: 10, minHeight: 0, overflow: 'hidden',
-                opacity: readingPhase ? 0.5 : 1, transition: 'opacity 0.3s, border-color 0.3s',
+                background: '#0b0e17', border: `1px solid ${readingPhase ? 'rgba(16,185,129,0.4)' : ac + '25'}`,
+                borderRadius: 10, minHeight: 0, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                opacity: readingPhase ? 0.6 : 1, transition: 'all 0.3s',
               }}>
-                {/* Editor header */}
-                <div style={{ background: '#07090e', padding: '7px 14px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ background: '#07090e', padding: '8px 14px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      {['#ff5f56','#ffbd2e','#27c93f'].map(c => <div key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c }} />)}
+                      {['#ff5f56','#ffbd2e','#27c93f'].map(c => <div key={c} style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />)}
                     </div>
-                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#94a3b8', fontWeight: 600 }}>solution.{ext(language)} — {myUsername}</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#94a3b8' }}>solution.{ext(language)}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {readingPhase && <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: '#10b981', padding: '2px 8px', borderRadius: 4, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Lock size={8} /> LOCKED
+                    {readingPhase && <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: '#10b981', padding: '2px 8px', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Lock size={10} /> LOCKED
                     </span>}
-                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, background: `${ac}20`, color: ac, padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>{language}</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#64748b' }}>Ctrl+Enter: Run · Ctrl+Shift+Enter: Submit</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, background: `${ac}20`, color: ac, padding: '2px 8px', borderRadius: 4 }}>{language}</span>
                   </div>
                 </div>
 
-                {/* Textarea */}
                 <textarea
                   value={userCode}
                   onChange={e => handleCodeChange(e.target.value)}
-                  placeholder={readingPhase ? '// Editor locked during reading phase...' : `// Write your ${language} solution here...\n// ${challenge.objective}`}
+                  placeholder={readingPhase ? '// Editor locked during reading phase...' : `// Write your ${language} solution here...
+// ${challenge.objective}`}
                   disabled={readingPhase}
                   spellCheck={false}
                   style={{
                     flex: 1, minHeight: 0, background: '#07090e', color: '#f8fafc',
                     fontFamily: "'JetBrains Mono','Fira Code',monospace", fontSize: 15, fontWeight: 700,
-                    lineHeight: 1.8, padding: '14px', border: 'none', resize: 'none', outline: 'none',
-                    caretColor: ac, cursor: readingPhase ? 'not-allowed' : 'text',
-                    tabSize: 2,
+                    lineHeight: 1.8, padding: '16px', border: 'none', resize: 'none', outline: 'none',
+                    caretColor: ac, cursor: readingPhase ? 'not-allowed' : 'text', tabSize: 2,
                   }}
                 />
 
-                {/* Progress bar under editor */}
-                <div style={{ height: 3, background: 'rgba(255,255,255,0.04)', flexShrink: 0 }}>
-                  <div style={{ height: '100%', width: `${progress}%`, background: allPassed ? '#10b981' : ac, transition: 'width 0.5s', boxShadow: `0 0 6px ${allPassed ? '#10b981' : ac}` }} />
+                {/* Action bar */}
+                <div style={{
+                  flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
+                  borderTop: '1px solid rgba(255,255,255,0.06)', background: '#07090e',
+                }}>
+                  <button
+                    onClick={handleCompile} disabled={compiling || readingPhase || roundEndedRef.current}
+                    style={{
+                      padding: '12px 0', border: 'none', borderRight: '1px solid rgba(255,255,255,0.06)',
+                      background: readingPhase ? 'rgba(255,255,255,0.04)' : compiling ? 'rgba(16,185,129,0.18)' : '#10b981',
+                      color: readingPhase ? 'rgba(255,255,255,0.6)' : 'white', cursor: compiling || readingPhase ? 'not-allowed' : 'pointer',
+                      fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 15, letterSpacing: 2, textTransform: 'uppercase',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => { if(!compiling && !readingPhase) e.currentTarget.style.background='#059669'; }}
+                    onMouseLeave={e => { if(!compiling && !readingPhase) e.currentTarget.style.background='#10b981'; }}
+                  >
+                    {compiling
+                      ? <><div style={{ width: 11, height: 11, border: '2px solid rgba(255,255,255,0.55)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> RUNNING...</>
+                      : <><Play size={12} fill="white" /> RUN CODE</>}
+                  </button>
+
+                  <button
+                    onClick={handleSubmit} disabled={!allPassed || compiling || readingPhase || roundEndedRef.current}
+                    style={{
+                      padding: '12px 0', border: 'none',
+                      background: allPassed && !readingPhase ? `linear-gradient(135deg, ${ac}, ${theme.ui})` : 'rgba(255,255,255,0.04)',
+                      color: allPassed && !readingPhase ? 'white' : 'rgba(255,255,255,0.6)', cursor: allPassed && !readingPhase ? 'pointer' : 'not-allowed',
+                      fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 15, letterSpacing: 2, textTransform: 'uppercase',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, transition: 'all 0.3s',
+                      boxShadow: allPassed && !readingPhase ? `0 0 20px 80` : 'none',
+                    }}
+                  >
+                    <Trophy size={12} /> SUBMIT
+                  </button>
                 </div>
               </div>
-
-              {/* Controls row */}
-              <div style={{ flexShrink: 0, display: 'flex', gap: 6, alignItems: 'center' }}>
-                {/* Test result pills */}
-                <div style={{ display: 'flex', gap: 4, flex: 1 }}>
-                  {(challenge.testCases || []).map((_, i) => (
-                    <div key={i} style={{
-                      height: 28, flex: 1, borderRadius: 6,
-                      background: testResults[i] === true ? 'rgba(16,185,129,0.2)' : testResults[i] === false ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${testResults[i] === true ? '#10b98140' : testResults[i] === false ? '#ef444430' : 'rgba(255,255,255,0.08)'}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: 'monospace', fontSize: 16, fontWeight: 700,
-                      color: testResults[i] === true ? '#10b981' : testResults[i] === false ? '#ef4444' : 'rgba(255,255,255,0.6)',
-                      transition: 'all 0.3s',
-                    }}>
-                      {testResults[i] === true ? '✓' : testResults[i] === false ? '✗' : `T${i + 1}`}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Compile */}
-                <button onClick={handleCompile} disabled={compiling || readingPhase} style={{
-                  padding: '0 16px', height: 28, borderRadius: 6,
-                  border: `1px solid 70`,
-                  background: compiling ? 'rgba(255,255,255,0.08)' : `${ac}18`,
-                  color: compiling ? 'rgba(255,255,255,0.6)' : ac,
-                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, letterSpacing: 2,
-                  cursor: compiling ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
-                  display: 'flex', alignItems: 'center', gap: 5,
-                }}>
-                  {compiling ? <><div style={{ width: 10, height: 10, border: `2px solid 80`, borderTopColor: ac, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> RUN</> : <><Play size={10} fill={ac} /> RUN</>}
-                </button>
-
-                {/* Submit */}
-                <button onClick={handleSubmit} disabled={!allPassed} style={{
-                  padding: '0 16px', height: 28, borderRadius: 6, border: 'none',
-                  background: allPassed ? `linear-gradient(135deg, ${ac}, ${theme.ui})` : 'rgba(255,255,255,0.06)',
-                  color: allPassed ? '#001a20' : 'rgba(255,255,255,0.6)',
-                  fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, letterSpacing: 2,
-                  cursor: allPassed ? 'pointer' : 'not-allowed', transition: 'all 0.2s',
-                  boxShadow: allPassed ? `0 4px 16px 80` : 'none',
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  animation: allPassed ? 'glowPulse 2s infinite' : 'none',
-                }}>
-                  <Trophy size={11} fill={allPassed ? '#001a20' : 'rgba(255,255,255,0.6)'} /> SUBMIT
-                </button>
-              </div>
-
-              {/* ── OUTPUT PANEL (Test Cases + Expected/Actual output + Logs) ── */}
-              <OutputPanel
-                testResults={testResults}
-                challenge={challenge}
-                outputData={outputData}
-                logs={logs}
-                ac={ac}
-              />
             </div>
 
-            {/* ═══ OPPONENT PANELS ═══ */}
-            {effectiveOpponents.map((opp, idx) => {
-              const oppColor   = PLAYER_COLORS[(idx + 1) % PLAYER_COLORS.length];
-              const isTyping   = opponentTyping[opp.userId] || false;
-              const oppProgress = opponentProgress[opp.userId] ?? opp.progress ?? 0;
-              const isPlaceholder = opp.userId?.startsWith('placeholder-');
+            {/* ═══════════ COLUMN 2: OUTPUTS & CONSOLE ═══════════ */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, overflow: 'hidden' }}>
+              
+              {/* PREVIEW ARENA CARD (tabbed) */}
+              <div style={{
+                flex: 3, display: 'flex', flexDirection: 'column',
+                background: '#0b0e17', border: `1px solid ${ac}25`, borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                minHeight: 0, overflow: 'hidden',
+              }}>
+                {(language === 'HTML' || language === 'CSS') ? (
+                  <>
+                    <div style={{
+                      background: '#07090e', padding: '4px 6px', flexShrink: 0,
+                      borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 4
+                    }}>
+                      <button onClick={() => setPreviewTab('yours')} style={{
+                        border: 'none', outline: 'none', padding: '6px 12px', borderRadius: 6,
+                        background: previewTab === 'yours' ? `${ac}1e` : 'transparent',
+                        color: previewTab === 'yours' ? ac : '#94a3b8',
+                        fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.2s',
+                        borderBottom: previewTab === 'yours' ? `2px solid ${ac}` : '2px solid transparent',
+                      }}>YOUR OUTPUT</button>
+                      <button onClick={() => setPreviewTab('expected')} style={{
+                        border: 'none', outline: 'none', padding: '6px 12px', borderRadius: 6,
+                        background: previewTab === 'expected' ? `${ac}1e` : 'transparent',
+                        color: previewTab === 'expected' ? ac : '#94a3b8',
+                        fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.2s',
+                        borderBottom: previewTab === 'expected' ? `2px solid ${ac}` : '2px solid transparent',
+                      }}>EXPECTED OUTPUT</button>
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: '#07090e', padding: 10 }}>
+                      <div style={{ display: previewTab === 'yours' ? 'block' : 'none', width: '100%', height: '100%' }}>
+                        {compiledOutput ? (
+                          <iframe ref={iframeRef} title="your-output" sandbox="allow-same-origin allow-scripts"
+                            style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
+                        ) : (
+                          <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>Compile code to view live output.</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: previewTab === 'expected' ? 'block' : 'none', width: '100%', height: '100%' }}>
+                        {challenge?.expectedOutput ? (
+                          <iframe ref={expectedIframeRef} title="expected-output" sandbox="allow-same-origin allow-scripts"
+                            style={{ width: '100%', height: '100%', border: 'none', background: 'white', borderRadius: 6 }} />
+                        ) : (
+                          <div style={{ height: '100%', background: '#0a0d14', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>No expected output available.</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{
+                      background: '#07090e', padding: '4px 6px', flexShrink: 0,
+                      borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 4
+                    }}>
+                      <button onClick={() => setPreviewTab('tests')} style={{
+                        border: 'none', outline: 'none', padding: '6px 12px', borderRadius: 6,
+                        background: previewTab === 'tests' || previewTab === 'yours' || previewTab === 'expected' ? `${ac}1e` : 'transparent',
+                        color: previewTab === 'tests' || previewTab === 'yours' || previewTab === 'expected' ? ac : '#94a3b8',
+                        fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.2s',
+                        borderBottom: previewTab === 'tests' || previewTab === 'yours' || previewTab === 'expected' ? `2px solid ${ac}` : '2px solid transparent',
+                      }}>TEST RESULTS</button>
+                      <button onClick={() => setPreviewTab('stdout')} style={{
+                        border: 'none', outline: 'none', padding: '6px 12px', borderRadius: 6,
+                        background: previewTab === 'stdout' ? `${ac}1e` : 'transparent',
+                        color: previewTab === 'stdout' ? ac : '#94a3b8',
+                        fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.2s',
+                        borderBottom: previewTab === 'stdout' ? `2px solid ${ac}` : '2px solid transparent',
+                      }}>STDOUT</button>
+                    </div>
 
-              return (
-                <div key={opp.userId} style={{
-                  display: 'flex', flexDirection: 'column', gap: 0,
-                  background: '#0b0e17',
-                  border: `1px solid ${oppColor}20`,
-                  borderRadius: 10, overflow: 'hidden',
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: '#07090e', padding: 10, overflowY: 'auto' }}>
+                      {(previewTab === 'tests' || previewTab === 'yours' || previewTab === 'expected') && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {!outputData || outputData.length === 0 || !outputData.some(od => od !== null) ? (
+                            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '24px 0' }}>
+                              // Run your code to see test results
+                            </div>
+                          ) : (
+                            (challenge.testCases || []).map((tc, i) => {
+                              const passed = testResults[i];
+                              const od = outputData?.[i];
+                              if (!od) return null;
+                              return (
+                                <div key={i} style={{
+                                  borderRadius: 8,
+                                  border: `1px solid ${passed === true ? '#10b98130' : passed === false ? '#ef444430' : 'rgba(255,255,255,0.08)'}`,
+                                  background: passed === true ? 'rgba(16,185,129,0.04)' : passed === false ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.02)',
+                                  overflow: 'hidden',
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                    <div style={{
+                                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                                      background: passed === true ? '#10b98120' : passed === false ? '#ef444420' : 'rgba(255,255,255,0.06)',
+                                      border: `1.5px solid ${passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)'}`,
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                      fontFamily: 'monospace', fontSize: 16, fontWeight: 900,
+                                      color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)',
+                                    }}>
+                                      {passed === true ? '✓' : passed === false ? '✗' : i + 1}
+                                    </div>
+                                    <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 16, color: passed === true ? '#10b981' : passed === false ? '#ef4444' : 'rgba(255,255,255,0.6)' }}>
+                                      Test Case {i + 1} {tc.description ? `— ${tc.description}` : ''}
+                                    </span>
+                                  </div>
+                                  <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    {tc.input !== undefined && (
+                                      <div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 2 }}>Input</div>
+                                        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '6px 10px', borderRadius: 4, wordBreak: 'break-all' }}>{JSON.stringify(tc.input)}</div>
+                                      </div>
+                                    )}
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                      <div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 2 }}>Expected</div>
+                                        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.06)', padding: '6px 10px', borderRadius: 4, wordBreak: 'break-all' }}>
+                                          {tc.expectedOutput !== undefined ? JSON.stringify(tc.expectedOutput) : tc.expected !== undefined ? JSON.stringify(tc.expected) : '—'}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 2 }}>Your Output</div>
+                                        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: passed ? '#10b981' : '#ef4444', background: passed ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', padding: '6px 10px', borderRadius: 4, wordBreak: 'break-all' }}>
+                                          {od.actualOutput !== undefined ? JSON.stringify(od.actualOutput) : '—'}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {od.error && (
+                                      <div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#ef4444', textTransform: 'uppercase', marginBottom: 2 }}>Error</div>
+                                        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.06)', padding: '6px 10px', borderRadius: 4, wordBreak: 'break-all' }}>{od.error}</div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      )}
+
+                      {previewTab === 'stdout' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {!outputData || !outputData.some(od => od && od.stdout) ? (
+                            <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textAlign: 'center', padding: '24px 0' }}>
+                              // No stdout output from your code
+                            </div>
+                          ) : (
+                            outputData.map((od, i) => (
+                              od?.stdout ? (
+                                <div key={i} style={{ marginBottom: 4 }}>
+                                  <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>► Test {i+1} stdout:</div>
+                                  <pre style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, color: '#e2e8f0', background: 'rgba(0,0,0,0.3)', padding: '8px 12px', borderRadius: 6, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                                    {od.stdout}
+                                  </pre>
+                                </div>
+                              ) : null
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* CONSOLE LOGS CARD */}             <div style={{
+                flex: 2, display: 'flex', flexDirection: 'column',
+                background: '#0b0e17', border: `1px solid ${ac}25`, borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                minHeight: 0, overflow: 'hidden',
+              }}>
+                <div style={{
+                  background: '#07090e', padding: '6px 14px', flexShrink: 0,
+                  borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                  {/* Opponent header */}
-                  <div style={{
-                    padding: '8px 14px', background: '#07090e',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-                  }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: oppColor, boxShadow: `0 0 6px ${oppColor}`, animation: isPlaceholder ? 'binaryPulse 2s infinite' : 'none' }} />
-                    <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, color: oppColor }}>{opp.username}</span>
-                    {isPlaceholder ? (
-                      <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginLeft: 'auto' }}>
-                        ⏳ WAITING TO CONNECT...
-                      </span>
-                    ) : (
-                      <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginLeft: 'auto' }}>
-                        {oppProgress.toFixed(0)}% done
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 2.5 }}>
+                      Execution Console
+                    </span>
+                    {logs.length > 0 && (
+                      <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, padding: '1px 6px', borderRadius: 8, background: `${ac}20`, color: ac }}>{logs.length}</span>
+                    )}
+                  </div>
+                  <button onClick={() => setLogs([])} style={{ color: '#64748b', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 4 }} title="Clear Console">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+                <div style={{
+                  flex: 1, overflowY: 'auto', padding: '12px',
+                  fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 700, background: '#07090e', lineHeight: 1.6,
+                }}>
+                  {logs.length === 0
+                    ? <span style={{ color: 'rgba(255,255,255,0.6)' }}>No system logs yet.</span>
+                    : logs.map((l, i) => (
+                      <div key={i} style={{
+                        marginBottom: 4, display: 'flex', gap: 8, alignItems: 'flex-start',
+                        color: l.type === 'error' ? '#ef4444' : l.type === 'success' ? '#10b981' : l.type === 'warning' ? '#f59e0b' : '#94a3b8'
+                      }}>
+                        <span style={{ color: 'rgba(255,255,255,0.15)', flexShrink: 0, fontSize: 15 }}>{l.ts}</span>
+                        <span>{l.msg}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* ═══════════ COLUMN 3: STATUS & OPPONENTS ═══════════ */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0, overflow: 'hidden' }}>
+              
+              {/* TIMER CARD */}
+              <div style={{
+                flexShrink: 0, padding: '16px',
+                background: '#0b0e17', border: `1px solid ${readingPhase ? 'rgba(16,185,129,0.4)' : ac+'25'}`,
+                borderRadius: 10, boxShadow: `0 4px 20px ${readingPhase ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.4)'}`,
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'border-color 0.3s',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, color: readingPhase ? '#10b981' : '#94a3b8', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 2 }}>
+                      {readingPhase ? '📖 READING TIME' : '⏱ TIME REMAINING'}
+                    </div>
+                    <div style={{
+                      fontFamily: "'JetBrains Mono',monospace", fontWeight: 900, fontSize: 36,
+                      color: readingPhase ? '#10b981' : timerColor, lineHeight: 1, letterSpacing: 0.5,
+                      textShadow: `0 0 20px ${readingPhase ? '#10b981' : timerColor}55`, fontVariantNumeric: 'tabular-nums', transition: 'color 0.3s',
+                    }}>
+                      {readingPhase ? `00:${String(readingCountdown).padStart(2,'0')}.00` : fmtMs(playerMs)}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden', marginBottom: 6 }}>
+                    <div style={{
+                      height: '100%', borderRadius: 2,
+                      width: readingPhase ? `${(readingCountdown/15)*100}%` : `${timerPct}%`,
+                      background: readingPhase ? '#10b981' : timerColor,
+                      boxShadow: `0 0 8px ${readingPhase ? '#10b981' : timerColor}80`, transition: 'width 0.1s linear,background 0.3s',
+                    }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+                      {readingPhase ? '🔒 Editor locked' : `${Math.round(progress)}% complete`}
+                    </span>
+                    {allPassed && !readingPhase && (
+                      <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 16, color: '#10b981', animation: 'pulse 1s infinite', letterSpacing: 0.5 }}>
+                        ✅ READY
                       </span>
                     )}
                   </div>
+                </div>
+              </div>
 
-                  {/* Binary Matrix — always shown */}
-                  <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-                    <BinaryPanel
-                      username={opp.username}
-                      progress={oppProgress}
-                      isTyping={isTyping}
-                      color={oppColor}
-                    />
+              {/* TEST CASES COMPACT CARD */}
+              <div style={{
+                flexShrink: 0, padding: '12px 16px',
+                background: '#0b0e17', border: `1px solid ${ac}25`, borderRadius: 10,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.4)', maxHeight: 160, overflowY: 'auto',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 2.5, height: 12, borderRadius: 2, background: '#10b981' }} />
+                    <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, textTransform: 'uppercase', letterSpacing: 2, color: 'white' }}>TESTS</span>
                   </div>
-
-                  {/* Opponent progress footer */}
-                  <div style={{ padding: '8px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0, background: '#080a12' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                      <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>PROGRESS</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {opp.finished
-                          ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#10b981' }}>✅ SUBMITTED</span>
-                          : isTyping
-                            ? <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: oppColor }}>⌨️ TYPING...</span>
-                            : null
-                        }
-                        <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 16, fontWeight: 700, color: oppColor }}>{oppProgress.toFixed(0)}%</span>
-                      </div>
-                    </div>
-                    <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${oppProgress}%`, background: oppColor, borderRadius: 2, transition: 'width 0.5s', boxShadow: `0 0 6px ${oppColor}` }} />
-                    </div>
+                  <div style={{
+                    padding: '2px 8px', borderRadius: 20,
+                    background: testResults.every(Boolean) ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${testResults.every(Boolean) ? 'rgba(16,185,129,0.35)' : 'rgba(255,255,255,0.07)'}`,
+                    fontFamily: 'monospace', fontSize: 15, fontWeight: 700,
+                    color: testResults.every(Boolean) ? '#10b981' : 'rgba(255,255,255,0.65)', transition: 'all 0.3s',
+                  }}>
+                    {testResults.filter(Boolean).length} / {testResults.length} PASS
                   </div>
                 </div>
-              );
-            })}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {(challenge.testCases || []).map((tc, i) => (
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'center', gap: 8, padding: '4px 8px', borderRadius: 6,
+                      background: testResults[i] ? 'rgba(16,185,129,0.07)' : 'rgba(255,255,255,0.015)',
+                      border: `1px solid ${testResults[i] ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.05)'}`,
+                      transition: 'all 0.3s',
+                    }}>
+                      <div style={{
+                        width: 14, height: 14, borderRadius: '50%', flexShrink: 0,
+                        background: testResults[i] ? '#10b981' : 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 900, color: testResults[i] ? 'white' : 'rgba(255,255,255,0.6)',
+                        boxShadow: testResults[i] ? '0 0 6px rgba(16,185,129,0.4)' : 'none',
+                      }}>
+                        {testResults[i] ? '✓' : i + 1}
+                      </div>
+                      <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: testResults[i] ? '#6ee7b7' : '#94a3b8', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {tc.description || `Test ${i + 1}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COMPACT OPPONENTS CARD */}
+              <div style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                background: '#0b0e17', border: `1px solid ${ac}25`, borderRadius: 10,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.4)', minHeight: 0, overflow: 'hidden',
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#07090e', flexShrink: 0,
+                }}>
+                  <div style={{ width: 2.5, height: 12, borderRadius: 2, background: '#f97316' }} />
+                  <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 15, color: '#f97316', textTransform: 'uppercase', letterSpacing: 2 }}>OPPONENTS</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginLeft: 'auto' }}>
+                    {effectiveOpponents.length} player{effectiveOpponents.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
+
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: '12px 14px 4px', gap: 10 }}>
+                  {effectiveOpponents.map((opp, idx) => {
+                    const oppColor   = PLAYER_COLORS[(idx + 1) % PLAYER_COLORS.length];
+                    const isTyping   = opponentTyping[opp.userId] || false;
+                    const oppProgress = opponentProgress[opp.userId] ?? opp.progress ?? 0;
+                    const isPlaceholder = opp.userId?.startsWith('placeholder-');
+
+                    return (
+                      <div key={opp.userId} style={{
+                        padding: '12px', background: opp.finished ? `${oppColor}10` : 'rgba(255,255,255,0.02)',
+                        border: `1px solid ${opp.finished ? oppColor+'60' : 'rgba(255,255,255,0.09)'}`,
+                        borderRadius: 10, boxShadow: opp.finished ? `0 4px 15px ${oppColor}15` : 'none',
+                        transition: 'all 0.3s', display: 'flex', flexDirection: 'column', gap: 8,
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: oppColor, boxShadow: `0 0 8px ${oppColor}`, animation: isPlaceholder ? 'pulse 2s infinite' : 'none' }} />
+                            <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, color: oppColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>{opp.username}</span>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            {opp.finished ? (
+                              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: '#10b981' }}>✅ DONE</span>
+                            ) : isPlaceholder ? (
+                              <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>⏳ WAITING</span>
+                            ) : (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                {isTyping && <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: oppColor }}>⌨️</span>}
+                                <span style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 18, color: oppColor }}>{oppProgress.toFixed(0)}%</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', borderRadius: 2, width: `${oppProgress}%`, background: oppColor, boxShadow: `0 0 6px ${oppColor}50`, transition: 'width 0.5s' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
           </>
         )}
       </div>
@@ -1074,10 +1134,10 @@ export default function CustomModeGamePage() {
             <h2 style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 26, color: '#ef4444', letterSpacing: 3, margin: '0 0 12px' }}>ABANDON BATTLE?</h2>
             <p style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.8)', marginBottom: 28, lineHeight: 1.6 }}>You will forfeit this battle. Your opponent will be declared the winner.</p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={() => setExitModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: `1px solid 80`, background: `${ac}10`, color: ac, fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, cursor: 'pointer', letterSpacing: 2 }}>
+              <button onClick={() => setExitModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: `1px solid 80`, background: `${ac}10`, color: ac, fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', letterSpacing: 2 }}>
                 KEEP FIGHTING
               </button>
-              <button onClick={() => navigate('/custom-mode')} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1px solid #ef444430', background: '#ef444420', color: '#ef4444', fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, cursor: 'pointer', letterSpacing: 2 }}>
+              <button onClick={() => navigate('/custom-mode')} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1px solid #ef444430', background: '#ef444420', color: '#ef4444', fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', letterSpacing: 2 }}>
                 ABANDON
               </button>
             </div>
@@ -1106,7 +1166,7 @@ export default function CustomModeGamePage() {
                   padding: '10px 20px', borderRadius: 12,
                   background: 'rgba(255,255,255,0.04)', border: `1px solid ${PLAYER_COLORS[i]}30`,
                 }}>
-                  <div style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, fontWeight: 700, color: PLAYER_COLORS[i], marginBottom: 4 }}>{p.username}</div>
+                  <div style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 800, fontSize: 16, color: PLAYER_COLORS[i], marginBottom: 4 }}>{p.username}</div>
                   <div style={{ fontFamily: 'Rajdhani,sans-serif', fontWeight: 900, fontSize: 28, color: 'white' }}>{scores[p.userId] || 0}</div>
                   <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>POINTS</div>
                 </div>
@@ -1118,7 +1178,7 @@ export default function CustomModeGamePage() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes binaryPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
         @keyframes glowPulse { 0%,100%{box-shadow:0 4px 16px 80} 50%{box-shadow:0 4px 24px ${ac}70} }
         @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
         * { box-sizing: border-box; }

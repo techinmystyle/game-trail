@@ -55,8 +55,9 @@ const LobbyPage = () => {
     purple: { accent: '#a855f7', ui: '#d8b4fe' },
   };
 
-  const currentTheme = themes[themeKey];
-  const pageBg = THEMES[themeKey].bg;
+  const currentTheme = themes[themeKey] || themes.purple;
+  const safeTheme = THEMES[themeKey] || THEMES.purple;
+  const pageBg = safeTheme.bg;
   const ac = currentTheme.accent;
 
   // State

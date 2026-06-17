@@ -300,7 +300,7 @@ const CustomModePage = () => {
     return () => clearInterval(iv);
   }, []);
 
-  const currentTheme = THEMES[themeKey];
+  const currentTheme = THEMES[themeKey] || THEMES.purple;
 
   return (
     <div style={{ minHeight: '100vh', background: currentTheme.bg, color: 'white', position: 'relative', overflow: 'hidden', transition: 'background-color 0.5s ease' }}>

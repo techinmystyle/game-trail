@@ -4,9 +4,9 @@ import { Navbar } from '../components/Navbar';
 import { CustomCursor } from '../components/landing/CustomCursor';
 import { Trophy, Zap, RotateCcw, Home, Clock, Target, Code } from 'lucide-react';
 
-const CM_ACCENT = '#00e5ff';
-const CM_UI     = '#80ffff';
-const CM_BG     = '#010d12';
+
+
+
 
 const PLAYER_COLORS = ['#00e5ff', '#ff6b35', '#a855f7', '#10b981'];
 
@@ -25,7 +25,7 @@ const Confetti = ({ active }) => {
       y: Math.random() * -canvas.height,
       r: Math.random() * 8 + 3,
       d: Math.random() * 120 + 80,
-      color: [CM_ACCENT, '#ff6b35', '#a855f7', '#10b981', '#f59e0b'][Math.floor(Math.random() * 5)],
+      color: [ac, '#ff6b35', '#a855f7', '#10b981', '#f59e0b'][Math.floor(Math.random() * 5)],
       vx: Math.random() * 2 - 1,
       vy: Math.random() * 2 + 1,
       opacity: Math.random() * 0.8 + 0.2,
@@ -60,7 +60,7 @@ const Confetti = ({ active }) => {
 const HexBg = () => (
   <div style={{
     position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.04,
-    backgroundImage: `radial-gradient(${CM_ACCENT}80 1px, transparent 1px)`,
+    backgroundImage: `radial-gradient(${ac}80 1px, transparent 1px)`,
     backgroundSize: '30px 30px',
   }} />
 );
@@ -71,14 +71,19 @@ const CustomModeResultsPage = () => {
   const rd = location.state || {};
 
   const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
+  const safeTheme = THEMES[themeKey] || THEMES.purple;
+  const { accent: ac, ui } = safeTheme;
+
   useEffect(() => { localStorage.setItem('themeKey', themeKey); }, [themeKey]);
 
-  const themes = {
-    red: { accent: '#ff5252', ui: '#ff6b6b' },
-    blue: { accent: '#0099ff', ui: '#00ccff' },
-    green: { accent: '#00ff88', ui: '#00ff99' },
-    purple: { accent: '#a855f7', ui: '#d8b4fe' },
-  };
+  
+const THEMES = {
+  purple: { accent: '#a855f7', ui: '#d8b4fe', bg: '#0b0e14' },
+  blue:   { accent: '#3b82f6', ui: '#93c5fd', bg: '#0b1120' },
+  green:  { accent: '#10b981', ui: '#6ee7b7', bg: '#061411' },
+  red:    { accent: '#ef4444', ui: '#fca5a5', bg: '#1a0b0b' },
+};
+
 
   const players   = rd.players || [];
   const scores    = rd.scores || {};
@@ -122,9 +127,9 @@ const CustomModeResultsPage = () => {
     : { icon: '💀', title: 'YOU LOSE', subtitle: `${winnerPlayer?.username || 'Your opponent'} was faster. Train harder.`, color: '#ef4444' };
 
   return (
-    <div style={{ minHeight: '100vh', background: CM_BG, color: 'white', position: 'relative', overflow: 'hidden' }}>
-      <CustomCursor theme={{ accent: CM_ACCENT, ui: CM_UI }} />
-      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: CM_ACCENT, ui: CM_UI }} />
+    <div style={{ minHeight: '100vh', background: ('#010d12'), color: 'white', position: 'relative', overflow: 'hidden' }}>
+      <CustomCursor theme={{ accent: ac, ui: ui }} />
+      <Navbar currentPage="custom-mode" themeKey={themeKey} setThemeKey={setThemeKey} themes={themes} currentTheme={{ accent: ac, ui: ui }} />
       <HexBg />
       <Confetti active={showConfetti} />
 
@@ -148,11 +153,11 @@ const CustomModeResultsPage = () => {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
             padding: '6px 20px', borderRadius: 20,
-            background: `${CM_ACCENT}10`, border: `1px solid ${CM_ACCENT}30`,
-            fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: CM_ACCENT,
+            background: `${ac}10`, border: `1px solid ${ac}30`,
+            fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: ac,
             textTransform: 'uppercase', letterSpacing: 4, marginBottom: 24,
           }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: CM_ACCENT, animation: 'pulse 2s infinite' }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: ac, animation: 'pulse 2s infinite' }} />
             CUSTOM MODE — HUMAN VS HUMAN · BATTLE COMPLETE
           </div>
 
@@ -179,7 +184,7 @@ const CustomModeResultsPage = () => {
           <div style={{
             display: 'flex', justifyContent: 'center', gap: 32, marginTop: 32,
             padding: '16px 32px',
-            background: 'rgba(0,229,255,0.03)', border: `1px solid ${CM_ACCENT}15`,
+            background: 'rgba(0,229,255,0.03)', border: `1px solid ${ac}15`,
             borderRadius: 14, width: 'fit-content', margin: '32px auto 0',
           }}>
             {[
@@ -189,7 +194,7 @@ const CustomModeResultsPage = () => {
               { icon: Trophy, label: `${totalRounds} rounds`, sublabel: 'Rounds' },
             ].map(({ icon: Icon, label, sublabel }) => (
               <div key={sublabel} style={{ textAlign: 'center' }}>
-                <Icon size={18} style={{ color: CM_ACCENT, marginBottom: 6 }} />
+                <Icon size={18} style={{ color: ac, marginBottom: 6 }} />
                 <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: 'white' }}>{label}</div>
                 <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 }}>{sublabel}</div>
               </div>
@@ -205,7 +210,7 @@ const CustomModeResultsPage = () => {
           transform: animated ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1)',
         }}>
-          <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: CM_ACCENT, marginBottom: 20, letterSpacing: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 16, color: ac, marginBottom: 20, letterSpacing: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Trophy size={18} /> FINAL STANDINGS
           </div>
 
@@ -220,8 +225,8 @@ const CustomModeResultsPage = () => {
                 <div key={player.userId} style={{
                   display: 'flex', alignItems: 'center', gap: 16,
                   padding: '16px 20px', borderRadius: 14,
-                  background: isMe ? `${CM_ACCENT}08` : 'rgba(255,255,255,0.02)',
-                  border: `1.5px solid ${isWinner ? playerColor + '50' : isMe ? CM_ACCENT + '25' : 'rgba(255,255,255,0.06)'}`,
+                  background: isMe ? `${ac}08` : 'rgba(255,255,255,0.02)',
+                  border: `1.5px solid ${isWinner ? playerColor + '50' : isMe ? ac + '25' : 'rgba(255,255,255,0.06)'}`,
                   boxShadow: isWinner ? `0 0 24px ${playerColor}15` : 'none',
                 }}>
                   {/* Rank */}
@@ -239,7 +244,7 @@ const CustomModeResultsPage = () => {
                   {/* Player info */}
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 18, color: isMe ? CM_ACCENT : 'white' }}>
+                      <span style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 800, fontSize: 18, color: isMe ? ac : 'white' }}>
                         {player.username} {isMe && '(YOU)'}
                       </span>
                       {isWinner && <span style={{ fontSize: 18 }}>👑</span>}
@@ -273,10 +278,10 @@ const CustomModeResultsPage = () => {
           <button onClick={() => navigate('/custom-mode')} style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '14px 32px', borderRadius: 12, border: 'none',
-            background: `linear-gradient(135deg, ${CM_ACCENT}, ${CM_UI})`,
+            background: `linear-gradient(135deg, ${ac}, ${ui})`,
             color: '#001a20', fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
             fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
-            cursor: 'pointer', boxShadow: `0 8px 32px ${CM_ACCENT}40`,
+            cursor: 'pointer', boxShadow: `0 8px 32px ${ac}40`,
             transition: 'all 0.3s',
           }}
           onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
@@ -287,14 +292,14 @@ const CustomModeResultsPage = () => {
 
           <button onClick={() => navigate('/dashboard')} style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '14px 32px', borderRadius: 12, border: `1.5px solid ${CM_ACCENT}30`,
-            background: `${CM_ACCENT}08`, color: CM_ACCENT,
+            padding: '14px 32px', borderRadius: 12, border: `1.5px solid ${ac}30`,
+            background: `${ac}08`, color: ac,
             fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
             fontSize: 15, letterSpacing: 3, textTransform: 'uppercase',
             cursor: 'pointer', transition: 'all 0.3s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = `${CM_ACCENT}18`; e.currentTarget.style.transform = 'translateY(-3px)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = `${CM_ACCENT}08`; e.currentTarget.style.transform = 'translateY(0)'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${ac}18`; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = `${ac}08`; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
             <Home size={16} /> DASHBOARD
           </button>

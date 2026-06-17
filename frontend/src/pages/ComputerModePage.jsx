@@ -213,9 +213,10 @@ const ComputerModePage = () => {
     return () => clearInterval(iv);
   }, []);
 
-  const ac = THEMES[themeKey].accent;
-  const ui = THEMES[themeKey].ui;
-  const pageBg = THEMES[themeKey].bg;
+  const safeTheme = THEMES[themeKey] || THEMES.purple || THEMES['purple'] || { accent: "#a855f7", ui: "#d8b4fe", bg: "#06020d" };
+  const ac = safeTheme.accent;
+  const ui = safeTheme.ui;
+  const pageBg = safeTheme.bg;
 
   const themes = {
     red: { accent: '#ff5252', ui: '#ff6b6b' },
