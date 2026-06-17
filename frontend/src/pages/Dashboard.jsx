@@ -269,6 +269,29 @@ const Dashboard = () => {
                       >
                         SPECIALS
                       </button>
+                      <button
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          setIsGameModeOpen(false);
+                          navigate('/custom-mode'); 
+                        }}
+                        className="w-full text-left px-4 py-2.5 font-techno text-[14px] font-semibold tracking-wider text-white/90 transition-all duration-200 hover:text-white cursor-pointer bg-transparent border-none"
+                        style={{ 
+                          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = `rgba(0,229,255,0.12)`;
+                          e.currentTarget.style.borderLeft = `3px solid #00e5ff`;
+                          e.currentTarget.style.paddingLeft = '13px';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.borderLeft = 'none';
+                          e.currentTarget.style.paddingLeft = '16px';
+                        }}
+                      >
+                        ⚔️ CUSTOM MODE
+                      </button>
                     </div>
                   )}
                 </div>

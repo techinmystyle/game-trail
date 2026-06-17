@@ -24,6 +24,12 @@ const JoinRoomPage = lazy(() => import('./pages/JoinRoomPage'));
 const ComputerModeGamePage = lazy(() => import('./pages/ComputerModeGamePage'));
 const ComputerModeResultsPage = lazy(() => import('./pages/ComputerModeResultsPage'));
 const ResetPassword = lazy(() => import('./components/auth/ResetPassword'));
+const CustomModePage = lazy(() => import('./pages/CustomModePage'));
+const CustomModeRoomCreationPage = lazy(() => import('./pages/CustomModeRoomCreationPage'));
+const CustomModeJoinPage = lazy(() => import('./pages/CustomModeJoinPage'));
+const CustomModeLobbyPage = lazy(() => import('./pages/CustomModeLobbyPage'));
+const CustomModeGamePage = lazy(() => import('./pages/CustomModeGamePage'));
+const CustomModeResultsPage = lazy(() => import('./pages/CustomModeResultsPage'));
 
 // Lightweight loading spinner shown during lazy-load
 const PageLoader = () => (
@@ -75,6 +81,14 @@ function App() {
           <Route path="/computer-mode/lobby" element={<ProtectedRoute><LobbyPage /></ProtectedRoute>} />
           <Route path="/computer-mode/game" element={<ProtectedRoute><ComputerModeGamePage /></ProtectedRoute>} />
           <Route path="/computer-mode/results" element={<ProtectedRoute><ComputerModeResultsPage /></ProtectedRoute>} />
+
+          {/* Custom Mode Routes */}
+          <Route path="/custom-mode" element={<ProtectedRoute><CustomModePage /></ProtectedRoute>} />
+          <Route path="/custom-mode/create-room" element={<ProtectedRoute><CustomModeRoomCreationPage /></ProtectedRoute>} />
+          <Route path="/custom-mode/join-room" element={<ProtectedRoute><CustomModeJoinPage /></ProtectedRoute>} />
+          <Route path="/custom-mode/lobby" element={<ProtectedRoute><CustomModeLobbyPage /></ProtectedRoute>} />
+          <Route path="/custom-mode/game" element={<ProtectedRoute><CustomModeGamePage /></ProtectedRoute>} />
+          <Route path="/custom-mode/results" element={<ProtectedRoute><CustomModeResultsPage /></ProtectedRoute>} />
 
           {/* Dynamic Course Routes */}
           <Route path="/levels/:courseId/:phaseId" element={<ProtectedRoute><GenericPhaseLevelsPage /></ProtectedRoute>} />

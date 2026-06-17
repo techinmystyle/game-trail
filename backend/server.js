@@ -799,6 +799,336 @@ io.on('connection', (socket) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CUSTOM MODE — HUMAN VS HUMAN SOCKET EVENTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const customRooms = new Map();
+const customSessions = new Map();
+
+// Clean up old custom rooms every 5 mins
+setInterval(() => {
+  const now = Date.now();
+  const TIMEOUT = 30 * 60 * 1000;
+  customRooms.forEach((room, roomId) => {
+    if (now - room.createdAt > TIMEOUT && room.status === 'waiting') {
+      customRooms.delete(roomId);
+      console.log(`🗑️ [Custom] Cleaned up inactive room: ${roomId}`);
+    }
+  });
+}, 5 * 60 * 1000);
+
+io.on('custom-connection-check', () => {}); // noop
+
+// We add custom handlers inside the existing io.on('connection') via a second handler
+// by attaching them directly on the socket when connected.
+// Since we're already inside io.on('connection'), we use a flag to separate.
+// Actually we attach them in a separate function called from io.on('connection').
+// But since that block is already closed, we handle via a new socket event namespace pattern below.
+
+// Re-open connection handler for custom mode events
+io.on('connection', (socket) => {
+
+  // ─── CUSTOM CREATE ROOM ───
+  socket.on('custom-create-room', ({ roomId, roomData, userId, username }) => {
+    console.log(`[Custom] 🏠 ${username} creating custom room: ${roomId}`);
+    const existing = customRooms.get(roomId);
+    if (existing) {
+      const ep = existing.players.find(p => p.userId === userId);
+      if (ep) {
+        ep.socketId = socket.id;
+        socket.join(roomId);
+        socket.emit('custom-room-created', { success: true, roomId, room: existing });
+        return;
+      }
+      customRooms.delete(roomId);
+    }
+    customRooms.set(roomId, {
+      id: roomId,
+      host: socket.id,
+      hostUserId: userId,
+      hostUsername: username,
+      settings: roomData,
+      players: [{ socketId: socket.id, userId, username, ready: false, isHost: true, isSpectator: false }],
+      spectators: [],
+      status: 'waiting',
+      createdAt: Date.now(),
+      mode: 'custom',
+    });
+    socket.join(roomId);
+    socket.emit('custom-room-created', { success: true, roomId, room: customRooms.get(roomId) });
+    console.log(`[Custom] ✅ Room ${roomId} created by ${username}`);
+  });
+
+  // ─── CUSTOM JOIN ROOM ───
+  socket.on('custom-join-room', ({ roomId, password, userId, username }) => {
+    console.log(`[Custom] 🚪 ${username} joining room: ${roomId}`);
+    const room = customRooms.get(roomId);
+    if (!room) { socket.emit('custom-join-error', { message: 'Room not found' }); return; }
+    if (room.settings.password && room.settings.password !== password) {
+      socket.emit('custom-join-error', { message: 'Incorrect password' }); return;
+    }
+    const activePlayers = room.players.filter(p => !p.isSpectator);
+    const ep = room.players.find(p => p.userId === userId);
+    if (ep) {
+      ep.socketId = socket.id;
+      socket.join(roomId);
+      socket.emit('custom-room-joined', { success: true, roomId, room });
+      io.to(roomId).emit('custom-player-status-changed', { userId, ready: ep.ready, room });
+      return;
+    }
+    if (activePlayers.length >= room.settings.playerMode) {
+      socket.emit('custom-join-error', { message: 'Room is full' }); return;
+    }
+    room.players.push({ socketId: socket.id, userId, username, ready: false, isHost: false, isSpectator: false });
+    socket.join(roomId);
+    io.to(roomId).emit('custom-player-joined', {
+      player: { userId, username, ready: false },
+      room, totalPlayers: room.players.length,
+    });
+    socket.emit('custom-room-joined', { success: true, roomId, room });
+    console.log(`[Custom] ✅ ${username} joined room ${roomId}`);
+  });
+
+  // ─── CUSTOM PLAYER READY ───
+  socket.on('custom-player-ready', ({ roomId, userId, ready }) => {
+    const room = customRooms.get(roomId);
+    if (!room) return;
+    const player = room.players.find(p => p.userId === userId);
+    if (player) {
+      player.ready = ready;
+      io.to(roomId).emit('custom-player-status-changed', { userId, ready, room });
+    }
+  });
+
+  // ─── CUSTOM SPECTATE TOGGLE ───
+  socket.on('custom-spectate-toggle', ({ roomId, userId, isSpectator }) => {
+    const room = customRooms.get(roomId);
+    if (!room) return;
+    const player = room.players.find(p => p.userId === userId);
+    if (player) {
+      player.isSpectator = isSpectator;
+      io.to(roomId).emit('custom-player-status-changed', { userId, isSpectator, room });
+    }
+  });
+
+  // ─── CUSTOM LOBBY CHAT ───
+  socket.on('custom-send-chat', ({ roomId, message }) => {
+    socket.to(roomId).emit('custom-chat-message', { ...message, isMine: false });
+  });
+
+  // ─── CUSTOM START GAME ───
+  socket.on('custom-start-game', async ({ roomId }) => {
+    const room = customRooms.get(roomId);
+    if (!room) return;
+    const activePlayers = room.players.filter(p => !p.isSpectator);
+    const allReady = activePlayers.every(p => p.ready);
+    if (!allReady) { socket.emit('custom-start-error', { message: 'Not all players are ready' }); return; }
+    if (activePlayers.length < room.settings.playerMode) {
+      socket.emit('custom-start-error', { message: 'Waiting for more players' }); return;
+    }
+    room.status = 'playing';
+    try {
+      const challenge = await generateChallenge(room.settings.language, room.settings.difficulty, room.settings.roomTime);
+      const session = {
+        roomId, status: 'playing',
+        currentRound: 1, totalRounds: room.settings.rounds,
+        language: room.settings.language,
+        difficulty: room.settings.difficulty,
+        roomTime: room.settings.roomTime,
+        timer: room.settings.roomTime * 60,
+        challenge,
+        players: activePlayers.map(p => ({
+          userId: p.userId, username: p.username,
+          progress: 0, testsPassed: 0, finished: false, timeUsed: 0, score: 0,
+        })),
+        spectators: room.players.filter(p => p.isSpectator),
+        scores: {},
+        intervalId: null,
+      };
+      customSessions.set(roomId, session);
+
+      const gameInitPayload = {
+        challenge: session.challenge,
+        currentRound: 1,
+        totalRounds: session.totalRounds,
+        timer: session.timer,
+        players: session.players,
+        language: session.language,
+        difficulty: session.difficulty,
+      };
+
+      io.to(roomId).emit('custom-game-starting', { room, countdown: 3, gameData: gameInitPayload });
+      console.log(`[Custom] 🎮 Game starting in room ${roomId}`);
+
+      // Start game timer after 4s countdown
+      setTimeout(() => {
+        const s = customSessions.get(roomId);
+        if (!s) return;
+        s.intervalId = setInterval(async () => {
+          const ts = customSessions.get(roomId);
+          if (!ts) return;
+          ts.timer -= 1;
+          io.to(roomId).emit('custom-game-state-tick', {
+            timer: ts.timer, players: ts.players,
+            round: ts.currentRound, totalRounds: ts.totalRounds,
+          });
+          if (ts.timer <= 0) {
+            clearInterval(ts.intervalId); ts.intervalId = null;
+            await endCustomRound(roomId);
+          }
+        }, 1000);
+      }, 4000);
+    } catch (err) {
+      console.error('[Custom] Start error:', err);
+      socket.emit('custom-start-error', { message: 'Error generating challenge' });
+    }
+  });
+
+  // ─── CUSTOM JOIN GAME (sync after nav) ───
+  socket.on('custom-join-game', ({ roomId, userId }) => {
+    socket.join(roomId);
+    const sess = customSessions.get(roomId);
+    if (sess) {
+      socket.emit('custom-game-init', {
+        challenge: sess.challenge,
+        currentRound: sess.currentRound,
+        totalRounds: sess.totalRounds,
+        timer: sess.timer,
+        players: sess.players,
+        language: sess.language,
+        difficulty: sess.difficulty,
+      });
+    }
+  });
+
+  // ─── CUSTOM PLAYER PROGRESS ───
+  socket.on('custom-player-progress', ({ roomId, userId, progress, testsPassed }) => {
+    const sess = customSessions.get(roomId);
+    if (!sess) return;
+    const player = sess.players.find(p => p.userId === userId);
+    if (player) { player.progress = progress; player.testsPassed = testsPassed; }
+    io.to(roomId).emit('custom-progress-update', { userId, progress, testsPassed, players: sess.players });
+  });
+
+  // ─── CUSTOM PLAYER TYPING ───
+  socket.on('custom-player-typing', ({ roomId, userId, isTyping }) => {
+    socket.to(roomId).emit('custom-player-typing-update', { userId, isTyping });
+  });
+
+  // ─── CUSTOM PLAYER FINISHED (submitted) ───
+  socket.on('custom-player-finished', ({ roomId, userId }) => {
+    const sess = customSessions.get(roomId);
+    if (!sess) return;
+    const player = sess.players.find(p => p.userId === userId);
+    if (player && !player.finished) {
+      player.finished = true;
+      player.timeUsed = sess.roomTime * 60 - sess.timer;
+      console.log(`[Custom] 🏁 ${player.username} submitted in ${player.timeUsed}s`);
+    }
+    io.to(roomId).emit('custom-player-completed', { userId, username: player?.username, players: sess.players });
+
+    // Check if this is the first finisher → end round immediately
+    const finished = sess.players.filter(p => p.finished);
+    if (finished.length === 1) {
+      // First submitter wins this round — end it after 2s to let others see
+      setTimeout(async () => {
+        const currentSess = customSessions.get(roomId);
+        if (currentSess && currentSess.intervalId) {
+          clearInterval(currentSess.intervalId);
+          currentSess.intervalId = null;
+        }
+        await endCustomRound(roomId);
+      }, 2000);
+    }
+  });
+
+  // ─── CUSTOM LEAVE ROOM ───
+  socket.on('custom-leave-room', ({ roomId, userId }) => {
+    const room = customRooms.get(roomId);
+    if (!room) return;
+    room.players = room.players.filter(p => p.userId !== userId);
+    if (room.players.length === 0) { customRooms.delete(roomId); }
+    else {
+      if (room.host === socket.id && room.players.length > 0) {
+        room.host = room.players[0].socketId;
+        room.players[0].isHost = true;
+      }
+      io.to(roomId).emit('custom-player-left', { userId, room, totalPlayers: room.players.length });
+    }
+    socket.leave(roomId);
+  });
+});
+
+async function endCustomRound(roomId) {
+  const sess = customSessions.get(roomId);
+  if (!sess) return;
+  if (sess.intervalId) { clearInterval(sess.intervalId); sess.intervalId = null; }
+
+  // Find round winner: first finisher, or highest testsPassed if no one finished
+  let roundWinner = null;
+  const finished = sess.players.filter(p => p.finished);
+  if (finished.length > 0) {
+    roundWinner = finished.reduce((min, p) => p.timeUsed < min.timeUsed ? p : min, finished[0]);
+  } else {
+    const maxTests = Math.max(...sess.players.map(p => p.testsPassed || 0));
+    roundWinner = sess.players.find(p => (p.testsPassed || 0) === maxTests) || null;
+  }
+
+  if (roundWinner) {
+    sess.scores = sess.scores || {};
+    sess.scores[roundWinner.userId] = (sess.scores[roundWinner.userId] || 0) + 1;
+    roundWinner.score = (roundWinner.score || 0) + 1;
+  }
+
+  if (sess.currentRound < sess.totalRounds) {
+    io.to(roomId).emit('custom-round-ended', {
+      roundWinner: roundWinner ? { userId: roundWinner.userId, username: roundWinner.username } : null,
+      players: sess.players, scores: sess.scores,
+      currentRound: sess.currentRound, nextRoundIn: 5,
+    });
+
+    setTimeout(async () => {
+      const cs = customSessions.get(roomId);
+      if (!cs) return;
+      try {
+        cs.currentRound += 1;
+        const newChallenge = await generateChallenge(cs.language, cs.difficulty, cs.roomTime);
+        cs.challenge = newChallenge;
+        cs.timer = cs.roomTime * 60;
+        cs.players.forEach(p => { p.progress = 0; p.testsPassed = 0; p.finished = false; p.timeUsed = 0; });
+
+        cs.intervalId = setInterval(async () => {
+          const ts = customSessions.get(roomId);
+          if (!ts) return;
+          ts.timer -= 1;
+          io.to(roomId).emit('custom-game-state-tick', {
+            timer: ts.timer, players: ts.players,
+            round: ts.currentRound, totalRounds: ts.totalRounds,
+          });
+          if (ts.timer <= 0) { clearInterval(ts.intervalId); ts.intervalId = null; await endCustomRound(roomId); }
+        }, 1000);
+
+        io.to(roomId).emit('custom-next-round', { round: cs.currentRound, challenge: newChallenge });
+      } catch (err) { console.error('[Custom] Next round error:', err); }
+    }, 5000);
+  } else {
+    // Game over
+    const scores = sess.scores || {};
+    let winner = 'draw';
+    let maxScore = 0;
+    sess.players.forEach(p => { if ((scores[p.userId] || 0) > maxScore) { maxScore = scores[p.userId] || 0; winner = p.userId; } });
+    const topPlayers = sess.players.filter(p => (scores[p.userId] || 0) === maxScore);
+    if (topPlayers.length > 1) winner = 'draw';
+
+    io.to(roomId).emit('custom-game-over', {
+      winner, players: sess.players, scores,
+    });
+    customSessions.delete(roomId);
+    console.log(`[Custom] 🏆 Game over in room ${roomId}. Winner: ${winner}`);
+  }
+}
+
 // Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
