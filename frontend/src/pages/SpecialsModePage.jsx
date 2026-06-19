@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy, Bug } from "lucide-react";
+import { Trophy, Bug, User, Users, Target, Crown } from "lucide-react";
 import { Navbar } from '../components/Navbar';
 import { Footer } from "../components/landing/Footer";
 import { CustomCursor } from "../components/landing/CustomCursor";
@@ -12,12 +12,12 @@ const PAGE_BG = {
   purple: "linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 50%, #FAF5FF 100%)",
 };
 
-const Carousel = ({ theme }) => {
+const Carousel = ({ theme, navigate }) => {
   const [active, setActive] = useState(0);
   const TOTAL = 5;
 
   useEffect(() => {
-    const id = setInterval(() => setActive((i) => (i + 1) % TOTAL), 3000);
+    const id = setInterval(() => setActive((i) => (i + 1) % TOTAL), 4000);
     return () => clearInterval(id);
   }, []);
 
@@ -41,16 +41,249 @@ const Carousel = ({ theme }) => {
           {Array.from({ length: TOTAL }).map((_, i) => (
             <div
               key={i}
-              className="min-w-full h-full flex items-center justify-center"
+              className="min-w-full h-full flex items-center justify-center relative"
             >
-              <div
-                className="rounded-2xl border-2 border-dashed"
-                style={{
-                  width: "260px",
-                  height: "200px",
-                  borderColor: `${theme.accent}35`,
-                }}
-              />
+              {i === 0 ? (
+                <div 
+                  className="w-full h-full bg-white relative overflow-hidden flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => navigate('/computer-mode')}
+                >
+                  {/* Left Character */}
+                  <img 
+                    src="/assets/HUMAN.png" 
+                    alt="Human" 
+                    className="absolute left-0 bottom-0 h-full object-contain object-left-bottom" 
+                  />
+                  {/* Right Character */}
+                  <img 
+                    src="/assets/ROBOT.png" 
+                    alt="Robot" 
+                    className="absolute right-0 bottom-0 h-full object-contain object-right-bottom" 
+                  />
+                  
+                  {/* Center Content */}
+                  <div className="z-10 flex flex-col items-center justify-center">
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1.1]" 
+                      style={{ color: '#60a5fa', textShadow: '0 2px 10px rgba(96,165,250,0.3)' }}
+                    >
+                      COMPUTER
+                    </h2>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1]" 
+                      style={{ color: '#fb7185', textShadow: '0 2px 10px rgba(251,113,133,0.3)' }}
+                    >
+                      MODE
+                    </h2>
+                    
+                    <button 
+                      className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
+                      style={{ 
+                        backgroundColor: '#ffffff',
+                        color: 'black',
+                        boxShadow: '0 6px 0 0 black',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/computer-mode');
+                      }}
+                    >
+                      ENTER
+                    </button>
+                  </div>
+                </div>
+              ) : i === 1 ? (
+                <div 
+                  className="w-full h-full bg-white relative overflow-hidden flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => navigate('/custom-mode')}
+                >
+                  {/* Left Character */}
+                  <img 
+                    src="/assets/HUMAN.png" 
+                    alt="Human Player 1" 
+                    className="absolute left-0 bottom-0 h-full object-contain object-left-bottom" 
+                  />
+                  {/* Right Character */}
+                  <img 
+                    src="/assets/HUMAN-RED.png" 
+                    alt="Human Player 2" 
+                    className="absolute right-0 bottom-0 h-full object-contain object-right-bottom" 
+                  />
+                  
+                  {/* Center Content */}
+                  <div className="z-10 flex flex-col items-center justify-center">
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1.1]" 
+                      style={{ color: '#60a5fa', textShadow: '0 2px 10px rgba(96,165,250,0.3)' }}
+                    >
+                      CUSTOM
+                    </h2>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1]" 
+                      style={{ color: '#fb7185', textShadow: '0 2px 10px rgba(251,113,133,0.3)' }}
+                    >
+                      MODE
+                    </h2>
+                    
+                    <button 
+                      className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
+                      style={{ 
+                        backgroundColor: '#ffffff',
+                        color: 'black',
+                        boxShadow: '0 6px 0 0 black',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/custom-mode');
+                      }}
+                    >
+                      ENTER
+                    </button>
+                  </div>
+                </div>
+              ) : i === 2 ? (
+                <div 
+                  className="w-full h-full bg-white relative overflow-hidden flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => navigate('/levels-mode')}
+                >
+                  {/* Left Character */}
+                  <img 
+                    src="/assets/HUMANS-LOAD-BG.png" 
+                    alt="Humans" 
+                    className="absolute left-0 bottom-0 h-full max-w-[42%] object-contain object-left-bottom" 
+                    style={{ 
+                      WebkitMaskImage: 'linear-gradient(to right, black 80%, transparent 95%)', 
+                      maskImage: 'linear-gradient(to right, black 80%, transparent 95%)' 
+                    }}
+                  />
+                  {/* Right Character */}
+                  <img 
+                    src="/assets/ROBOTS-LOAD-BG.png" 
+                    alt="Robots" 
+                    className="absolute right-0 bottom-0 h-full max-w-[42%] object-contain object-right-bottom" 
+                    style={{ 
+                      WebkitMaskImage: 'linear-gradient(to left, black 80%, transparent 95%)', 
+                      maskImage: 'linear-gradient(to left, black 80%, transparent 95%)' 
+                    }}
+                  />
+                  
+                  {/* Center Content */}
+                  <div className="z-10 flex flex-col items-center justify-center" style={{ transform: 'translateX(-25px)' }}>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1.1]" 
+                      style={{ color: '#60a5fa', textShadow: '0 2px 10px rgba(96,165,250,0.3)' }}
+                    >
+                      LEVELS
+                    </h2>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1]" 
+                      style={{ color: '#fb7185', textShadow: '0 2px 10px rgba(251,113,133,0.3)' }}
+                    >
+                      MODE
+                    </h2>
+                    
+                    <button 
+                      className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
+                      style={{ 
+                        backgroundColor: '#ffffff',
+                        color: 'black',
+                        boxShadow: '0 6px 0 0 black',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/levels-mode');
+                      }}
+                    >
+                      ENTER
+                    </button>
+                  </div>
+                </div>
+              ) : i === 3 ? (
+                <div 
+                  className="w-full h-full bg-white relative overflow-hidden flex items-center justify-evenly cursor-pointer"
+                  onClick={() => navigate('/specials')}
+                >
+                  {/* Left Graphic: Bug */}
+                  <div className="text-[#10b981] drop-shadow-lg relative">
+                    <Bug size={150} strokeWidth={1.5} />
+                    <div className="absolute top-2 right-2 bg-white rounded-full p-1">
+                      <div className="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xl leading-none">
+                        ×
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Content: Text & Button */}
+                  <div className="z-10 flex flex-col items-center justify-center">
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1.1]" 
+                      style={{ color: '#60a5fa', textShadow: '0 2px 10px rgba(96,165,250,0.3)' }}
+                    >
+                      BUG HUNTER
+                    </h2>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1]" 
+                      style={{ color: '#fb7185', textShadow: '0 2px 10px rgba(251,113,133,0.3)' }}
+                    >
+                      ARENA
+                    </h2>
+                    <button 
+                      className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
+                      style={{ backgroundColor: '#ffffff', color: 'black', boxShadow: '0 6px 0 0 black' }}
+                      onClick={(e) => { e.stopPropagation(); navigate('/specials'); }}
+                    >
+                      ENTER
+                    </button>
+                  </div>
+                </div>
+              ) : i === 4 ? (
+                <div 
+                  className="w-full h-full bg-white relative overflow-hidden flex items-center justify-evenly cursor-pointer"
+                  onClick={() => navigate('/specials')}
+                >
+                  {/* Left Graphic: Podium */}
+                  <div className="flex items-end h-[150px] drop-shadow-lg">
+                    {/* 2nd */}
+                    <div className="w-16 h-[100px] bg-gray-300 flex flex-col items-center justify-start pt-2 rounded-t-md border-x border-t border-black/10">
+                      <span className="text-white font-black text-2xl drop-shadow-md">2</span>
+                      <Trophy size={20} className="text-white mt-auto mb-3 drop-shadow-md" />
+                    </div>
+                    {/* 1st */}
+                    <div className="w-20 h-[140px] bg-yellow-400 flex flex-col items-center justify-start pt-2 rounded-t-md border-x border-t border-black/10 z-10 shadow-xl">
+                      <span className="text-white font-black text-3xl drop-shadow-md">1</span>
+                      <Trophy size={28} className="text-white mt-auto mb-3 drop-shadow-md" />
+                    </div>
+                    {/* 3rd */}
+                    <div className="w-16 h-[80px] bg-amber-600 flex flex-col items-center justify-start pt-2 rounded-t-md border-x border-t border-black/10">
+                      <span className="text-white font-black text-2xl drop-shadow-md">3</span>
+                      <Trophy size={20} className="text-white mt-auto mb-3 drop-shadow-md" />
+                    </div>
+                  </div>
+
+                  {/* Right Content: Text & Button */}
+                  <div className="z-10 flex flex-col items-center justify-center">
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1.1]" 
+                      style={{ color: '#60a5fa', textShadow: '0 2px 10px rgba(96,165,250,0.3)' }}
+                    >
+                      GRAND
+                    </h2>
+                    <h2 
+                      className="font-sans font-black text-[3.5rem] leading-[1]" 
+                      style={{ color: '#fb7185', textShadow: '0 2px 10px rgba(251,113,133,0.3)' }}
+                    >
+                      TOURNAMENT
+                    </h2>
+                    <button 
+                      className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
+                      style={{ backgroundColor: '#ffffff', color: 'black', boxShadow: '0 6px 0 0 black' }}
+                      onClick={(e) => { e.stopPropagation(); navigate('/specials'); }}
+                    >
+                      ENTER
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -249,7 +482,7 @@ const SpecialsModePage = () => {
 
       <main className="flex-1 px-6 py-10 sm:px-12">
         <div className="mx-auto max-w-6xl">
-          <Carousel theme={currentTheme} />
+          <Carousel theme={currentTheme} navigate={navigate} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-2 max-w-3xl mx-auto">
             <SpecialCard

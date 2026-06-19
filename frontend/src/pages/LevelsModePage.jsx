@@ -451,7 +451,7 @@ const LevelsModePage = () => {
                 margin: '0 0 12px',
                 fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 52px)',
                 textTransform: 'uppercase', letterSpacing: 5,
-                background: `linear-gradient(135deg, white 30%, ${ac} 65%, ${ui})`,
+                backgroundImage: `linear-gradient(135deg, white 30%, ${ac} 65%, ${ui})`,
                 backgroundClip: 'text', WebkitBackgroundClip: 'text',
                 color: 'transparent', WebkitTextFillColor: 'transparent',
                 filter: `drop-shadow(0 0 30px 70)`,

@@ -197,7 +197,7 @@ const theme = THEMES[themeKey] || THEMES.purple;
             <h1 style={{
               margin: 0, fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 38,
               textTransform: 'uppercase', letterSpacing: 4,
-              background: `linear-gradient(135deg, white 30%, ${accent})`,
+              backgroundImage: `linear-gradient(135deg, white 30%, ${accent})`,
               backgroundClip: 'text', WebkitBackgroundClip: 'text',
               color: 'transparent', WebkitTextFillColor: 'transparent',
               transition: 'all 0.4s ease',

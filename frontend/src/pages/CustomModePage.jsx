@@ -341,7 +341,7 @@ const CustomModePage = () => {
             fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
             fontSize: 'clamp(52px, 9vw, 90px)',
             textTransform: 'uppercase', letterSpacing: 6,
-            background: `linear-gradient(135deg, white 20%, ${currentTheme.accent} 50%, ${currentTheme.ui} 80%)`,
+            backgroundImage: `linear-gradient(135deg, white 20%, ${currentTheme.accent} 50%, ${currentTheme.ui} 80%)`,
             backgroundClip: 'text', WebkitBackgroundClip: 'text',
             color: 'transparent', WebkitTextFillColor: 'transparent',
             filter: glitch

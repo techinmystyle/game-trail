@@ -501,7 +501,7 @@ const CustomModeLobbyPage = () => {
             <h1 style={{
               margin: 0, fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 32,
               textTransform: 'uppercase', letterSpacing: 3,
-              background: `linear-gradient(135deg, white 40%, ${ac})`,
+              backgroundImage: `linear-gradient(135deg, white 40%, ${ac})`,
               backgroundClip: 'text', WebkitBackgroundClip: 'text',
               color: 'transparent', WebkitTextFillColor: 'transparent',
             }}>

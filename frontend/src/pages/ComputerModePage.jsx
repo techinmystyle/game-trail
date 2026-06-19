@@ -269,7 +269,7 @@ const ComputerModePage = () => {
             fontFamily: 'Rajdhani, sans-serif', fontWeight: 900,
             fontSize: 'clamp(48px, 8vw, 80px)',
             textTransform: 'uppercase', letterSpacing: 6,
-            background: `linear-gradient(135deg, white 30%, ${ac} 70%, ${ui})`,
+            backgroundImage: `linear-gradient(135deg, white 30%, ${ac} 70%, ${ui})`,
             backgroundClip: 'text', WebkitBackgroundClip: 'text',
             color: 'transparent', WebkitTextFillColor: 'transparent',
             filter: glitch ? `drop-shadow(2px 0 0 ${ac}) drop-shadow(-2px 0 0 #ff0000)` : 'none',

@@ -565,7 +565,7 @@ const LobbyPage = () => {
             <h1 style={{
               margin: 0, fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 34,
               textTransform: 'uppercase', letterSpacing: 3,
-              background: `linear-gradient(135deg, white 50%, ${ac})`,
+              backgroundImage: `linear-gradient(135deg, white 30%, ${ac} 70%, ${currentTheme.ui})`,
               backgroundClip: 'text', WebkitBackgroundClip: 'text',
               color: 'transparent', WebkitTextFillColor: 'transparent',
             }}>
