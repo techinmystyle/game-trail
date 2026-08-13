@@ -127,9 +127,13 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
       border: `4px solid ${countdown <= 5 ? '#ef4444' : ac}40`,
       boxShadow: `0 0 30px ${countdown <= 5 ? '#ef4444' : ac}30`,
       display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+        {/* track ring */}
+        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+        {/* progress ring */}
         <circle cx="50" cy="50" r="46" fill="none" stroke={countdown <= 5 ? '#ef4444' : ac}
-          strokeWidth="4" strokeDasharray={`${2 * Math.PI * 46}`}
+          strokeWidth="4" strokeLinecap="round"
+          strokeDasharray={`${2 * Math.PI * 46}`}
           strokeDashoffset={`${2 * Math.PI * 46 * (1 - countdown / 15)}`}
           style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }} />
       </svg>
