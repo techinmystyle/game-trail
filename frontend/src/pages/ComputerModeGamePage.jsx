@@ -139,29 +139,48 @@ const ReadingPhaseOverlay = ({ challenge, countdown, ac }) => (
     </div>
 
     {/* Countdown ring */}
-    <div style={{
-      width: 100, height: 100, borderRadius: '50%', marginBottom: 24,
-      border: `4px solid ${countdown <= 5 ? '#ef4444' : '#10b981'}40`,
-      boxShadow: `0 0 30px ${countdown <= 5 ? '#ef4444' : '#10b981'}30`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative',
-    }}>
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-        {/* track ring */}
-        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
-        {/* progress ring */}
-        <circle cx="50" cy="50" r="46" fill="none" stroke={countdown <= 5 ? '#ef4444' : '#10b981'}
-          strokeWidth="4" strokeLinecap="round"
-          strokeDasharray={`${2 * Math.PI * 46}`}
-          strokeDashoffset={`${2 * Math.PI * 46 * (1 - countdown / 15)}`}
-          style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }} />
-      </svg>
-      <div style={{
-        fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 36,
-        color: countdown <= 5 ? '#ef4444' : '#10b981',
-        textShadow: `0 0 20px ${countdown <= 5 ? '#ef4444' : '#10b981'}60`,
-      }}>{countdown}</div>
-    </div>
+    {(() => {
+      const ringColor = countdown <= 5 ? '#ef4444' : '#10b981';
+      const r = 46;
+      const circumference = 2 * Math.PI * r;
+      // offset = 0 means full circle drawn; offset = circumference means nothing drawn
+      // As countdown goes from 15→0, offset goes from 0→circumference (ring drains)
+      const offset = circumference * (1 - countdown / 15);
+      return (
+        <div style={{
+          width: 120, height: 120, marginBottom: 24,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative',
+        }}>
+          <svg viewBox="0 0 100 100" style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            transform: 'rotate(-90deg)',
+          }}>
+            {/* dim track */}
+            <circle cx="50" cy="50" r={r} fill="none"
+              stroke="rgba(255,255,255,0.08)" strokeWidth="5" />
+            {/* animated progress arc */}
+            <circle cx="50" cy="50" r={r} fill="none"
+              stroke={ringColor} strokeWidth="5" strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s ease' }}
+            />
+          </svg>
+          {/* glow behind number */}
+          <div style={{
+            position: 'absolute', inset: 0, borderRadius: '50%',
+            boxShadow: `0 0 28px ${ringColor}50`,
+          }} />
+          <div style={{
+            fontFamily: 'Rajdhani, sans-serif', fontWeight: 900, fontSize: 38,
+            color: ringColor,
+            textShadow: `0 0 20px ${ringColor}80`,
+            zIndex: 1,
+          }}>{countdown}</div>
+        </div>
+      );
+    })()}
 
     <div style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: 28, letterSpacing: 2 }}>
       {countdown <= 5 ? '⚠️ GET READY — TIMER STARTS SOON!' : 'Editor locked · Read the problem carefully'}
