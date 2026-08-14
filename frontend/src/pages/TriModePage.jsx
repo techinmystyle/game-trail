@@ -213,7 +213,7 @@ const Carousel = ({ theme, navigate }) => {
               ) : i === 3 ? (
                 <div 
                   className="w-full h-full bg-white relative overflow-hidden flex items-center justify-evenly cursor-pointer"
-                  onClick={() => navigate('/specials')}
+                  onClick={() => navigate('/specials-mode')}
                 >
                   {/* Left Graphic: Bug */}
                   <div className="text-[#10b981] drop-shadow-lg relative">
@@ -242,7 +242,7 @@ const Carousel = ({ theme, navigate }) => {
                     <button 
                       className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
                       style={{ backgroundColor: '#ffffff', color: 'black', boxShadow: '0 6px 0 0 black' }}
-                      onClick={(e) => { e.stopPropagation(); navigate('/specials'); }}
+                      onClick={(e) => { e.stopPropagation(); navigate('/specials-mode'); }}
                     >
                       ENTER
                     </button>
@@ -251,7 +251,7 @@ const Carousel = ({ theme, navigate }) => {
               ) : i === 4 ? (
                 <div 
                   className="w-full h-full bg-white relative overflow-hidden flex items-center justify-evenly cursor-pointer"
-                  onClick={() => navigate('/specials')}
+                  onClick={() => navigate('/specials-mode')}
                 >
                   {/* Left Graphic: Podium */}
                   <div className="flex items-end h-[150px] drop-shadow-lg">
@@ -289,7 +289,7 @@ const Carousel = ({ theme, navigate }) => {
                     <button 
                       className="mt-5 px-10 py-2.5 font-sans font-black text-xl rounded-lg border-4 border-black transition-transform hover:scale-105 active:scale-95"
                       style={{ backgroundColor: '#ffffff', color: 'black', boxShadow: '0 6px 0 0 black' }}
-                      onClick={(e) => { e.stopPropagation(); navigate('/specials'); }}
+                      onClick={(e) => { e.stopPropagation(); navigate('/specials-mode'); }}
                     >
                       ENTER
                     </button>

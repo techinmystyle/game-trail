@@ -1,4 +1,5 @@
 import { Home, BookOpen, Zap, Trophy, User, Gift, ShoppingBag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const featureCards = [
   {
@@ -41,21 +42,23 @@ const featureCards = [
     id: 'profile',
     title: 'Profile',
     icon: User,
+    route: '/profile',
     description: 'Manage your account, view your achievements, and customize your gaming experience to match your preferences.',
   },
 ];
 
 export const DiscoverFeatures = ({ theme, id }) => {
-  // Professional content section colors - muted and readable
+  const navigate = useNavigate();
+  // Professional content section colors - using passed theme
   const contentTheme = {
-    primary: '#3B82F6', // Blue
-    primaryLight: '#60A5FA',
-    primaryDark: '#2563EB',
+    primary: theme.accent,
+    primaryLight: `${theme.accent}cc`,
+    primaryDark: `${theme.accent}99`,
     text: '#F9FAFB',
     textMuted: '#D1D5DB',
-    cardBg: 'rgba(30, 41, 59, 0.6)',
-    cardBorder: 'rgba(148, 163, 184, 0.2)',
-    cardHoverBorder: 'rgba(148, 163, 184, 0.4)',
+    cardBg: 'rgba(5, 5, 10, 0.6)',
+    cardBorder: `${theme.accent}20`,
+    cardHoverBorder: `${theme.accent}60`,
   };
 
   return (
@@ -84,11 +87,23 @@ export const DiscoverFeatures = ({ theme, id }) => {
 
           {/* Cards Grid - 3 columns with spacing */}
           <div className="flex flex-wrap justify-center gap-8" data-testid="features-cards-grid">
-            {featureCards.map((card) => {
+            {featureCards.map((card, index) => {
               const IconComponent = card.icon;
               const handleCardClick = () => {
-                const sectionId = card.id === 'home' ? 'hero-section' : card.id;
-                document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+                if (card.route) {
+                  navigate(card.route);
+                } else if (card.id === 'home') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  const routeMap = {
+                    'rules': '/rules',
+                    'store': '/store',
+                    'specials': '/specials-mode',
+                    'tri-mode': '/tri-mode',
+                    'leaderboard': '/dashboard', // no separate leaderboard page yet
+                  };
+                  navigate(routeMap[card.id] || '/dashboard');
+                }
               };
               return (
                 <div
@@ -99,10 +114,11 @@ export const DiscoverFeatures = ({ theme, id }) => {
                     backgroundColor: contentTheme.cardBg,
                     border: `1px solid ${contentTheme.cardBorder}`,
                     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                    animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = contentTheme.cardHoverBorder;
-                    e.currentTarget.style.boxShadow = `0 8px 30px rgba(59, 130, 246, 0.2)`;
+                    e.currentTarget.style.boxShadow = `0 8px 30px ${contentTheme.primary}40`;
                     e.currentTarget.style.transform = 'translateY(-4px)';
                   }}
                   onMouseLeave={(e) => {
@@ -117,7 +133,7 @@ export const DiscoverFeatures = ({ theme, id }) => {
                     <div
                       className="rounded-lg p-3 transition-all duration-300 group-hover:scale-110"
                       style={{
-                        backgroundColor: `rgba(59, 130, 246, 0.15)`,
+                        backgroundColor: `${contentTheme.primary}20`,
                         color: contentTheme.primaryLight,
                       }}
                     >
@@ -148,6 +164,12 @@ export const DiscoverFeatures = ({ theme, id }) => {
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 };

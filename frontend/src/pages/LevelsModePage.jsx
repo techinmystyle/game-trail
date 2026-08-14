@@ -342,7 +342,7 @@ const LevelsModePage = () => {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
               padding: '6px 20px', borderRadius: 20,
-              background: `${ac}12`, border: `1px solid 70`,
+              background: `${ac}12`, border: `1px solid ${ac}70`,
               fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: ac,
               textTransform: 'uppercase', letterSpacing: 4, marginBottom: 28,
             }}>
@@ -370,9 +370,9 @@ const LevelsModePage = () => {
 
             {/* Divider */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, transparent, 90)` }} />
+              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, transparent, ${ac}90)` }} />
               <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}70`, letterSpacing: 4, textTransform: 'uppercase' }}>MASTER · PROGRESS · CONQUER</span>
-              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, 90, transparent)` }} />
+              <div style={{ height: 1, width: 80, background: `linear-gradient(90deg, ${ac}90, transparent)` }} />
             </div>
 
             <p style={{
@@ -436,7 +436,7 @@ const LevelsModePage = () => {
               <ChevronRight size={20} style={{ color: ac }} />
             </button>
 
-            <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `80`, letterSpacing: 3 }}>
+            <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}80`, letterSpacing: 3 }}>
               CLICK TO SELECT YOUR LANGUAGE
             </div>
           </div>
@@ -454,11 +454,11 @@ const LevelsModePage = () => {
                 backgroundImage: `linear-gradient(135deg, white 30%, ${ac} 65%, ${ui})`,
                 backgroundClip: 'text', WebkitBackgroundClip: 'text',
                 color: 'transparent', WebkitTextFillColor: 'transparent',
-                filter: `drop-shadow(0 0 30px 70)`,
+                filter: `drop-shadow(0 0 30px ${ac}70)`,
               }}>
                 CHOOSE YOUR LANGUAGE
               </h2>
-              <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `99`, letterSpacing: 3, margin: 0 }}>
+              <p style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}99`, letterSpacing: 3, margin: 0 }}>
                 5 LANGUAGES · 100 LEVELS EACH · START ANYTIME
               </p>
             </div>
@@ -467,7 +467,7 @@ const LevelsModePage = () => {
             <div style={{
               display: 'flex', gap: 22, alignItems: 'stretch',
               overflowX: 'auto', paddingBottom: 8,
-              scrollbarWidth: 'thin', scrollbarColor: `80 transparent`,
+              scrollbarWidth: 'thin', scrollbarColor: `${ac}80 transparent`,
             }}>
               {COURSES.map((course, idx) => (
                 <div key={course.id} style={{ flex: '1 1 0', minWidth: 248, maxWidth: 310 }}>
@@ -502,7 +502,7 @@ const LevelsModePage = () => {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `70`, letterSpacing: 3 }}>
+              <div style={{ marginTop: 16, fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: `${ac}70`, letterSpacing: 3 }}>
                 SELECT A LANGUAGE TO BEGIN YOUR CAMPAIGN · ALL 100 LEVELS UNLOCKED
               </div>
             </div>
@@ -525,7 +525,7 @@ const LevelsModePage = () => {
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width:5px; height:5px; }
         ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:80; border-radius:3px; }
+        ::-webkit-scrollbar-thumb { background:${ac}80; border-radius:3px; }
       `}</style>
     </div>
   );

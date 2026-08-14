@@ -14,7 +14,7 @@ const PAGE_BG = {
 
 const LevelTemplate = ({ challenge, course, phase, levelNumber }) => {
   const navigate = useNavigate();
-  const [themeKey, setThemeKey] = useState("purple");
+  const [themeKey, setThemeKey] = useState(() => localStorage.getItem('themeKey') || 'purple');
   const [code, setCode] = useState(challenge.starterCode);
   const [consoleOutput, setConsoleOutput] = useState([]);
   const [isConsoleOpen, setIsConsoleOpen] = useState(true);
@@ -82,6 +82,10 @@ const LevelTemplate = ({ challenge, course, phase, levelNumber }) => {
 
   const currentTheme = themes[themeKey] || themes.purple;
   const pageBg = PAGE_BG[themeKey] || PAGE_BG.purple;
+
+  useEffect(() => {
+    localStorage.setItem('themeKey', themeKey);
+  }, [themeKey]);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {

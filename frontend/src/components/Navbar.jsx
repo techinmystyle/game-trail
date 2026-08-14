@@ -85,7 +85,7 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
     localStorage.removeItem('token');
     localStorage.removeItem('profileImage');
     localStorage.removeItem('username');
-    navigate('/auth');
+    navigate('/');
   };
 
   const isDashboard = currentPage === 'dashboard';
@@ -254,17 +254,7 @@ const Navbar = ({ currentPage, themeKey, setThemeKey, themes: passedThemes, curr
           >
             LEADERBOARD
           </button>
-          <button
-            onClick={() => navigate("/tutorials")}
-            className={`nav-btn relative tracking-wider transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 font-techno text-[15px] font-semibold ${
-              currentPage === 'tutorials' 
-                ? 'text-white nav-btn-active' 
-                : 'text-white/90 hover:text-white nav-btn-inactive'
-            }`}
-            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
-          >
-            TUTORIALS
-          </button>
+
         </nav>
       </div>
 

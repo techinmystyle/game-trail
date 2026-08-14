@@ -7,10 +7,10 @@ import { CustomCursor } from "../components/landing/CustomCursor";
 import { levelsAPI } from "../utils/api";
 
 const PAGE_BG = {
-  red: "#fff5f5",
-  blue: "#f4f8ff",
-  green: "#f4fff8",
-  purple: "#f8f4ff",
+  red: "#0d0305",
+  blue: "#020810",
+  green: "#020d07",
+  purple: "#06020d",
 };
 
 const COURSE_INFO = {
@@ -22,30 +22,39 @@ const COURSE_INFO = {
 };
 
 const PhaseCard = ({ phaseNumber, theme, isLocked, onStart, totalLevels = 5 }) => {
+  const difficultyLabel = phaseNumber <= 3 ? "Beginner" : phaseNumber <= 6 ? "Intermediate" : phaseNumber <= 9 ? "Advanced" : "Expert";
+  const diffColor = phaseNumber <= 3 ? "#10b981" : phaseNumber <= 6 ? "#f59e0b" : phaseNumber <= 9 ? "#ef4444" : theme.accent;
+
   return (
-    <div className={`flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ${isLocked ? 'opacity-60' : 'hover:shadow-lg hover:-translate-y-1'}`}>
+    <div className={`flex flex-col border rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ${isLocked ? 'opacity-50' : 'hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:-translate-y-1'}`}
+         style={{ 
+           background: isLocked ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
+           borderColor: isLocked ? 'rgba(255,255,255,0.1)' : `${theme.accent}40`,
+           backdropFilter: 'blur(10px)'
+         }}>
       {/* Top section with phase number - increased height */}
       <div
         className="flex items-end justify-center pb-6 pt-16 relative"
         style={{
-          background: isLocked ? '#9CA3AF' : theme.accent,
+          background: isLocked ? 'rgba(0,0,0,0.4)' : `linear-gradient(to top, ${theme.accent}30, transparent)`,
           transition: "background 0.4s ease",
+          borderBottom: `1px solid ${isLocked ? 'rgba(255,255,255,0.05)' : `${theme.accent}30`}`
         }}
       >
         <h3
           className="font-techno font-black text-white"
-          style={{ fontSize: "32px", letterSpacing: "0.1em" }}
+          style={{ fontSize: "32px", letterSpacing: "0.1em", textShadow: isLocked ? 'none' : `0 0 15px ${theme.accent}80` }}
         >
           PHASE {phaseNumber}
         </h3>
         {isLocked && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <svg
               width="40"
               height="40"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="white"
+              stroke="rgba(255,255,255,0.3)"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -57,54 +66,49 @@ const PhaseCard = ({ phaseNumber, theme, isLocked, onStart, totalLevels = 5 }) =
         )}
       </div>
 
-      <div className="border-t border-gray-200" />
-
       {/* Level breakdown section - only show for unlocked phases */}
       {!isLocked && (
-        <>
-          <div className="px-5 py-4 bg-gray-50">
-            <div className="space-y-2">
+        <div className="px-5 py-4" style={{ background: 'rgba(0,0,0,0.2)' }}>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: diffColor }}>
+                {difficultyLabel}
+              </span>
+              <span className="text-xs font-bold text-gray-300">{totalLevels} Tasks</span>
+            </div>
+            <div className="border-t pt-2 mt-2" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-green-600 uppercase tracking-wider">
-                  Beginner
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                  Total
                 </span>
-                <span className="text-xs font-bold text-gray-700">{totalLevels} Tasks</span>
-              </div>
-              <div className="border-t border-gray-300 pt-2 mt-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-800 uppercase tracking-wider">
-                    Total
-                  </span>
-                  <span className="text-sm font-black text-gray-900">{totalLevels} Tasks</span>
-                </div>
+                <span className="text-sm font-black text-white">{totalLevels} Tasks</span>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-200" />
-        </>
+        </div>
       )}
 
       {/* Spacer to push button to bottom */}
       <div className="flex-1" />
 
       {/* Bottom section with button */}
-      <div className="flex flex-col items-center gap-3 px-5 py-5">
+      <div className="flex flex-col items-center gap-3 px-5 py-5" style={{ background: 'rgba(0,0,0,0.2)' }}>
         {isLocked ? (
           <button
             type="button"
             disabled
-            className="font-sans font-bold text-white uppercase rounded-full cursor-not-allowed"
+            className="font-sans font-bold text-white uppercase rounded-full cursor-not-allowed border border-white/10"
             style={{
               width: "148px",
               paddingTop: "10px",
               paddingBottom: "10px",
-              background: "#9CA3AF",
+              background: "rgba(255,255,255,0.05)",
               letterSpacing: "0.22em",
               fontSize: "13px",
-              boxShadow: "0 2px 8px rgba(156, 163, 175, 0.3)",
+              color: 'rgba(255,255,255,0.3)'
             }}
           >
-            COMING SOON
+            LOCKED
           </button>
         ) : (
           <button
@@ -115,18 +119,18 @@ const PhaseCard = ({ phaseNumber, theme, isLocked, onStart, totalLevels = 5 }) =
               width: "148px",
               paddingTop: "10px",
               paddingBottom: "10px",
-              background: theme.accent,
+              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`,
               letterSpacing: "0.22em",
               fontSize: "13px",
-              boxShadow: `0 2px 8px ${theme.accent}55`,
+              boxShadow: `0 4px 15px ${theme.accent}60`,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = `0 4px 12px ${theme.accent}88`;
-              e.currentTarget.style.opacity = '0.9';
+              e.currentTarget.style.boxShadow = `0 6px 20px ${theme.accent}99`;
+              e.currentTarget.style.filter = 'brightness(1.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = `0 2px 8px ${theme.accent}55`;
-              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.boxShadow = `0 4px 15px ${theme.accent}60`;
+              e.currentTarget.style.filter = 'brightness(1)';
             }}
           >
             START
@@ -297,11 +301,11 @@ const PhasesModePage = () => {
           </div>
 
           <h1
-            className="font-techno font-black tracking-wide text-gray-900"
-            style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}
+            className="font-techno font-black tracking-wide text-white"
+            style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", textShadow: '0 0 20px rgba(255,255,255,0.2)' }}
           >
             SELECT YOUR{" "}
-            <span style={{ color: currentTheme.accent }}>PHASE</span>
+            <span style={{ color: currentTheme.accent, textShadow: `0 0 20px ${currentTheme.accent}40` }}>PHASE</span>
           </h1>
 
           <p

@@ -60,11 +60,32 @@ const AuthFlow = () => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        background: '#000',
-        color: '#fff',
-        fontFamily: 'monospace'
+        background: '#04020a',
+        flexDirection: 'column',
+        gap: '16px'
       }}>
-        Loading...
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          border: '3px solid rgba(168, 85, 247, 0.2)',
+          borderTopColor: '#a855f7',
+          animation: 'spin 1s ease-in-out infinite'
+        }} />
+        <span style={{
+          fontFamily: 'monospace',
+          fontSize: '13px',
+          color: '#a855f7',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase'
+        }}>
+          Authenticating...
+        </span>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

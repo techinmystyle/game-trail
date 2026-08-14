@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
-import { Plus, Clock, Trophy, Target, Award, ArrowRight, Activity, Cpu, Hexagon, Star, Crown, Flame, Zap, Shield, ChevronDown } from 'lucide-react';
 import { PrismThemeToggle } from '../components/landing/PrismThemeToggle';
 import { SpaceHeroScene } from '../components/landing/SpaceHeroScene';
 import { DiscoverFeatures } from '../components/landing/DiscoverFeatures';
@@ -57,7 +56,6 @@ const Dashboard = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [xpPoints, setXpPoints] = useState(0);
   const [gThunderPoints, setGThunderPoints] = useState(0);
-  const [isGameModeOpen, setIsGameModeOpen] = useState(false);
   const [particlesVisible, setParticlesVisible] = useState(false);
   const currentTheme = useMemo(() => themes[themeKey], [themeKey]);
   const navigate = useNavigate();
@@ -118,19 +116,6 @@ const Dashboard = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isGameModeOpen && !event.target.closest('[data-dropdown="game-mode"]')) {
-        setIsGameModeOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isGameModeOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

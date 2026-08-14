@@ -12,6 +12,8 @@ const AuthPage = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
@@ -35,13 +37,17 @@ const AuthPage = ({ onLoginSuccess }) => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+    setErrorMsg("");
+    setSuccessMsg("");
   };
 
   // API Handlers
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     if (password !== confirmPassword) {
-      return alert("Passwords do not match!");
+      return setErrorMsg("Passwords do not match!");
     }
     try {
       const response = await authAPI.register({
@@ -49,12 +55,12 @@ const AuthPage = ({ onLoginSuccess }) => {
         email,
         password,
       });
-      alert(response.data.message);
       setIsSignUp(false);
       clearInputs();
+      setSuccessMsg("Registration successful! Please sign in.");
     } catch (err) {
       console.error("Register error:", err);
-      alert(
+      setErrorMsg(
         err.response?.data?.message ||
           "Registration failed. Check console for details.",
       );
@@ -63,6 +69,8 @@ const AuthPage = ({ onLoginSuccess }) => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     try {
       const response = await authAPI.login({
         email,
@@ -72,7 +80,7 @@ const AuthPage = ({ onLoginSuccess }) => {
       onLoginSuccess();
     } catch (err) {
       console.error("Login error:", err);
-      alert(
+      setErrorMsg(
         err.response?.data?.message ||
           "Login failed. Check console for details.",
       );
@@ -81,12 +89,14 @@ const AuthPage = ({ onLoginSuccess }) => {
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     try {
       const response = await authAPI.forgotPassword({ email });
-      alert(response.data.message);
+      setSuccessMsg(response.data.message || "Reset link sent!");
     } catch (err) {
       console.error("Forgot password error:", err);
-      alert(
+      setErrorMsg(
         err.response?.data?.message ||
           "Failed to send reset email. Please try again later.",
       );
@@ -140,6 +150,8 @@ const AuthPage = ({ onLoginSuccess }) => {
         <div className="form-container sign-up-container">
           <form onSubmit={handleSignUp}>
             <h1 className="title-red">CREATE ACCOUNT</h1>
+            {errorMsg && <div className="error-msg">{errorMsg}</div>}
+            {successMsg && <div className="success-msg">{successMsg}</div>}
             <input
               type="text"
               placeholder="Name"
@@ -189,6 +201,8 @@ const AuthPage = ({ onLoginSuccess }) => {
         <div className="form-container sign-in-container">
           <form onSubmit={handleSignIn}>
             <h1 className="title-blue">SIGN IN</h1>
+            {errorMsg && <div className="error-msg">{errorMsg}</div>}
+            {successMsg && <div className="success-msg">{successMsg}</div>}
             <input
               type="email"
               placeholder="Email"
@@ -226,6 +240,8 @@ const AuthPage = ({ onLoginSuccess }) => {
             <p className="forgot-text">
               No worries. We'll help you recover your account quickly.
             </p>
+            {errorMsg && <div className="error-msg">{errorMsg}</div>}
+            {successMsg && <div className="success-msg">{successMsg}</div>}
             <input
               type="email"
               placeholder="Email"
@@ -288,6 +304,32 @@ const AuthPage = ({ onLoginSuccess }) => {
           </div>
         </div>
       </div>
+      <style>{`
+        .error-msg {
+          background-color: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          padding: 10px 14px;
+          border-radius: 6px;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          font-family: monospace;
+          font-size: 13px;
+          margin-bottom: 15px;
+          width: 100%;
+          text-align: center;
+        }
+        .success-msg {
+          background-color: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+          padding: 10px 14px;
+          border-radius: 6px;
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          font-family: monospace;
+          font-size: 13px;
+          margin-bottom: 15px;
+          width: 100%;
+          text-align: center;
+        }
+      `}</style>
     </div>
   );
 };

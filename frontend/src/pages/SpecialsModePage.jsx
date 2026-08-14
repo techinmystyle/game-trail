@@ -397,6 +397,13 @@ const SpecialCard = ({ title, badge, type, navigate, theme }) => {
         </span>
         <button
           type="button"
+          onClick={() => {
+            if (type === "tournament") {
+              navigate("/tournament-mode"); // Or wherever it should go
+            } else if (type === "bug-hunter") {
+              navigate("/bug-hunter"); // Or wherever it should go
+            }
+          }}
           className="font-sans font-bold text-white uppercase rounded-full transition-all duration-300 hover:scale-105"
           style={{
             width: "148px",
